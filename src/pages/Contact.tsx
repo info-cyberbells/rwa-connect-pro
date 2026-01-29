@@ -30,7 +30,7 @@ export default function Contact() {
   return (
     <PublicLayout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden section-padding">
+      <section className="relative overflow-hidden pt-20 pb-12">
         <div className="absolute inset-0 hero-gradient opacity-5" />
         <div className="container mx-auto container-padding relative">
           <div className="max-w-3xl mx-auto text-center">
@@ -55,7 +55,7 @@ export default function Contact() {
       </section>
 
       {/* Contact Section */}
-      <section className="section-padding pt-0">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {/* Contact Info */}

@@ -102,7 +102,7 @@ export default function HowItWorks() {
   return (
     <PublicLayout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden section-padding">
+      <section className="relative overflow-hidden pt-20 pb-12">
         <div className="absolute inset-0 hero-gradient opacity-5" />
         <div className="container mx-auto container-padding relative">
           <div className="max-w-3xl mx-auto text-center">
@@ -127,7 +127,7 @@ export default function HowItWorks() {
       </section>
 
       {/* Steps Section */}
-      <section className="section-padding">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="relative">
             {/* Vertical Line */}
@@ -177,7 +177,7 @@ export default function HowItWorks() {
       </section>
 
       {/* User Roles Section */}
-      <section className="section-padding bg-muted/50">
+      <section className="pt-16 pb-12 bg-muted/50">
         <div className="container mx-auto container-padding">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-heading font-bold mb-4">Role-Based Access</h2>
@@ -218,7 +218,7 @@ export default function HowItWorks() {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="relative overflow-hidden rounded-3xl hero-gradient p-8 md:p-16">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />

@@ -102,7 +102,7 @@ export default function FAQ() {
   return (
     <PublicLayout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden section-padding">
+      <section className="relative overflow-hidden pt-20 pb-12">
         <div className="absolute inset-0 hero-gradient opacity-5" />
         <div className="container mx-auto container-padding relative">
           <div className="max-w-3xl mx-auto text-center">
@@ -127,7 +127,7 @@ export default function FAQ() {
               transition={{ delay: 0.2 }}
               className="text-lg text-muted-foreground"
             >
-              Find answers to common questions about SocietySmartHub. 
+              Find answers to common questions about SocietySmartHub.
               Can't find what you're looking for? Contact our support team.
             </motion.p>
           </div>
@@ -135,7 +135,7 @@ export default function FAQ() {
       </section>
 
       {/* FAQ Section */}
-      <section className="section-padding pt-0">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="max-w-4xl mx-auto space-y-12">
             {faqCategories.map((category, categoryIndex) => (
@@ -169,7 +169,7 @@ export default function FAQ() {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding bg-muted/50">
+      <section className="pt-16 pb-12 bg-muted/50">
         <div className="container mx-auto container-padding">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-heading font-bold mb-4">

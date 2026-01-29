@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import navbarLogo from "@/assets/navbar.webp"
 
 export default function Register() {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ export default function Register() {
       <div className="hidden lg:flex flex-1 items-center justify-center hero-gradient relative overflow-hidden">
         <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-        
+
         <div className="relative text-center p-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -53,7 +54,7 @@ export default function Register() {
               Join Your Society
             </h2>
             <p className="text-primary-foreground/80 max-w-md">
-              Register as a member of your housing society. Once approved by your Society Admin, 
+              Register as a member of your housing society. Once approved by your Society Admin,
               you'll get access to all member features.
             </p>
           </motion.div>
@@ -67,13 +68,10 @@ export default function Register() {
           animate={{ opacity: 1, x: 0 }}
           className="w-full max-w-md"
         >
-          <Link to="/" className="flex items-center gap-2 mb-8">
-            <div className="p-2 rounded-xl hero-gradient">
-              <Building2 className="w-6 h-6 text-primary-foreground" />
+          <Link to="/" className="flex items-center gap-2 mb-4">
+            <div className="p-2 rounded-xl">
+              <img src={navbarLogo} alt="Logo" className="w-36 h-50 object-contain" />
             </div>
-            <span className="text-xl font-heading font-bold">
-              Society<span className="text-gradient">SmartHub</span>
-            </span>
           </Link>
 
           <h1 className="text-3xl font-heading font-bold mb-2">Member Registration</h1>
@@ -81,7 +79,19 @@ export default function Register() {
             Fill in your details to register as a society member
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
+            <input
+              type="text"
+              name="fake-username"
+              autoComplete="username"
+              className="hidden"
+            />
+            <input
+              type="password"
+              name="fake-password"
+              autoComplete="new-password"
+              className="hidden"
+            />
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name</Label>
               <div className="relative">
@@ -105,6 +115,7 @@ export default function Register() {
                   type="email"
                   placeholder="you@example.com"
                   className="pl-10"
+                  autoComplete="email"
                   required
                 />
               </div>

@@ -96,7 +96,7 @@ export default function Features() {
   return (
     <PublicLayout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden section-padding">
+      <section className="relative overflow-hidden pt-20 pb-12">
         <div className="absolute inset-0 hero-gradient opacity-5" />
         <div className="container mx-auto container-padding relative">
           <div className="max-w-3xl mx-auto text-center">
@@ -113,7 +113,7 @@ export default function Features() {
               transition={{ delay: 0.1 }}
               className="text-lg text-muted-foreground"
             >
-              Everything you need to manage your housing society efficiently, 
+              Everything you need to manage your housing society efficiently,
               all in one comprehensive platform.
             </motion.p>
           </div>
@@ -121,7 +121,7 @@ export default function Features() {
       </section>
 
       {/* Main Features */}
-      <section className="section-padding">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="space-y-16">
             {mainFeatures.map((feature, index) => (
@@ -130,9 +130,8 @@ export default function Features() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className={`grid lg:grid-cols-2 gap-12 items-center ${
-                  index % 2 === 1 ? "lg:flex-row-reverse" : ""
-                }`}
+                className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? "lg:flex-row-reverse" : ""
+                  }`}
               >
                 <div className={index % 2 === 1 ? "lg:order-2" : ""}>
                   <div className="w-14 h-14 rounded-xl hero-gradient flex items-center justify-center mb-6">
@@ -164,7 +163,7 @@ export default function Features() {
       </section>
 
       {/* Additional Features Grid */}
-      <section className="section-padding bg-muted/50">
+      <section className="pt-16 pb-12 bg-muted/50">
         <div className="container mx-auto container-padding">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-heading font-bold mb-4">And Much More...</h2>
@@ -172,7 +171,7 @@ export default function Features() {
               Additional features to make society management even easier.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {additionalFeatures.map((feature, index) => (
               <motion.div
@@ -197,7 +196,7 @@ export default function Features() {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="text-center">
             <h2 className="text-3xl font-heading font-bold mb-4">

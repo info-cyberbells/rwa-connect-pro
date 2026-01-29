@@ -79,7 +79,7 @@ export default function Pricing() {
   return (
     <PublicLayout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden section-padding">
+      <section className="relative overflow-hidden pt-20 pb-12">
         <div className="absolute inset-0 hero-gradient opacity-5" />
         <div className="container mx-auto container-padding relative">
           <div className="max-w-3xl mx-auto text-center">
@@ -103,7 +103,7 @@ export default function Pricing() {
       </section>
 
       {/* Pricing Cards */}
-      <section className="section-padding pt-0">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {plans.map((plan, index) => (
@@ -166,7 +166,7 @@ export default function Pricing() {
       </section>
 
       {/* Enterprise Section */}
-      <section className="section-padding bg-muted/50">
+      <section className="pt-16 pb-12 bg-muted/50">
         <div className="container mx-auto container-padding">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-heading font-bold mb-4">
@@ -183,7 +183,7 @@ export default function Pricing() {
       </section>
 
       {/* FAQ Section */}
-      <section className="section-padding">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-heading font-bold mb-8 text-center">

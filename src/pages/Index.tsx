@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { 
-  Building2, Users, CreditCard, Shield, Bell, FileText, 
+import {
+  Building2, Users, CreditCard, Shield, Bell, FileText,
   CheckCircle2, ArrowRight, Star, Quote
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -73,8 +73,8 @@ export default function Index() {
         <div className="absolute inset-0 hero-gradient opacity-5" />
         <div className="absolute top-20 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        
-        <div className="container mx-auto container-padding section-padding relative">
+
+        <div className="container mx-auto container-padding pt-20 pb-12 relative">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -86,7 +86,7 @@ export default function Index() {
                 Trusted by 500+ Housing Societies
               </span>
             </motion.div>
-            
+
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -96,17 +96,17 @@ export default function Index() {
               The Smartest Way to{" "}
               <span className="text-gradient">Manage Your Society</span>
             </motion.h1>
-            
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto"
             >
-              Streamline member management, payment tracking, and community communication 
+              Streamline member management, payment tracking, and community communication
               with India's most trusted society management platform.
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -124,7 +124,7 @@ export default function Index() {
               </Button>
             </motion.div>
           </div>
-          
+
           {/* Stats */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -145,7 +145,7 @@ export default function Index() {
       </section>
 
       {/* Features Section */}
-      <section className="section-padding bg-muted/50">
+      <section className="pt-16 pb-12 bg-muted/50">
         <div className="container mx-auto container-padding">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
@@ -155,7 +155,7 @@ export default function Index() {
               From member onboarding to payment tracking, we've got every aspect of society management covered.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <motion.div
@@ -178,7 +178,7 @@ export default function Index() {
       </section>
 
       {/* Value Proposition Section */}
-      <section className="section-padding">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -253,7 +253,7 @@ export default function Index() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="section-padding bg-muted/50">
+      <section className="pt-16 pb-12 bg-muted/50">
         <div className="container mx-auto container-padding">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
@@ -263,7 +263,7 @@ export default function Index() {
               See what society administrators and members have to say about SocietySmartHub.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <motion.div
@@ -287,18 +287,18 @@ export default function Index() {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="relative overflow-hidden rounded-3xl hero-gradient p-8 md:p-16">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
-            
+
             <div className="relative text-center">
               <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary-foreground mb-4">
                 Ready to Transform Your Society Management?
               </h2>
               <p className="text-primary-foreground/80 max-w-2xl mx-auto mb-8">
-                Join 500+ societies that have already simplified their operations with SocietySmartHub. 
+                Join 500+ societies that have already simplified their operations with SocietySmartHub.
                 Start your free trial today.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
+import navbarLogo from "@/assets/navbar.webp"
 
 type UserRole = "member" | "society-admin" | "super-admin";
 
@@ -48,13 +49,10 @@ export default function Login() {
           animate={{ opacity: 1, x: 0 }}
           className="w-full max-w-md"
         >
-          <Link to="/" className="flex items-center gap-2 mb-8">
-            <div className="p-2 rounded-xl hero-gradient">
-              <Building2 className="w-6 h-6 text-primary-foreground" />
+          <Link to="/" className="flex items-center gap-2 mb-4">
+            <div className="p-2 rounded-xl">
+              <img src={navbarLogo} alt="Logo" className="w-36 h-50 object-contain" />
             </div>
-            <span className="text-xl font-heading font-bold">
-              Society<span className="text-gradient">SmartHub</span>
-            </span>
           </Link>
 
           <h1 className="text-3xl font-heading font-bold mb-2">Welcome Back</h1>
@@ -69,17 +67,15 @@ export default function Login() {
               {[
                 { value: "member", label: "Member" },
                 { value: "society-admin", label: "Society Admin" },
-                { value: "super-admin", label: "Super Admin" },
               ].map((role) => (
                 <button
                   key={role.value}
                   type="button"
                   onClick={() => setSelectedRole(role.value as UserRole)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    selectedRole === role.value
-                      ? "hero-gradient text-primary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-accent"
-                  }`}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${selectedRole === role.value
+                    ? "hero-gradient text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-accent"
+                    }`}
                 >
                   {role.label}
                 </button>
@@ -87,7 +83,19 @@ export default function Login() {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
+            <input
+              type="text"
+              name="fake-username"
+              autoComplete="username"
+              className="hidden"
+            />
+            <input
+              type="password"
+              name="fake-password"
+              autoComplete="new-password"
+              className="hidden"
+            />
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -97,20 +105,21 @@ export default function Login() {
                   type="email"
                   placeholder="you@example.com"
                   className="pl-10"
+                  autoComplete="email"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between text-primary cursor-pointer">
                 <Label htmlFor="password">Password</Label>
-                <Link
+                {/* <Link
                   to="/forgot-password"
                   className="text-sm text-primary hover:underline"
-                >
-                  Forgot password?
-                </Link>
+                > */}
+                Forgot password?
+                {/* </Link> */}
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -140,13 +149,14 @@ export default function Login() {
               <ArrowRight className="w-4 h-4" />
             </Button>
           </form>
-
-          <p className="mt-8 text-center text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-primary hover:underline font-medium">
-              Register here
-            </Link>
-          </p>
+          {selectedRole === "society-admin" && (
+            <p className="mt-8 text-center text-muted-foreground">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-primary hover:underline font-medium">
+                Register here
+              </Link>
+            </p>
+          )}
         </motion.div>
       </div>
 
@@ -154,7 +164,7 @@ export default function Login() {
       <div className="hidden lg:flex flex-1 items-center justify-center hero-gradient relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-        
+
         <div className="relative text-center p-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -52,7 +52,7 @@ export default function About() {
   return (
     <PublicLayout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden section-padding">
+      <section className="relative overflow-hidden pt-20 pb-12">
         <div className="absolute inset-0 hero-gradient opacity-5" />
         <div className="container mx-auto container-padding relative">
           <div className="max-w-3xl mx-auto text-center">
@@ -69,7 +69,7 @@ export default function About() {
               transition={{ delay: 0.1 }}
               className="text-lg text-muted-foreground"
             >
-              SocietySmartHub was founded with a simple mission: to make society management 
+              SocietySmartHub was founded with a simple mission: to make society management
               effortless, transparent, and accessible for every housing community in India.
             </motion.p>
           </div>
@@ -77,26 +77,26 @@ export default function About() {
       </section>
 
       {/* Story Section */}
-      <section className="section-padding bg-muted/50">
+      <section className="pt-16 pb-12 bg-muted/50">
         <div className="container mx-auto container-padding">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-heading font-bold mb-6">Our Story</h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  Founded in 2020, SocietySmartHub emerged from a real need experienced by our founders 
-                  who served on their own housing society committees. The challenges of managing member 
-                  records, tracking payments, and communicating effectively with residents inspired us 
+                  Founded in 2020, SocietySmartHub emerged from a real need experienced by our founders
+                  who served on their own housing society committees. The challenges of managing member
+                  records, tracking payments, and communicating effectively with residents inspired us
                   to create a better solution.
                 </p>
                 <p>
-                  Today, we serve over 500 housing societies across India, helping them streamline 
-                  operations, improve transparency, and build stronger communities. Our platform handles 
+                  Today, we serve over 500 housing societies across India, helping them streamline
+                  operations, improve transparency, and build stronger communities. Our platform handles
                   millions of rupees in payment tracking and serves over 50,000 residents.
                 </p>
                 <p>
-                  We continue to innovate and expand our features based on direct feedback from society 
-                  administrators and members, ensuring that SocietySmartHub remains the most comprehensive 
+                  We continue to innovate and expand our features based on direct feedback from society
+                  administrators and members, ensuring that SocietySmartHub remains the most comprehensive
                   and user-friendly society management platform in the market.
                 </p>
               </div>
@@ -114,7 +114,7 @@ export default function About() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="section-padding">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="grid md:grid-cols-2 gap-8">
             <motion.div
@@ -128,12 +128,12 @@ export default function About() {
               </div>
               <h3 className="text-2xl font-heading font-bold mb-4">Our Mission</h3>
               <p className="text-muted-foreground">
-                To empower housing societies with technology that simplifies administration, 
-                enhances transparency, and strengthens community bonds. We believe every society 
+                To empower housing societies with technology that simplifies administration,
+                enhances transparency, and strengthens community bonds. We believe every society
                 deserves access to professional-grade management tools.
               </p>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -145,8 +145,8 @@ export default function About() {
               </div>
               <h3 className="text-2xl font-heading font-bold mb-4">Our Vision</h3>
               <p className="text-muted-foreground">
-                To become the most trusted society management platform in India, serving 
-                millions of residents and setting the standard for how communities operate 
+                To become the most trusted society management platform in India, serving
+                millions of residents and setting the standard for how communities operate
                 in the digital age.
               </p>
             </motion.div>
@@ -155,7 +155,7 @@ export default function About() {
       </section>
 
       {/* Values Section */}
-      <section className="section-padding bg-muted/50">
+      <section className="pt-16 pb-12 bg-muted/50">
         <div className="container mx-auto container-padding">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-heading font-bold mb-4">Our Values</h2>
@@ -163,7 +163,7 @@ export default function About() {
               The principles that guide everything we do at SocietySmartHub.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value, index) => (
               <motion.div
@@ -186,7 +186,7 @@ export default function About() {
       </section>
 
       {/* Team Section */}
-      <section className="section-padding">
+      <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-heading font-bold mb-4">Meet Our Team</h2>
@@ -194,7 +194,7 @@ export default function About() {
               The passionate people behind SocietySmartHub working to transform society management.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member, index) => (
               <motion.div

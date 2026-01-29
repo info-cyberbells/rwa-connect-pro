@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Building2, Mail, Phone, MapPin } from "lucide-react";
+import navbarLogo from "@/assets/navbar.webp"
 
 const footerLinks = {
   product: [
@@ -28,13 +29,10 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-6">
-              <div className="p-2 rounded-xl bg-primary">
-                <Building2 className="w-6 h-6 text-primary-foreground" />
+            <Link to="/" className="flex items-center gap-2 mb-4">
+              <div className="p-2 rounded-xl">
+                <img src={navbarLogo} alt="Logo" className="w-36 h-50 object-contain" />
               </div>
-              <span className="text-xl font-heading font-bold">
-                SocietySmartHub
-              </span>
             </Link>
             <p className="text-background/70 mb-6 max-w-sm">
               The smartest way to manage your society. Streamline operations, enhance communication, and simplify payments for your residential community.

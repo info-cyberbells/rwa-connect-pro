@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import navbarLogo from "@/assets/navbar.webp"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -24,12 +25,9 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="p-2 rounded-xl hero-gradient">
-              <Building2 className="w-6 h-6 text-primary-foreground" />
+            <div className="p-2 rounded-xl">
+              <img src={navbarLogo} alt="Logo" className="w-36 h-50 object-contain" />
             </div>
-            <span className="text-xl font-heading font-bold text-foreground">
-              Society<span className="text-gradient">SmartHub</span>
-            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -39,9 +37,9 @@ export function Navbar() {
                 key={link.href}
                 to={link.href}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "px-4 py-2 rounded-lg text-base font-medium transition-colors",
                   location.pathname === link.href
-                    ? "text-primary bg-accent"
+                    ? "text-primary font-semibold"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
@@ -52,10 +50,10 @@ export function Navbar() {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button variant="ghost" asChild>
+            <Button variant="ghost" asChild className="text-base">
               <Link to="/login">Login</Link>
             </Button>
-            <Button asChild>
+            <Button asChild className="text-base">
               <Link to="/register">Get Started</Link>
             </Button>
           </div>
@@ -90,10 +88,10 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border/50">
-                <Button variant="outline" asChild className="w-full">
+                <Button variant="outline" asChild className="w-full text-base">
                   <Link to="/login" onClick={() => setIsOpen(false)}>Login</Link>
                 </Button>
-                <Button asChild className="w-full">
+                <Button asChild className="w-full text-base">
                   <Link to="/register" onClick={() => setIsOpen(false)}>Get Started</Link>
                 </Button>
               </div>
