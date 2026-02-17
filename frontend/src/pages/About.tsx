@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Target, Eye, Heart, Users, Award, Shield } from "lucide-react";
+import { Target, Eye, Heart,CreditCard, Lock,Users, CheckCircle,Award, Shield } from "lucide-react";
 import { PublicLayout } from "@/components/layout/PublicLayout";
+
 
 const values = [
   {
@@ -47,7 +48,33 @@ const team = [
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=face",
   },
 ];
-
+  const features = [
+    {
+      title: "Trust & Responsibility",
+      desc: "Focused on secure, transparent, and reliable society management.",
+      icon: <Shield className="w-8 h-8 text-blue-600" />,
+    },
+    {
+      title: "Data Privacy & Security",
+      desc: "Member and society data is kept secure with controlled access.",
+      icon: <Lock className="w-8 h-8 text-green-600" />,
+    },
+    {
+      title: "Transparent Payment Records",
+      desc: "Payments are recorded clearly for easy tracking and verification.",
+      icon: <CreditCard className="w-8 h-8 text-yellow-600" />,
+    },
+    {
+      title: "Role-Based Access",
+      desc: "Access is given based on roles for committees and members.",
+      icon: <Users className="w-8 h-8 text-purple-600" />,
+    },
+    {
+      title: "Reliable System",
+      desc: "Built to support smooth and organized daily society operations.",
+      icon: <CheckCircle className="w-8 h-8 text-red-600" />,
+    },
+  ];
 export default function About() {
   return (
     <PublicLayout>
@@ -220,6 +247,30 @@ export default function About() {
           </div>
         </div>
       </section>
+      {/* Trust & Responsibility section */}
+  <section className="bg-gray-50 py-16">
+      <div className="max-w-7xl mx-auto px-6 text-center mb-12">
+        <h2 className="text-3xl font-bold text-gray-800">Our Core Values</h2>
+        <p className="text-gray-600 mt-4">
+          We focus on building trust, security, and efficiency for every society member.
+        </p>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {features.map((feature, index) => (
+          <div
+            key={index}
+            className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition cursor-pointer"
+          >
+            <div className="mb-4">{feature.icon}</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">{feature.title}</h3>
+            <p className="text-gray-600">{feature.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+          {/* Trust & Responsibility section end */}
+
     </PublicLayout>
   );
 }

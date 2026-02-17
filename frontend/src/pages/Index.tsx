@@ -26,7 +26,7 @@ const features = [
   {
     icon: FileText,
     title: "Document Management",
-    description: "Store and share important documents securely with all stakeholders.",
+  description: "Store and share society documents securely so members can access them when needed.",
   },
   {
     icon: Shield,
@@ -103,8 +103,7 @@ export default function Index() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto"
             >
-              Streamline member management, payment tracking, and community communication
-              with India's most trusted society management platform.
+            Manage members, track payments, and communicate with residents efficiently using a trusted society management platform built for Indian housing communities
             </motion.p>
 
             <motion.div
@@ -149,11 +148,11 @@ export default function Index() {
         <div className="container mx-auto container-padding">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
-              Everything You Need to Manage Your Society
+  Simplifying Everyday Society Management
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              From member onboarding to payment tracking, we've got every aspect of society management covered.
-            </p>
+  Handle member onboarding, maintenance billing, payment tracking, and resident
+  communication through a single platform built for practical society management.            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -187,12 +186,14 @@ export default function Index() {
               </h2>
               <div className="space-y-4">
                 {[
-                  "Easy Society Management with intuitive dashboards",
-                  "Member Self-Registration with Aadhaar verification",
-                  "Transparent Payment Tracking and proof submission",
-                  "Automated Notifications for dues and announcements",
-                  "Secure Document Storage and sharing",
-                  "Multi-level Approval Workflows",
+                  
+ "Easy dashboards that help manage daily society work in one place",
+ "Member self-registration with Aadhaar verification for better record accuracy",
+ "Clear payment tracking with proper records and payment proof options",
+ "Automatic notifications for maintenance dues and important updates",
+ "Secure storage and sharing of society documents when needed",
+ "Approval workflows to manage requests and decisions in an organized way",
+
                 ].map((item, index) => (
                   <motion.div
                     key={index}

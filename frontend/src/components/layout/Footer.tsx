@@ -35,8 +35,7 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-background/70 mb-6 max-w-sm">
-              The smartest way to manage your society. Streamline operations, enhance communication, and simplify payments for your residential community.
-            </p>
+Simplify society management with better coordination, clear communication, and structured payment tracking for your residential community.            </p>
             <div className="flex flex-col gap-3 text-sm text-background/70">
               <a href="mailto:contact@societysmarthub.com" className="flex items-center gap-2 hover:text-background transition-colors">
                 <Mail className="w-4 h-4" />

@@ -33,7 +33,7 @@ const faqCategories = [
     questions: [
       {
         question: "How do I register my society on SocietySmartHub?",
-        answer: "Society registration is handled by our team. Contact us through the Contact page or call us, and our onboarding team will help set up your society account and provide admin credentials to the society committee.",
+        answer: "Societies can register themselves through the sign-in page or contact our team for assistance. Our onboarding team can help set up the society account and provide admin access to the committee.",
       },
       {
         question: "How do members register on the platform?",
