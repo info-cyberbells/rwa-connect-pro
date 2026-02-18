@@ -23,6 +23,13 @@ import SocietyAdminDashboard from "./pages/dashboard/SocietyAdminDashboard";
 import MemberDashboard from "./pages/dashboard/MemberDashboard";
 
 import NotFound from "./pages/NotFound";
+// import Admin from "./pages/SocietySetup/Admin/Admin"
+
+import SocietyIdentitySetup from "./pages/SocietySetup/SuperAdmin/SocietyIdentitySetup"
+import StructureStep from "./pages/SocietySetup/User/StructureStep"
+import AddressStep from "./pages/SocietySetup/User/AddressStep"
+import FinalizeSetup from "./pages/SocietySetup/User/FinalizeSetup"
+import AdminDetailsStep from "./pages/SocietySetup/Admin/AdminDetailsStep"
 
 const queryClient = new QueryClient();
 
@@ -60,6 +67,14 @@ const App = () => (
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
+          {/* societyIdentity */}
+          {/* <Route path="/admin/*" element={<Admin />} /> */}
+          <Route path="/societyIdentitySetup/*" element={<SocietyIdentitySetup />} />
+          <Route path="/structureStep/*" element={< StructureStep />} />
+          <Route path="/addressStep/*" element={< AddressStep />} />
+          <Route path="/finalizeSetup/*" element={< FinalizeSetup />} />
+          <Route path="/adminDetailsStep/*" element={< AdminDetailsStep />} />
+
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
