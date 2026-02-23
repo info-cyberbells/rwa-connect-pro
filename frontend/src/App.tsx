@@ -30,6 +30,19 @@ import StructureStep from "./pages/SocietySetup/User/StructureStep"
 import AddressStep from "./pages/SocietySetup/User/AddressStep"
 import FinalizeSetup from "./pages/SocietySetup/User/FinalizeSetup"
 import AdminDetailsStep from "./pages/SocietySetup/Admin/AdminDetailsStep"
+import AdminDashboard from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/AdminDashboard"
+import GlobalSocietyDirectory from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/GlobalSocietyDirectory"
+import SocietyDetails from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietyDetails"
+import RegistrationReview from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/RegistrationReview"
+import SupportTickets from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SupportTickets"
+import GlobalPayments from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/GlobalPayments"
+import NotificationsHub from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/NotificationsHub"
+import DocumentCenter from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/DocumentCenter"
+import SecurityAndPreferences from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SecurityAndPreferences"
+import SuperAdminSettings from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SuperAdminSettings"
+import SystemSettings from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SystemSettings";
+
+import { Sidebar } from "lucide-react";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +87,20 @@ const App = () => (
           <Route path="/addressStep/*" element={< AddressStep />} />
           <Route path="/finalizeSetup/*" element={< FinalizeSetup />} />
           <Route path="/adminDetailsStep/*" element={< AdminDetailsStep />} />
+
+          <Route path="/sidebar/*" element={<Sidebar />} />
+          <Route path="/adminDashboard/*" element={<AdminDashboard />} />
+        <Route path="/globalSocietyDirectory" element={<GlobalSocietyDirectory />} />
+<Route path="/globalSocietyDirectory/:id" element={<SocietyDetails />} />
+          <Route path="/globalPayments/*" element={<GlobalPayments/>} />
+          <Route path="/registrationReview/*" element={<RegistrationReview/>} />
+          <Route path="/support-Tickets/*" element={<SupportTickets/>} />
+          <Route path="/notificationsHub/*" element={<NotificationsHub/>} />
+          <Route path="/documentCenter/*" element={<DocumentCenter/>} />
+          <Route path="/superAdminSettings/*" element={<SuperAdminSettings/>} />
+          <Route path="/securityAndPreferences/*" element={<SecurityAndPreferences/>} />
+          <Route path="/systemSettings/*" element={<SystemSettings/>} />
+
 
         </Routes>
       </BrowserRouter>
