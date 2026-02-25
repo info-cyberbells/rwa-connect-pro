@@ -4,12 +4,14 @@ import {
   Building,
   CreditCard,
   FileText,
-  Settings,
+  Settings, 
   Menu,
   X,
   Bell,
   Building2,
   HelpCircle,
+  Shield, 
+  Cog, 
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -24,7 +26,7 @@ const Sidebar: React.FC = () => {
     },
     {
       name: "Societies",
-      path: "/globalSocietyDirectory", 
+      path: "/globalSocietyDirectory",
       icon: <Building className="w-5 h-5" />,
     },
     {
@@ -32,13 +34,12 @@ const Sidebar: React.FC = () => {
       path: "/globalPayments",
       icon: <CreditCard className="w-5 h-5" />,
     },
-  
     {
       name: "Support Tickets",
       path: "/support-tickets",
       icon: <HelpCircle className="w-5 h-5" />,
     },
-      {
+    {
       name: "Notifications",
       path: "/notificationsHub",
       icon: <Bell className="w-5 h-5" />,
@@ -48,15 +49,21 @@ const Sidebar: React.FC = () => {
       path: "/documentCenter",
       icon: <FileText className="w-5 h-5" />,
     },
+    
     {
-      name: "Settings",
+      name: "Super Admin Settings",
       path: "/superAdminSettings",
       icon: <Settings className="w-5 h-5" />,
     },
     {
-      name: "Security& Prefs",
+      name: "System Settings",
+      path: "/systemSettings",
+      icon: <Cog className="w-5 h-5" />, 
+    },
+    {
+      name: "Security & Prefs",
       path: "/securityAndPreferences",
-      icon: <Settings className="w-5 h-5" />,
+      icon: <Shield className="w-5 h-5" />, 
     },
   ];
 
@@ -67,11 +74,10 @@ const Sidebar: React.FC = () => {
         <button onClick={() => setOpen(true)}>
           <Menu className="w-6 h-6 text-gray-700" />
         </button>
- <div className="p-2 rounded-xl hero-gradient">
-                <Building2 className="w-5 h-5 text-primary-foreground" />
-              </div>
+        <div className="p-2 rounded-xl bg-blue-600 ml-2">
+          <Building2 className="w-5 h-5 text-white" />
+        </div>
         <span className="ml-4 font-extrabold text-blue-600 text-lg">
-          
           SocietyHub
         </span>
       </div>
@@ -93,22 +99,24 @@ const Sidebar: React.FC = () => {
           md:translate-x-0
         `}
       >
-        {/* Logo */}
+        {/* Logo Section */}
         <div className="p-6 flex items-center justify-between border-b">
-           <div className="p-2 rounded-xl hero-gradient">
-                <Building2 className="w-5 h-5 text-primary-foreground" />
-              </div>
-         <span className="text-xl font-heading font-bold">
-  <span className="text-slate-900">Society</span>
-  <span className="text-blue-600">SmartHub</span>
-</span>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-blue-600">
+              <Building2 className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold">
+              <span className="text-slate-900">Society</span>
+              <span className="text-blue-600">Hub</span>
+            </span>
+          </div>
           <button onClick={() => setOpen(false)} className="md:hidden">
             <X className="w-5 h-5 text-gray-600" />
           </button>
         </div>
 
-        {/* Menu */}
-        <nav className="flex flex-col px-4 py-6 space-y-2 text-sm font-semibold">
+        {/* Menu Section */}
+        <nav className="flex flex-col px-4 py-6 space-y-1 text-sm font-semibold overflow-y-auto max-h-[calc(100vh-100px)]">
           {menuItems.map((item) => (
             <NavLink
               key={item.name}
@@ -116,11 +124,10 @@ const Sidebar: React.FC = () => {
               onClick={() => setOpen(false)}
               className={({ isActive }) =>
                 `
-                flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer
-                ${
-                  isActive
-                    ? "bg-blue-50 text-blue-600 font-bold shadow-sm"
-                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition"
+                flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all duration-200
+                ${isActive
+                  ? "bg-blue-50 text-blue-600 font-bold shadow-sm"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }
               `
               }
