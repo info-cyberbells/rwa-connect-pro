@@ -49,6 +49,8 @@ import NoticeBoard from "./pages/SocietyAdmin/NoticeBoard";
 import Finances from "./pages/SocietyAdmin/Finances";
 import AdminSettings from "./pages/SocietyAdmin/AdminSettings";
 import NotificationHub from "./pages/SocietyAdmin/NotificationHub";
+import Maintenance from "./pages/SocietyAdmin/Maintenance";
+import AddPenaltyFine from "./pages/SocietyAdmin/AddPenaltyFine";
 
 import{DashboardLayout} from "./components/layout/DashboardLayout"
 import ResidentialDashboard from "./pages/ResidentialHub/ResidentialDashboard"
@@ -94,7 +96,7 @@ const App = () => (
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
 
-          {/*  Super Admin Routes societyIdentity */}
+          {/*  Super Admin Routes */}
           {/* <Route path="/admin/*" element={<Admin />} /> */}
           <Route path="/societyIdentitySetup/*" element={<SocietyIdentitySetup />} />
           <Route path="/structureStep/*" element={< StructureStep />} />
@@ -123,6 +125,8 @@ const App = () => (
           <Route path="/finances/*" element={<Finances />} />
           <Route path="/adminSettings/*" element={<AdminSettings />} />
           <Route path="/notificationHub/*" element={<NotificationHub />} />
+          <Route path="/maintenance/*" element={<Maintenance/>} />
+         <Route path="/addPenaltyFine/*" element={<AddPenaltyFine/>} /> 
 
          
 {/* --- RESIDENTIAL ADMIN ROUTES (With Sidebar) --- */}

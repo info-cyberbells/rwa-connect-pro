@@ -7,22 +7,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import navbarLogo from "@/assets/navbar.webp"
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store/store"; // adjust path
+import { login } from "../features/authSlice";
 
 type UserRole = "member" | "society-admin" | "super-admin";
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { isLoading, error, user } = useSelector((state: RootState) => state.auth);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>("member");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
 
-    // Simulate login
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const resultAction = await dispatch(
+    login({ email, password })
+  );
 
+  if (login.fulfilled.match(resultAction)) {
     toast({
       title: "Login Successful",
       description: "Welcome back to SocietySmartHub!",
@@ -36,9 +44,14 @@ export default function Login() {
     } else {
       navigate("/member");
     }
-
-    setIsLoading(false);
-  };
+  } else {
+    toast({
+      title: "Login Failed",
+      description: resultAction.payload as string,
+      variant: "destructive",
+    });
+  }
+};
 
   return (
     <div className="min-h-screen flex">
@@ -107,6 +120,8 @@ export default function Login() {
                   className="pl-10"
                   autoComplete="email"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
@@ -129,6 +144,8 @@ export default function Login() {
                   placeholder="••••••••"
                   className="pl-10 pr-10"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   type="button"

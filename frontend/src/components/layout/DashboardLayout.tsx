@@ -4,7 +4,7 @@ import {
    Menu, X, LogOut, User, Bell, Megaphone,
   LayoutDashboard, Users, CreditCard, FileText, 
   Settings, MessageSquare, ClipboardList, Shield, Building, 
-  Home, UserCheck, HardHat, ShieldCheck
+  Home, UserCheck, HardHat, ShieldCheck,Wrench,AlertOctagon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -29,6 +29,8 @@ const navigationConfig = {
     { icon: CreditCard, label: "Finances", href: "/finances" },
     { icon: Bell, label: "NotificationHub", href: "/notificationHub" },
     { icon: MessageSquare, label: "Complaints", href: "/complaintsDetail" },
+    { icon: AlertOctagon, label: "Fine", href: "/addPenaltyFine" },
+    { icon: Wrench, label: "Maintenance", href: "/maintenance" },
     { icon: ClipboardList, label: "Registrations", href: "/society-admin/registrations" },
     { icon: FileText, label: "Documents", href: "/society-admin/documents" },
     { icon: Settings, label: "Settings", href: "/adminSettings" },
