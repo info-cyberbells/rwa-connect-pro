@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  Settings, 
-  Bell, 
-  Upload, 
-  CreditCard, 
-  Info, 
-  CheckCircle2, 
+import {
+  Settings,
+  Bell,
+  Upload,
+  CreditCard,
+  Info,
+  CheckCircle2,
   XCircle,
   Plus,
-  
+
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 
@@ -32,37 +32,35 @@ const SystemSettings = () => {
   };
 
   const Toggle = ({ active, onClick }) => (
-    <button 
+    <button
       onClick={onClick}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-        active ? 'bg-blue-600' : 'bg-gray-200'
-      }`}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${active ? 'bg-blue-600' : 'bg-gray-200'
+        }`}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-          active ? 'translate-x-6' : 'translate-x-1'
-        }`}
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${active ? 'translate-x-6' : 'translate-x-1'
+          }`}
       />
     </button>
   );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 pb-24">
-      <Sidebar/>
-    
-<header className="max-w-7xl mx-auto px-4 pt-20 pb-6 flex justify-between items-start md:ml-64 md:pt-10">
-  <div>
-    <h1 className="text-3xl font-bold text-slate-800">System Settings</h1>
-    <p className="text-slate-500 mt-1">Configure global platform parameters and management rules.</p>
-  </div>
-  {/* Notification Bell */}
-  <button className="p-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-colors relative">
-    <Bell className="w-5 h-5 text-slate-600 fill-slate-600" />
-    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-  </button>
-</header>
+      <Sidebar />
 
-<main className="max-w-7xl mx-auto px-4 space-y-6 md:ml-64">        
+      <header className="max-w-7xl mx-auto px-4 pt-20 pb-6 flex justify-between items-start md:ml-64 md:pt-10">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800">System Settings</h1>
+          <p className="text-slate-500 mt-1">Configure global platform parameters and management rules.</p>
+        </div>
+        {/* Notification Bell */}
+        <button className="p-2 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 transition-colors relative">
+          <Bell className="w-5 h-5 text-slate-600 fill-slate-600" />
+          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+        </button>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 space-y-6 md:ml-64">
         {/* General Configuration Section */}
         <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex items-center gap-3">
@@ -75,8 +73,8 @@ const SystemSettings = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Platform Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={platformName}
                   onChange={(e) => setPlatformName(e.target.value)}
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
@@ -84,8 +82,8 @@ const SystemSettings = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Support Email</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   value={supportEmail}
                   onChange={(e) => setSupportEmail(e.target.value)}
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
@@ -97,8 +95,8 @@ const SystemSettings = () => {
               <label className="text-sm font-medium text-slate-700">Platform Logo</label>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                 <label className="w-24 h-24 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 cursor-pointer hover:border-blue-400 transition-colors">
-                    <Upload className="w-6 h-6" />
-                    <input type="file" className="hidden" />
+                  <Upload className="w-6 h-6" />
+                  <input type="file" className="hidden" />
                 </label>
                 <div className="space-y-2">
                   <label className="cursor-pointer">
@@ -173,7 +171,7 @@ const SystemSettings = () => {
               Create New Tier
             </button>
           </div>
-          
+
           <div className="p-6 xl:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Starter Plan */}
             <div className="border border-slate-200 rounded-2xl p-6 flex flex-col hover:border-blue-200 transition-colors">
@@ -264,25 +262,25 @@ const SystemSettings = () => {
 
       {/* Floating Action Bar */}
       {unsavedChanges && (
-<div className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] animate-in slide-in-from-bottom duration-300 md:pl-64">          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-<div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">              <Info className="w-6 h-6 fill-[#F97316] text-white" />
-              <span className="text-sm text-[#64748B] font-medium">You have unsaved changes in 'Notification Rules'</span>
-            </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <button 
-                onClick={() => setUnsavedChanges(false)}
-                className="flex-1 sm:flex-none px-6 py-2.5 text-slate-600 font-semibold hover:bg-slate-100 rounded-xl transition-colors"
-              >
-                Discard
-              </button>
-              <button 
-                onClick={() => setUnsavedChanges(false)}
-                className="flex-1 sm:flex-none px-8 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-200"
-              >
-                Save Changes
-              </button>
-            </div>
+        <div className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] animate-in slide-in-from-bottom duration-300 md:pl-64">          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">              <Info className="w-6 h-6 fill-[#F97316] text-white" />
+            <span className="text-sm text-[#64748B] font-medium">You have unsaved changes in 'Notification Rules'</span>
           </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button
+              onClick={() => setUnsavedChanges(false)}
+              className="flex-1 sm:flex-none px-6 py-2.5 text-slate-600 font-semibold hover:bg-slate-100 rounded-xl transition-colors"
+            >
+              Discard
+            </button>
+            <button
+              onClick={() => setUnsavedChanges(false)}
+              className="flex-1 sm:flex-none px-8 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-200"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
         </div>
       )}
     </div>
