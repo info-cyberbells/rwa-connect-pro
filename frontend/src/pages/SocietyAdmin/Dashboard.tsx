@@ -3,7 +3,7 @@ import {
   Users, IndianRupee, AlertTriangle, UserCheck, 
   Plus, Home, UserPlus, User, ShieldCheck, 
   Camera, Edit2, ChevronDown, Upload, Info, X,
-  ChevronLeft, ChevronRight, Paperclip, Moon
+  ChevronLeft, ChevronRight, Paperclip, Moon,ImageIcon
 } from "lucide-react";
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 
@@ -25,7 +25,10 @@ const Dashboard = () => {
   // --- Modals State Control ---
   const [showNoticeModal, setShowNoticeModal] = useState(false);
   const [showResidentModal, setShowResidentModal] = useState(false);
-
+const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
+const [showFineModal, setShowFineModal] = useState(false);
+const [fineFileName, setFineFileName] = useState('No file chosen');
+const days = Array.from({ length: 31 }, (_, i) => i + 1);
   return (
     <DashboardLayout role="society-admin">
       <div className="max-w-[1600px] mx-auto relative">
@@ -60,18 +63,18 @@ const Dashboard = () => {
             >
               <UserPlus size={18} /> Add Resident
             </button>
-            <button 
-              onClick={() => setShowResidentModal(true)}
-              className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
-            >
-              <UserPlus size={18} /> Add Maintanence Charge
-            </button>
-            <button 
-              onClick={() => setShowResidentModal(true)}
-              className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
-            >
-              <UserPlus size={18} /> Add Fine
-            </button>
+          <button 
+  onClick={() => setShowMaintenanceModal(true)} 
+  className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
+>
+  <UserPlus size={18} /> Add Maintenance Charge
+</button>
+           <button 
+  onClick={() => setShowFineModal(true)} 
+  className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
+>
+  <AlertTriangle size={18} className="text-orange-500" /> Add Fine
+</button>
           
           </div>
         </div>
@@ -327,6 +330,186 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+        {/* 🔹 MODAL 3: ADD MAINTENANCE CHARGE*/}
+{showMaintenanceModal && (
+  <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowMaintenanceModal(false)} />
+    
+    <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[40px] shadow-2xl animate-in zoom-in-95 duration-300">
+      
+      {/* Modal Header */}
+      <div className="sticky top-0 bg-white/95 backdrop-blur-md px-8 py-6 border-b flex justify-between items-center z-10">
+        <div>
+          <nav className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">
+            Admin Dashboard &bull; <span className="text-blue-600">Maintenance</span>
+          </nav>
+          <h1 className="text-xl font-black text-slate-800 tracking-tight">Add Maintenance Charge</h1>
+        </div>
+        <button onClick={() => setShowMaintenanceModal(false)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full transition-all"><X size={24} /></button>
+      </div>
+
+      {/* Modal Form Body */}
+      <div className="p-8 space-y-6">
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Charge Title</label>
+          <input type="text" placeholder="e.g., Feb 2026 Maintenance" className="w-full px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all text-slate-600" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Category</label>
+            <div className="relative">
+              <select className="w-full appearance-none px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:border-blue-200 transition-all text-slate-500 bg-white">
+                <option>Maintenance</option>
+                <option>Electricity</option>
+                <option>Water</option>
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">Amount</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+              <input type="number" placeholder="0.00" className="w-full pl-8 pr-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:border-blue-200 transition-all text-slate-600" />
+            </div>
+          </div>
+        </div>
+
+        {/* Due Date Calendar Grid */}
+        <div>
+          <label className="block text-sm font-bold text-slate-700">Due Date</label>
+          <p className="text-xs text-slate-400 mb-4">Select the last date for payment</p>
+          <div className="border border-slate-100 rounded-[24px] p-6 bg-slate-50/30">
+            <div className="grid grid-cols-7 gap-y-2 text-center text-[11px] font-bold uppercase">
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <span key={d} className="text-slate-300 pb-2">{d}</span>)}
+              {days.map(n => (
+                <button key={n} className={`py-2 rounded-lg font-bold transition-all hover:bg-blue-50 ${n === 10 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600'}`}>
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
+          <textarea rows={3} placeholder="Add any specific instructions..." className="w-full px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:bg-white transition-all text-slate-600 resize-none"></textarea>
+        </div>
+      </div>
+
+      {/* Sticky Footer */}
+      <div className="sticky bottom-0 bg-white/95 backdrop-blur-md p-8 border-t border-slate-50 grid grid-cols-2 gap-4">
+        <button className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl shadow-xl shadow-blue-100 active:scale-95">Post Charge</button>
+        <button onClick={() => setShowMaintenanceModal(false)} className="bg-white hover:bg-slate-50 text-slate-500 font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl border border-slate-100 active:scale-95">Cancel</button>
+      </div>
+    </div>
+  </div>
+)}
+{/* 🔹 MODAL 4: ADD PENALTY / FINE */}
+{showFineModal && (
+  <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowFineModal(false)} />
+    
+    <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[40px] shadow-2xl animate-in zoom-in-95 duration-300">
+      
+      {/* Modal Header */}
+      <div className="sticky top-0 bg-white/95 backdrop-blur-md px-8 py-6 border-b flex justify-between items-center z-10">
+        <div>
+          <nav className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">
+            Admin Dashboard &bull; <span className="text-orange-600">Penalty & Fines</span>
+          </nav>
+          <h1 className="text-xl font-black text-slate-800 tracking-tight">Add Penalty / Fine</h1>
+        </div>
+        <button onClick={() => setShowFineModal(false)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full transition-all"><X size={24} /></button>
+      </div>
+
+      {/* Modal Form Body */}
+      <div className="p-8 space-y-6">
+        
+        {/* Fine Title */}
+        <div>
+          <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Fine Title</label>
+          <input type="text" placeholder="e.g. Late Payment Fine" className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 outline-none transition-all font-medium" />
+        </div>
+
+        {/* Category & Amount */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="relative">
+            <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Category</label>
+            <select className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl appearance-none outline-none focus:border-blue-200 transition-all font-medium">
+              <option>Fine</option>
+              <option>Penalty</option>
+              <option>Late Fee</option>
+            </select>
+            <ChevronDown className="absolute right-4 top-[44px] w-4 h-4 text-slate-400 pointer-events-none" />
+          </div>
+          <div>
+            <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Amount</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
+              <input type="number" placeholder="0.00" className="w-full pl-10 pr-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl outline-none focus:border-blue-200 transition-all font-medium" />
+            </div>
+          </div>
+        </div>
+
+        {/* Applied To & User Selection */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="relative">
+            <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Applied To</label>
+            <select className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl appearance-none outline-none focus:border-blue-200 transition-all font-medium">
+              <option>Specific User</option>
+              <option>All Residents</option>
+            </select>
+            <ChevronDown className="absolute right-4 top-[44px] w-4 h-4 text-slate-400 pointer-events-none" />
+          </div>
+          <div className="relative">
+            <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Select User</label>
+            <div className="relative">
+              <input type="text" placeholder="Search User..." className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl outline-none font-medium" />
+              <User className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            </div>
+          </div>
+        </div>
+
+        {/* Proof Image Section */}
+        <div>
+          <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Proof Image</label>
+          <div className="flex flex-col sm:flex-row items-center justify-between p-4 border border-dashed border-slate-200 bg-slate-50/30 rounded-3xl gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-100 transition-transform hover:scale-105">
+                <ImageIcon className="text-white w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-700">{fineFileName}</p>
+                <p className="text-[11px] text-slate-400 font-bold uppercase">Click to upload evidence</p>
+              </div>
+            </div>
+            <button className="w-full sm:w-auto px-6 py-2.5 text-xs font-black uppercase tracking-wider text-blue-600 bg-white border border-blue-100 rounded-xl hover:bg-blue-50 transition-all">
+              Upload File
+            </button>
+          </div>
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Description</label>
+          <textarea rows={3} placeholder="Provide details about the penalty..." className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl outline-none focus:bg-white transition-all text-slate-600 resize-none font-medium" />
+        </div>
+      </div>
+
+      {/* Sticky Footer */}
+      <div className="sticky bottom-0 bg-white/95 backdrop-blur-md p-8 border-t border-slate-50 grid grid-cols-2 gap-4">
+        <button className="bg-orange-600 hover:bg-orange-700 text-white font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl shadow-xl shadow-orange-100 active:scale-95 transition-all">
+          Post Fine
+        </button>
+        <button onClick={() => setShowFineModal(false)} className="bg-white hover:bg-slate-50 text-slate-500 font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl border border-slate-100 active:scale-95">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       </div>
     </DashboardLayout>

@@ -3,50 +3,53 @@ import authService, {
   LoginPayload,
   AuthResponse,
 } from "../auth/authServices";
-
+ 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
+ 
 interface User {
   id: string;
   name: string;
   email: string;
+  role: string;
+  society: string | null;
 }
-
+ 
 interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
   error: string | null;
 }
-
+ 
 // ─── Initial State ────────────────────────────────────────────────────────────
-
+ 
 const initialState: AuthState = {
   user: null,
-  token: localStorage.getItem("token"),
+  token: localStorage.getItem("accessToken"),
   isLoading: false,
   error: null,
 };
-
+ 
 // ─── Async Thunks ─────────────────────────────────────────────────────────────
-
+ 
 export const login = createAsyncThunk<AuthResponse, LoginPayload>(
   "auth/login",
   async (payload, { rejectWithValue }) => {
     try {
       const data = await authService.login(payload);
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("role", data.user.role);
       return data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Login failed");
     }
   }
 );
-
-
-
+ 
+ 
+ 
 // ─── Slice ────────────────────────────────────────────────────────────────────
-
+ 
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -70,16 +73,16 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
         state.isLoading = false;
         state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.token = action.payload.accessToken;
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });
-
+ 
    
   },
 });
-
+ 
 export const { clearError, resetAuth } = authSlice.actions;
-export default authSlice.reducer;
+export default authSlice.reducer;  

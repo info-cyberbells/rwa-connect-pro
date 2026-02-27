@@ -23,35 +23,42 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>("member");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
-
-  const resultAction = await dispatch(
-    login({ email, password })
-  );
-
+ 
+  const resultAction = await dispatch(login({ email, password }));
+ 
   if (login.fulfilled.match(resultAction)) {
+    const userRole = resultAction.payload.user.role; // get real role
+ 
     toast({
       title: "Login Successful",
       description: "Welcome back to SocietySmartHub!",
     });
-
-    // Navigate based on role
-    if (selectedRole === "super-admin") {
-      navigate("/super-admin");
-    } else if (selectedRole === "society-admin") {
-      navigate("/society-admin");
-    } else {
-      navigate("/member");
+ 
+    // Navigate based on backend role
+    switch (userRole) {
+      case "superadmin":
+        navigate("/super-admin");
+        break;
+      case "society_admin":
+        navigate("/society-admin");
+        break;
+      case "user":
+        navigate("/member");
+        break;
+      default:
+        navigate("/");
     }
   } else {
     toast({
       title: "Login Failed",
-      description: resultAction.payload as string,
+      description: (resultAction.payload as string) || "Login failed",
       variant: "destructive",
     });
   }
-};
+}; 
+ 
 
   return (
     <div className="min-h-screen flex">

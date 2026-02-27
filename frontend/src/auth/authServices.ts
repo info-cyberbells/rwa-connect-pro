@@ -13,11 +13,13 @@ export interface RegisterPayload {
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
   user: {
     id: string;
     name: string;
     email: string;
+    role: string;
+    society: string | null;
   };
 }
 
