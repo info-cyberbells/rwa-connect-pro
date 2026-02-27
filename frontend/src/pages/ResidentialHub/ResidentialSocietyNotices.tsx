@@ -26,8 +26,8 @@ const noticesData = [
 ];
 
 const SocietyNotices = () => {
-  const [view, setView] = useState('list'); // 'list' ya 'detail'
-  const [selectedNotice, setSelectedNotice] = useState(noticesData[0]); // Default first notice
+  const [view, setView] = useState('list'); 
+  const [selectedNotice, setSelectedNotice] = useState(noticesData[0]); 
 
   // Detail View Component
   const DetailView = ({ notice }) => (

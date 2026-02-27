@@ -36,9 +36,7 @@ const SecurityAndPreferences = () => {
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans antialiased flex">
       <Sidebar />
       
-      {/* CHANGE: Increased pt-20 (Top Padding) to push content down.
-          Added lg:pt-24 for even more space on larger screens.
-      */}
+     
 <div className="flex-1 w-full md:pl-64 min-h-screen">
 <div className="max-w-7xl mx-auto px-4 pt-24 pb-12 sm:px-6 lg:px-8 md:pt-8">          
           {/* --- PAGE HEADER --- */}

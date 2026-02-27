@@ -8,6 +8,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import authService from "@/auth/authServices";
+import { useDispatch } from "react-redux";
+
+
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -82,11 +86,30 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const isMember = role === "member";
   const isSocietyOrResidential = isSocietyAdmin || isResidentialAdmin;
 
-  const handleLogout = () => {
-    toast({ title: "Logged Out", description: "You have been successfully logged out." });
-    navigate("/login");
-  };
+const dispatch = useDispatch();
 
+const handleLogout = async () => {
+  try {
+    await authService.logout(); // Call API
+
+
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out.",
+    });
+
+    navigate("/login", { replace: true });
+    localStorage.clear()
+  } catch (error) {
+    console.error("Logout failed:", error);
+
+    toast({
+      title: "Logout Failed",
+      description: "Something went wrong.",
+      variant: "destructive",
+    });
+  }
+};
   return (
     <div className="min-h-screen bg-muted/30">
       

@@ -54,13 +54,25 @@ const Dashboard = () => {
             >
               <Plus size={18} /> Post Notice
             </button>
-            
-            <button 
+              <button 
               onClick={() => setShowResidentModal(true)}
               className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
             >
               <UserPlus size={18} /> Add Resident
             </button>
+            <button 
+              onClick={() => setShowResidentModal(true)}
+              className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
+            >
+              <UserPlus size={18} /> Add Maintanence Charge
+            </button>
+            <button 
+              onClick={() => setShowResidentModal(true)}
+              className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
+            >
+              <UserPlus size={18} /> Add Fine
+            </button>
+          
           </div>
         </div>
            {/* 🔹 Main Grid Section */}

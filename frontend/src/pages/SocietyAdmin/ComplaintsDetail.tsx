@@ -29,9 +29,7 @@ const ComplaintsDetail: React.FC = () => {
 
   return (
     <DashboardLayout role="society-admin">
-      {/* H-screen se sidebar aur top nav ke baad bachi hui jagah use karne ke liye 
-        hum 'h-[calc(100vh-120px)]' use kar rahe hain 
-      */}
+    
       <div className="flex h-[calc(100vh-140px)] bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
         
         {/* --- Left Sidebar: Ticket List --- */}

@@ -125,10 +125,7 @@ const NotificationHub = () => {
   return (
     <DashboardLayout role="society-admin">
     <div className="min-h-screen  text-[#0F172A] relative overflow-hidden ">
-      {/* Decorative Blurs */}
-      {/* <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-blue-200/40 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-blue-100/50 rounded-full blur-[100px] pointer-events-none" /> */}
-
+     
       <div className="max-w-5xl mx-auto relative z-10 space-y-10 mb-10">
         
         {/* Header Section */}

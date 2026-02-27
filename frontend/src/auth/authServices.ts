@@ -26,7 +26,14 @@ const authService = {
     const { data } = await axiosInstance.post<AuthResponse>(AUTHROUTES.LOGIN, payload);
     return data;
   },
-  
-};
 
-export default authService;
+    logout: async (): Promise<{ message: string }> => {
+    const { data } = await axiosInstance.post(
+      AUTHROUTES.LOGOUT
+    );
+    return data;
+  },
+  
+};   
+
+export default authService; 
