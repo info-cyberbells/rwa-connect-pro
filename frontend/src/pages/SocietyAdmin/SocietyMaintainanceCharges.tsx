@@ -12,7 +12,7 @@ import {
   FilePenLine
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import DeleteConfirmationModal from './DeleteModal';
+import DeleteConfirmationModal from './Delete';
 
 const INITIAL_DATA = [
   { id: 1, billingDate: 'Oct 01, 2023', billingTime: '08:00 AM', unit: 'B402', wing: 'WING B', recipient: 'John Doe', chargeTitle: 'Monthly Maintenance', amount: 245.00, dueDate: 'Oct 15, 2023', status: 'Paid' },

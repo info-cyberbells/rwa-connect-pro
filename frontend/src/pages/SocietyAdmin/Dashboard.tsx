@@ -1,518 +1,472 @@
 import React, { useState } from "react";
-import { 
-  Users, IndianRupee, AlertTriangle, UserCheck, 
-  Plus, Home, UserPlus, User, ShieldCheck, 
+import {
+  Users, IndianRupee, AlertTriangle, UserCheck,
+  Plus, Home, UserPlus, User, ShieldCheck,
   Camera, Edit2, ChevronDown, Upload, Info, X,
-  ChevronLeft, ChevronRight, Paperclip, Moon,ImageIcon
+  ChevronLeft, ChevronRight, Paperclip, Moon, ImageIcon,
+  TrendingUp, Bell, Calendar, ArrowUpRight, Wrench, Clock
 } from "lucide-react";
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 
-// --- Sub Component: StatCard ---
-const StatCard = ({ title, value, subtitle, icon, color }: any) => (
-  <div className="bg-white rounded-xl p-5 shadow-sm flex justify-between items-center w-full border border-slate-100 transition-hover hover:shadow-md">
-    <div>
-      <p className="text-sm text-slate-500 font-medium">{title}</p>
-      <h2 className="text-2xl font-bold mt-1 text-slate-800">{value}</h2>
-      {subtitle && <p className="text-xs text-green-600 mt-1 font-semibold">{subtitle}</p>}
+const avatarColors = ['bg-violet-500', 'bg-blue-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500'];
+
+const StatCard = ({ title, value, subtitle, icon, color, trend }: any) => (
+  <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer">
+    <div className="flex items-start justify-between mb-4">
+      <div className={`${color} p-2.5 rounded-xl`}>{icon}</div>
+      {trend && (
+        <span className="flex items-center gap-1 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
+          <ArrowUpRight size={10} /> {trend}
+        </span>
+      )}
     </div>
-    <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${color} shadow-sm`}>
-      {icon}
-    </div>
+    <p className="text-xs text-slate-400 font-semibold mb-1">{title}</p>
+    <h2 className="text-2xl font-black text-slate-800">{value}</h2>
+    {subtitle && <p className="text-xs text-emerald-600 font-bold mt-1">{subtitle}</p>}
   </div>
 );
 
 const Dashboard = () => {
-  // --- Modals State Control ---
   const [showNoticeModal, setShowNoticeModal] = useState(false);
   const [showResidentModal, setShowResidentModal] = useState(false);
-const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
-const [showFineModal, setShowFineModal] = useState(false);
-const [fineFileName, setFineFileName] = useState('No file chosen');
-const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
+  const [showFineModal, setShowFineModal] = useState(false);
+  const [fineFileName, setFineFileName] = useState('No file chosen');
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  const quickActions = [
+    { label: "Post Notice", icon: Bell, color: "bg-blue-600 text-white shadow-lg shadow-blue-100 hover:bg-blue-700", onClick: () => setShowNoticeModal(true) },
+    { label: "Add Resident", icon: UserPlus, color: "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50", onClick: () => setShowResidentModal(true) },
+    { label: "Maintenance Charge", icon: Wrench, color: "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50", onClick: () => setShowMaintenanceModal(true) },
+    { label: "Add Fine", icon: AlertTriangle, color: "bg-white border border-orange-200 text-orange-600 hover:bg-orange-50", onClick: () => setShowFineModal(true) },
+  ];
+
+  const activities = [
+    { text: "Unit 402 paid maintenance for October", val: "₹4,500", sub: "2 mins ago", dot: "bg-emerald-400" },
+    { text: "New visitor entry (Unit 105)", val: "Verified", sub: "15 mins ago", dot: "bg-blue-400" },
+    { text: "Plumbing complaint resolved in Unit 202", val: "Done", sub: "1 hr ago", dot: "bg-violet-400" },
+    { text: "Security alert: Gate 2 sensor check", val: "Active", sub: "3 hrs ago", dot: "bg-amber-400" },
+  ];
+
   return (
     <DashboardLayout role="society-admin">
       <div className="max-w-[1600px] mx-auto relative">
-        
-        {/* --- HEADER --- */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-800">Welcome back, Admin</h1>
-          <p className="text-slate-500 text-sm">Everything looks good at Greenwood Heights today.</p>
-        </div>
 
-        {/* --- STATS GRID --- */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard title="Total Residents" value="124" icon={<Users className="w-5 h-5 text-blue-600" />} color="bg-blue-50" />
-          <StatCard title="Maintenance" value="₹85k" icon={<IndianRupee className="w-5 h-5 text-green-600" />} color="bg-green-50" />
-          <StatCard title="Active Complaints" value="4" icon={<AlertTriangle className="w-5 h-5 text-orange-600" />} color="bg-orange-50" />
-          <StatCard title="Today's Visitors" value="8" icon={<UserCheck className="w-5 h-5 text-purple-600" />} color="bg-purple-50" />
-        </div>
-
-        {/* --- QUICK ACTIONS --- */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-8">
-          <h3 className="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider">Quick Actions</h3>
-          <div className="flex flex-wrap gap-4">
-            <button 
-              onClick={() => setShowNoticeModal(true)}
-              className="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-md active:scale-95 flex items-center gap-2"
-            >
-              <Plus size={18} /> Post Notice
-            </button>
-              <button 
-              onClick={() => setShowResidentModal(true)}
-              className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
-            >
-              <UserPlus size={18} /> Add Resident
-            </button>
-          <button 
-  onClick={() => setShowMaintenanceModal(true)} 
-  className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
->
-  <UserPlus size={18} /> Add Maintenance Charge
-</button>
-           <button 
-  onClick={() => setShowFineModal(true)} 
-  className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
->
-  <AlertTriangle size={18} className="text-orange-500" /> Add Fine
-</button>
-          
+        {/* ── Header ── */}
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
+              <h1 className="text-2xl font-black text-slate-800 tracking-tight">Welcome back, Admin</h1>
+            </div>
+            <p className="text-slate-400 text-sm pl-3.5">Everything looks good at Greenwood Heights today.</p>
+          </div>
+          <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 bg-white border border-slate-100 px-4 py-2 rounded-xl shadow-sm">
+            <Clock size={13} className="text-blue-500" />
+            {new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
           </div>
         </div>
-           {/* 🔹 Main Grid Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Activity */}
-          <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-            <div className="flex justify-between items-center mb-6 border-b border-slate-50 pb-4">
-              <h2 className="font-bold text-slate-800 text-lg">Recent Activity</h2>
-              <button className="text-blue-600 text-xs font-bold uppercase tracking-wider hover:underline">View All</button>
-            </div>
 
-            <div className="space-y-6">
-              {[
-                { text: "Unit 402 paid maintenance for October", val: "₹4,500", sub: "2 mins ago" },
-                { text: "New visitor entry (Unit 105)", val: "Verified", sub: "15 mins ago" },
-                { text: "Plumbing complaint resolved in Unit 202", val: "Done", sub: "1 hr ago" },
-                { text: "Security alert: Gate 2 sensor check", val: "Active", sub: "3 hrs ago" },
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between items-center group cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-2 h-2 rounded-full bg-blue-400 group-hover:scale-125 transition-transform" />
+        {/* ── Stats ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <StatCard title="Total Residents" value="124" trend="+3 this week" icon={<Users className="w-5 h-5 text-blue-600" />} color="bg-blue-50" />
+          <StatCard title="Maintenance Collected" value="₹85k" trend="+12%" icon={<IndianRupee className="w-5 h-5 text-emerald-600" />} color="bg-emerald-50" />
+          <StatCard title="Active Complaints" value="4" icon={<AlertTriangle className="w-5 h-5 text-orange-500" />} color="bg-orange-50" />
+          <StatCard title="Today's Visitors" value="8" icon={<UserCheck className="w-5 h-5 text-violet-600" />} color="bg-violet-50" />
+        </div>
+
+        {/* ── Quick Actions ── */}
+        <div className="bg-white rounded-2xl px-6 py-5 border border-slate-100 shadow-sm mb-6">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Quick Actions</p>
+          <div className="flex flex-wrap gap-3">
+            {quickActions.map(({ label, icon: Icon, color, onClick }) => (
+              <button key={label} onClick={onClick}
+                className={`${color} px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all active:scale-95`}>
+                <Icon size={16} /> {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Main Grid ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          {/* Recent Activity */}
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="flex justify-between items-center px-6 py-5 border-b border-slate-50">
+              <h2 className="font-black text-slate-800 flex items-center gap-2">
+                <TrendingUp size={16} className="text-blue-500" /> Recent Activity
+              </h2>
+              <button className="text-blue-600 text-xs font-bold hover:underline">View All</button>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {activities.map((item, i) => (
+                <div key={i} className="flex justify-between items-center px-6 py-4 hover:bg-slate-50/70 transition-colors group cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${item.dot} group-hover:scale-125 transition-transform flex-shrink-0`} />
                     <div>
-                      <p className="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">{item.text}</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">{item.sub}</p>
+                      <p className="text-sm font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">{item.text}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5 flex items-center gap-1">
+                        <Clock size={9} /> {item.sub}
+                      </p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-slate-900 bg-slate-50 px-3 py-1 rounded-lg">{item.val}</span>
+                  <span className="text-xs font-black text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl flex-shrink-0 ml-3">{item.val}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Right Panel */}
-          <div className="space-y-8">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <h2 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                Facility Bookings
-              </h2>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-transparent hover:border-blue-100 transition-all">
-                  <span className="text-sm font-medium text-slate-600">Clubhouse Party</span>
-                  <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">04:00 PM</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-transparent hover:border-blue-100 transition-all">
-                  <span className="text-sm font-medium text-slate-600">Tennis Court A</span>
-                  <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">06:00 PM</span>
-                </div>
+          <div className="space-y-5">
+
+            {/* Facility Bookings */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="flex justify-between items-center px-6 py-5 border-b border-slate-50">
+                <h2 className="font-black text-slate-800 flex items-center gap-2">
+                  <Calendar size={16} className="text-blue-500" /> Facility Bookings
+                </h2>
+                <span className="text-[10px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded-lg">Today</span>
+              </div>
+              <div className="p-4 space-y-2">
+                {[
+                  { name: "Clubhouse Party", time: "04:00 PM", color: "bg-violet-50 text-violet-600" },
+                  { name: "Tennis Court A", time: "06:00 PM", color: "bg-blue-50 text-blue-600" },
+                ].map((b) => (
+                  <div key={b.name} className="flex justify-between items-center p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                    <span className="text-sm font-semibold text-slate-700">{b.name}</span>
+                    <span className={`text-xs font-black px-2.5 py-1 rounded-lg ${b.color}`}>{b.time}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+            {/* Support Card */}
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-2xl p-6 shadow-lg relative overflow-hidden group">
               <div className="relative z-10">
-                <h2 className="font-bold mb-2 text-lg">Support Center</h2>
-                <p className="text-xs mb-5 text-blue-100 leading-relaxed">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4">
+                  <ShieldCheck size={20} className="text-white" />
+                </div>
+                <h2 className="font-black text-lg mb-1">Support Center</h2>
+                <p className="text-xs text-blue-100 leading-relaxed mb-5">
                   Need help managing the society portal or facing technical issues?
                 </p>
-                <button className="w-full bg-white text-blue-600 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-50 transition-colors shadow-lg active:scale-95">
+                <button className="w-full bg-white text-blue-600 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-50 transition-colors active:scale-95">
                   Contact Support
                 </button>
               </div>
-              {/* Decorative design */}
-              <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+              <div className="absolute -bottom-8 -right-8 w-28 h-28 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+              <div className="absolute -top-4 -left-4 w-16 h-16 bg-white/5 rounded-full" />
             </div>
           </div>
         </div>
 
-        {/*MODAL 1: POST NOTICE*/}
-   
+        {/* ════════════════ MODALS ════════════════ */}
+
+        {/* MODAL 1: POST NOTICE */}
         {showNoticeModal && (
-          <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowNoticeModal(false)} />
-            
-            <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[40px] shadow-2xl animate-in zoom-in-95 duration-300">
-              {/* Modal Header */}
-              <div className="sticky top-0 bg-white/95 backdrop-blur-md px-8 py-6 border-b flex justify-between items-center z-10">
-                <div>
-                  <nav className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">
-                    Admin Dashboard &bull; <span className="text-blue-600">Post New Notice</span>
-                  </nav>
-                  <h1 className="text-xl font-black text-slate-800 tracking-tight">Post New Notice</h1>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="p-2 hover:bg-slate-100 rounded-full text-slate-600"><Moon size={20} /></button>
-                  <button onClick={() => setShowNoticeModal(false)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full transition-all"><X size={24} /></button>
-                </div>
-              </div>
-
-              {/* Modal Form Body */}
-              <div className="p-8 space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Notice Title</label>
-                  <input type="text" placeholder="e.g., Annual General Meeting" className="w-full px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all text-slate-600" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Category</label>
-                  <div className="relative">
-                    <select className="w-full appearance-none px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:border-blue-200 transition-all text-slate-500 bg-white">
-                      <option>Select category</option>
-                      <option>Maintenance</option>
-                      <option>Event</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
-                  </div>
-                </div>
-
-                {/* Calendar UI */}
-                <div>
-                  <label className="block text-sm font-bold text-slate-700">Visibility Range</label>
-                  <p className="text-xs text-slate-400 mb-4">Choose how long this notice remains active</p>
-                  <div className="border border-slate-100 rounded-[24px] p-6 flex flex-col items-center bg-slate-50/30">
-                     <div className="w-full max-w-xs">
-                        <div className="flex justify-between items-center mb-6">
-                          <ChevronLeft size={18} className="text-slate-400 cursor-pointer" />
-                          <span className="font-bold text-slate-700">October 2023</span>
-                          <ChevronRight size={18} className="text-slate-400 cursor-pointer" />
-                        </div>
-                        <div className="grid grid-cols-7 gap-y-4 text-center text-[11px] font-bold uppercase">
-                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <span key={d} className="text-slate-300">{d}</span>)}
-                          <span className="text-slate-200">1</span>
-                          {[2,3,4].map(n => <span key={n} className="text-slate-600 py-1">{n}</span>)}
-                          <span className="bg-blue-600 text-white rounded-lg py-1 font-bold">5</span>
-                          {[6,7,8].map(n => <span key={n} className="bg-blue-50 text-blue-600 py-1">{n}</span>)}
-                          <span className="text-slate-600 py-1">9</span>
-                          <span className="bg-blue-600 text-white rounded-lg py-1 font-bold">10</span>
-                          {Array.from({length: 21}).map((_, i) => <span key={i} className="text-slate-600 py-1">{i+11}</span>)}
-                        </div>
-                     </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
-                  <textarea rows={4} placeholder="Enter detailed notice information..." className="w-full px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:bg-white transition-all text-slate-600 resize-none"></textarea>
-                </div>
-
-                {/* File Upload UI */}
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Attachments</label>
-                  <div className="border-2 border-dashed border-slate-200 rounded-[24px] p-10 flex flex-col items-center justify-center bg-slate-50/30 hover:bg-blue-50/50 transition-all cursor-pointer group">
-                    <div className="bg-white p-4 rounded-full mb-3 shadow-sm group-hover:scale-110 transition-transform">
-                      <Paperclip className="text-blue-500" size={24} />
-                    </div>
-                    <p className="text-sm text-slate-600 font-bold"><span className="text-blue-600 underline">Click to upload</span> or drag and drop</p>
-                    <p className="text-[10px] text-slate-400 mt-2 uppercase font-black">PDF, PNG, JPG (MAX. 10MB)</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Sticky Footer Buttons */}
-              <div className="sticky bottom-0 bg-white/95 backdrop-blur-md p-8 border-t border-slate-50 grid grid-cols-2 gap-4">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl shadow-xl shadow-blue-100 active:scale-95">Post Notice</button>
-                <button onClick={() => setShowNoticeModal(false)} className="bg-white hover:bg-slate-50 text-slate-500 font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl border border-slate-100 active:scale-95">Save as Draft</button>
-              </div>
+          <Modal onClose={() => setShowNoticeModal(false)}>
+            <ModalHeader title="Post New Notice" subtitle="Admin Dashboard • Notice Board" onClose={() => setShowNoticeModal(false)} />
+            <div className="p-8 space-y-5">
+              <Field label="Notice Title">
+                <input type="text" placeholder="e.g., Annual General Meeting" className="modal-input" />
+              </Field>
+              <Field label="Category">
+                <SelectField options={["Maintenance", "Event", "General", "Emergency"]} />
+              </Field>
+              <Field label="Visibility Range" hint="Choose how long this notice remains active">
+                <MiniCalendar />
+              </Field>
+              <Field label="Description">
+                <textarea rows={4} placeholder="Enter detailed notice information..." className="modal-input resize-none" />
+              </Field>
+              <Field label="Attachments">
+                <UploadBox icon={<Paperclip size={22} className="text-blue-500" />} label="Click to upload or drag and drop" hint="PDF, PNG, JPG (MAX. 10MB)" />
+              </Field>
             </div>
-          </div>
+            <ModalFooter>
+              <button className="modal-btn-primary">Post Notice</button>
+              <button onClick={() => setShowNoticeModal(false)} className="modal-btn-secondary">Save as Draft</button>
+            </ModalFooter>
+          </Modal>
         )}
 
-        {/* MODAL 2: ADD RESIDENT  */}
+        {/* MODAL 2: ADD RESIDENT */}
         {showResidentModal && (
-          <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowResidentModal(false)} />
-            
-            <div className="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[40px] shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-400">
-              
-              <div className="sticky top-0 bg-white/80 backdrop-blur-md px-8 py-6 border-b flex justify-between items-center z-10">
-                <div>
-                  <h2 className="text-2xl font-black text-slate-800 tracking-tight">Add New Resident</h2>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Society Directory Registration</p>
-                </div>
-                <button onClick={() => setShowResidentModal(false)} className="p-2 bg-slate-100 hover:bg-red-50 text-slate-500 rounded-full transition-all"><X size={24} /></button>
-              </div>
-
-              <div className="p-8 md:p-12 space-y-12">
-                {/* Personal Info Section */}
-                <div className="flex flex-col lg:flex-row gap-12">
-                  <div className="flex-1 space-y-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="p-1.5 bg-blue-50 rounded-lg"><User size={18} className="text-blue-500" /></div>
-                      <h2 className="font-bold text-slate-700">Personal Information</h2>
-                    </div>
-                    <div className="space-y-4">
-                      <input type="text" placeholder="Full Name" className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none" />
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="email" placeholder="Email Address" className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none" />
-                        <input type="text" placeholder="Mobile Number" className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-center justify-center bg-slate-50/50 p-8 rounded-[32px] border border-slate-100 min-w-[200px]">
-                    <div className="relative">
-                      <div className="w-24 h-24 rounded-full border-2 border-dashed border-blue-200 bg-white flex items-center justify-center"><Camera size={32} className="text-blue-200" /></div>
-                      <button className="absolute bottom-1 right-1 bg-blue-600 p-2 rounded-full text-white shadow-lg"><Edit2 size={12} /></button>
-                    </div>
-                    <span className="text-[10px] font-black text-slate-400 mt-4 uppercase tracking-widest">Resident Photo</span>
+          <Modal onClose={() => setShowResidentModal(false)} wide>
+            <ModalHeader title="Add New Resident" subtitle="Society Directory Registration" onClose={() => setShowResidentModal(false)} />
+            <div className="p-8 space-y-8">
+              {/* Personal + Avatar */}
+              <div className="flex flex-col lg:flex-row gap-8">
+                <div className="flex-1 space-y-4">
+                  <SectionLabel icon={<User size={14} />} label="Personal Information" color="text-blue-600" />
+                  <input type="text" placeholder="Full Name" className="modal-input" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="email" placeholder="Email Address" className="modal-input" />
+                    <input type="text" placeholder="Mobile Number" className="modal-input" />
                   </div>
                 </div>
-
-                {/* Residence Details */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 bg-blue-50 rounded-lg"><Home size={18} className="text-blue-500" /></div>
-                    <h2 className="font-bold text-slate-700">Residence Details</h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="relative">
-                      <select className="w-full appearance-none px-5 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 text-slate-600 focus:outline-none">
-                        <option>Select Wing</option>
-                        <option>Wing A</option><option>Wing B</option>
-                      </select>
-                      <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+                <div className="flex flex-col items-center justify-center bg-slate-50 p-6 rounded-2xl border border-slate-100 min-w-[160px]">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-blue-200 bg-white flex items-center justify-center">
+                      <Camera size={28} className="text-blue-200" />
                     </div>
-                    <input type="text" placeholder="Flat Number" className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none" />
-                    <select className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 text-slate-700 focus:outline-none"><option>Owner</option><option>Tenant</option></select>
+                    <button className="absolute -bottom-1 -right-1 bg-blue-600 p-1.5 rounded-xl text-white shadow-lg">
+                      <Edit2 size={11} />
+                    </button>
                   </div>
-                </div>
-
-                {/* Verification Section */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 bg-blue-50 rounded-lg"><ShieldCheck size={18} className="text-blue-500" /></div>
-                    <h2 className="font-bold text-slate-700">Verification Documents</h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="border-2 border-dashed border-slate-100 rounded-[24px] p-8 flex flex-col items-center bg-slate-50/30 group hover:bg-blue-50/30 transition-all cursor-pointer">
-                      <Upload size={20} className="text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
-                      <p className="text-xs font-black uppercase">Identity Proof</p>
-                    </div>
-                    <div className="border-2 border-dashed border-slate-100 rounded-[24px] p-8 flex flex-col items-center bg-slate-50/30 group hover:bg-blue-50/30 transition-all cursor-pointer">
-                      <ShieldCheck size={20} className="text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
-                      <p className="text-xs font-black uppercase">Agreement</p>
-                    </div>
-                  </div>
+                  <span className="text-[10px] font-black text-slate-400 mt-3 uppercase tracking-widest">Photo</span>
                 </div>
               </div>
 
-              {/* Modal Footer */}
-              <div className="sticky bottom-0 bg-white/90 backdrop-blur-md p-8 border-t flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-3 text-slate-400">
-                  <Info size={14} className="text-blue-500" />
-                  <p className="text-[10px] font-medium max-w-[240px]">Resident will receive welcome email with login credentials.</p>
+              {/* Residence */}
+              <div className="space-y-4">
+                <SectionLabel icon={<Home size={14} />} label="Residence Details" color="text-emerald-600" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <SelectField options={["Wing A", "Wing B", "Wing C"]} placeholder="Select Wing" />
+                  <input type="text" placeholder="Flat Number" className="modal-input" />
+                  <SelectField options={["Owner", "Tenant"]} />
                 </div>
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                  <button onClick={() => setShowResidentModal(false)} className="flex-1 md:flex-none text-sm font-bold text-slate-400 px-6">Cancel</button>
-                  <button className="flex-1 md:flex-none flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-black text-[11px] uppercase tracking-[2px] px-10 py-4 rounded-2xl shadow-xl shadow-blue-200 active:scale-95">
-                    <UserPlus size={18} /> Add & Notify
+              </div>
+
+              {/* Docs */}
+              <div className="space-y-4">
+                <SectionLabel icon={<ShieldCheck size={14} />} label="Verification Documents" color="text-violet-600" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <UploadBox icon={<Upload size={18} className="text-blue-500" />} label="Identity Proof" />
+                  <UploadBox icon={<ShieldCheck size={18} className="text-blue-500" />} label="Agreement" />
+                </div>
+              </div>
+            </div>
+            <ModalFooter>
+              <button className="modal-btn-primary flex items-center gap-2"><UserPlus size={16} /> Add & Notify</button>
+              <button onClick={() => setShowResidentModal(false)} className="modal-btn-secondary">Cancel</button>
+            </ModalFooter>
+          </Modal>
+        )}
+
+        {/* MODAL 3: MAINTENANCE CHARGE */}
+        {showMaintenanceModal && (
+          <Modal onClose={() => setShowMaintenanceModal(false)}>
+            <ModalHeader title="Add Maintenance Charge" subtitle="Admin Dashboard • Maintenance" onClose={() => setShowMaintenanceModal(false)} />
+            <div className="p-8 space-y-5">
+              <Field label="Charge Title">
+                <input type="text" placeholder="e.g., Feb 2026 Maintenance" className="modal-input" />
+              </Field>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <Field label="Category">
+                  <SelectField options={["Maintenance", "Electricity", "Water", "Other"]} />
+                </Field>
+                <Field label="Amount">
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+                    <input type="number" placeholder="0.00" className="modal-input pl-8" />
+                  </div>
+                </Field>
+              </div>
+              <Field label="Due Date" hint="Select the last date for payment">
+                <MiniCalendar />
+              </Field>
+              <Field label="Description">
+                <textarea rows={3} placeholder="Add any specific instructions..." className="modal-input resize-none" />
+              </Field>
+            </div>
+            <ModalFooter>
+              <button className="modal-btn-primary">Post Charge</button>
+              <button onClick={() => setShowMaintenanceModal(false)} className="modal-btn-secondary">Cancel</button>
+            </ModalFooter>
+          </Modal>
+        )}
+
+        {/* MODAL 4: ADD FINE */}
+        {showFineModal && (
+          <Modal onClose={() => setShowFineModal(false)}>
+            <ModalHeader title="Add Penalty / Fine" subtitle="Admin Dashboard • Penalty & Fines" accent="text-orange-600" onClose={() => setShowFineModal(false)} />
+            <div className="p-8 space-y-5">
+              <Field label="Fine Title">
+                <input type="text" placeholder="e.g. Late Payment Fine" className="modal-input" />
+              </Field>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <Field label="Category">
+                  <SelectField options={["Fine", "Penalty", "Late Fee"]} />
+                </Field>
+                <Field label="Amount">
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
+                    <input type="number" placeholder="0.00" className="modal-input pl-8" />
+                  </div>
+                </Field>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <Field label="Applied To">
+                  <SelectField options={["Specific User", "All Residents"]} />
+                </Field>
+                <Field label="Select User">
+                  <div className="relative">
+                    <input type="text" placeholder="Search resident..." className="modal-input pr-10" />
+                    <User size={15} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  </div>
+                </Field>
+              </div>
+              <Field label="Proof Image">
+                <div className="flex items-center justify-between p-4 border border-dashed border-slate-200 bg-slate-50 rounded-2xl gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center shadow-sm shadow-emerald-100">
+                      <ImageIcon className="text-white w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-700">{fineFileName}</p>
+                      <p className="text-[11px] text-slate-400">Click to upload evidence</p>
+                    </div>
+                  </div>
+                  <button className="px-4 py-2 text-xs font-black text-blue-600 bg-white border border-blue-100 rounded-xl hover:bg-blue-50 transition-all whitespace-nowrap">
+                    Upload File
                   </button>
                 </div>
-              </div>
-
+              </Field>
+              <Field label="Description">
+                <textarea rows={3} placeholder="Provide details about the penalty..." className="modal-input resize-none" />
+              </Field>
             </div>
-          </div>
+            <ModalFooter>
+              <button className="bg-orange-600 hover:bg-orange-700 text-white font-black uppercase tracking-widest text-[11px] py-3.5 px-8 rounded-2xl shadow-lg shadow-orange-100 active:scale-95 transition-all">
+                Post Fine
+              </button>
+              <button onClick={() => setShowFineModal(false)} className="modal-btn-secondary">Cancel</button>
+            </ModalFooter>
+          </Modal>
         )}
-        {/* 🔹 MODAL 3: ADD MAINTENANCE CHARGE*/}
-{showMaintenanceModal && (
-  <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowMaintenanceModal(false)} />
-    
-    <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[40px] shadow-2xl animate-in zoom-in-95 duration-300">
-      
-      {/* Modal Header */}
-      <div className="sticky top-0 bg-white/95 backdrop-blur-md px-8 py-6 border-b flex justify-between items-center z-10">
-        <div>
-          <nav className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">
-            Admin Dashboard &bull; <span className="text-blue-600">Maintenance</span>
-          </nav>
-          <h1 className="text-xl font-black text-slate-800 tracking-tight">Add Maintenance Charge</h1>
-        </div>
-        <button onClick={() => setShowMaintenanceModal(false)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full transition-all"><X size={24} /></button>
-      </div>
 
-      {/* Modal Form Body */}
-      <div className="p-8 space-y-6">
-        <div>
-          <label className="block text-sm font-bold text-slate-700 mb-2">Charge Title</label>
-          <input type="text" placeholder="e.g., Feb 2026 Maintenance" className="w-full px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 transition-all text-slate-600" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Category</label>
-            <div className="relative">
-              <select className="w-full appearance-none px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:border-blue-200 transition-all text-slate-500 bg-white">
-                <option>Maintenance</option>
-                <option>Electricity</option>
-                <option>Water</option>
-              </select>
-              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">Amount</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
-              <input type="number" placeholder="0.00" className="w-full pl-8 pr-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:border-blue-200 transition-all text-slate-600" />
-            </div>
-          </div>
-        </div>
-
-        {/* Due Date Calendar Grid */}
-        <div>
-          <label className="block text-sm font-bold text-slate-700">Due Date</label>
-          <p className="text-xs text-slate-400 mb-4">Select the last date for payment</p>
-          <div className="border border-slate-100 rounded-[24px] p-6 bg-slate-50/30">
-            <div className="grid grid-cols-7 gap-y-2 text-center text-[11px] font-bold uppercase">
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <span key={d} className="text-slate-300 pb-2">{d}</span>)}
-              {days.map(n => (
-                <button key={n} className={`py-2 rounded-lg font-bold transition-all hover:bg-blue-50 ${n === 10 ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600'}`}>
-                  {n}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
-          <textarea rows={3} placeholder="Add any specific instructions..." className="w-full px-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:bg-white transition-all text-slate-600 resize-none"></textarea>
-        </div>
-      </div>
-
-      {/* Sticky Footer */}
-      <div className="sticky bottom-0 bg-white/95 backdrop-blur-md p-8 border-t border-slate-50 grid grid-cols-2 gap-4">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl shadow-xl shadow-blue-100 active:scale-95">Post Charge</button>
-        <button onClick={() => setShowMaintenanceModal(false)} className="bg-white hover:bg-slate-50 text-slate-500 font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl border border-slate-100 active:scale-95">Cancel</button>
-      </div>
-    </div>
-  </div>
-)}
-{/* 🔹 MODAL 4: ADD PENALTY / FINE */}
-{showFineModal && (
-  <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowFineModal(false)} />
-    
-    <div className="relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[40px] shadow-2xl animate-in zoom-in-95 duration-300">
-      
-      {/* Modal Header */}
-      <div className="sticky top-0 bg-white/95 backdrop-blur-md px-8 py-6 border-b flex justify-between items-center z-10">
-        <div>
-          <nav className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">
-            Admin Dashboard &bull; <span className="text-orange-600">Penalty & Fines</span>
-          </nav>
-          <h1 className="text-xl font-black text-slate-800 tracking-tight">Add Penalty / Fine</h1>
-        </div>
-        <button onClick={() => setShowFineModal(false)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full transition-all"><X size={24} /></button>
-      </div>
-
-      {/* Modal Form Body */}
-      <div className="p-8 space-y-6">
-        
-        {/* Fine Title */}
-        <div>
-          <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Fine Title</label>
-          <input type="text" placeholder="e.g. Late Payment Fine" className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-500/5 focus:bg-white focus:border-blue-200 outline-none transition-all font-medium" />
-        </div>
-
-        {/* Category & Amount */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="relative">
-            <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Category</label>
-            <select className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl appearance-none outline-none focus:border-blue-200 transition-all font-medium">
-              <option>Fine</option>
-              <option>Penalty</option>
-              <option>Late Fee</option>
-            </select>
-            <ChevronDown className="absolute right-4 top-[44px] w-4 h-4 text-slate-400 pointer-events-none" />
-          </div>
-          <div>
-            <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Amount</label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
-              <input type="number" placeholder="0.00" className="w-full pl-10 pr-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl outline-none focus:border-blue-200 transition-all font-medium" />
-            </div>
-          </div>
-        </div>
-
-        {/* Applied To & User Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="relative">
-            <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Applied To</label>
-            <select className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl appearance-none outline-none focus:border-blue-200 transition-all font-medium">
-              <option>Specific User</option>
-              <option>All Residents</option>
-            </select>
-            <ChevronDown className="absolute right-4 top-[44px] w-4 h-4 text-slate-400 pointer-events-none" />
-          </div>
-          <div className="relative">
-            <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Select User</label>
-            <div className="relative">
-              <input type="text" placeholder="Search User..." className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl outline-none font-medium" />
-              <User className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            </div>
-          </div>
-        </div>
-
-        {/* Proof Image Section */}
-        <div>
-          <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Proof Image</label>
-          <div className="flex flex-col sm:flex-row items-center justify-between p-4 border border-dashed border-slate-200 bg-slate-50/30 rounded-3xl gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-100 transition-transform hover:scale-105">
-                <ImageIcon className="text-white w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-slate-700">{fineFileName}</p>
-                <p className="text-[11px] text-slate-400 font-bold uppercase">Click to upload evidence</p>
-              </div>
-            </div>
-            <button className="w-full sm:w-auto px-6 py-2.5 text-xs font-black uppercase tracking-wider text-blue-600 bg-white border border-blue-100 rounded-xl hover:bg-blue-50 transition-all">
-              Upload File
-            </button>
-          </div>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">Description</label>
-          <textarea rows={3} placeholder="Provide details about the penalty..." className="w-full px-5 py-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl outline-none focus:bg-white transition-all text-slate-600 resize-none font-medium" />
-        </div>
-      </div>
-
-      {/* Sticky Footer */}
-      <div className="sticky bottom-0 bg-white/95 backdrop-blur-md p-8 border-t border-slate-50 grid grid-cols-2 gap-4">
-        <button className="bg-orange-600 hover:bg-orange-700 text-white font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl shadow-xl shadow-orange-100 active:scale-95 transition-all">
-          Post Fine
-        </button>
-        <button onClick={() => setShowFineModal(false)} className="bg-white hover:bg-slate-50 text-slate-500 font-black uppercase tracking-[2px] text-[11px] py-4 rounded-2xl border border-slate-100 active:scale-95">
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+        {/* Shared Styles */}
+        <style>{`
+          .modal-input {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.15s, background 0.15s;
+            color: #334155;
+          }
+          .modal-input:focus { border-color: #3b82f6; background: #fff; }
+          .modal-btn-primary {
+            background: #2563eb;
+            color: white;
+            font-weight: 900;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 14px 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px -4px #bfdbfe;
+            transition: all 0.15s;
+          }
+          .modal-btn-primary:hover { background: #1d4ed8; }
+          .modal-btn-primary:active { transform: scale(0.97); }
+          .modal-btn-secondary {
+            background: white;
+            color: #64748b;
+            font-weight: 900;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 14px 32px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.15s;
+          }
+          .modal-btn-secondary:hover { background: #f8fafc; }
+          .modal-btn-secondary:active { transform: scale(0.97); }
+        `}</style>
       </div>
     </DashboardLayout>
+  );
+};
+
+/* ── Shared Modal Components ── */
+
+const Modal = ({ children, onClose, wide }: any) => (
+  <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+    <div className={`relative bg-white w-full ${wide ? "max-w-3xl" : "max-w-2xl"} max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl border border-slate-100`}>
+      {children}
+    </div>
+  </div>
+);
+
+const ModalHeader = ({ title, subtitle, accent = "text-blue-600", onClose }: any) => (
+  <div className="sticky top-0 bg-white/95 backdrop-blur-md px-8 py-6 border-b border-slate-100 flex justify-between items-center z-10">
+    <div>
+      <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${accent}`}>{subtitle}</p>
+      <h1 className="text-xl font-black text-slate-800 tracking-tight">{title}</h1>
+    </div>
+    <button onClick={onClose} className="p-2 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-xl transition-all"><X size={20} /></button>
+  </div>
+);
+
+const ModalFooter = ({ children }: any) => (
+  <div className="sticky bottom-0 bg-white/95 backdrop-blur-md px-8 py-6 border-t border-slate-100 flex flex-wrap gap-3 justify-end">
+    {children}
+  </div>
+);
+
+const Field = ({ label, hint, children }: any) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-[11px] font-black text-slate-500 uppercase tracking-wider">{label}</label>
+    {hint && <p className="text-[11px] text-slate-400 -mt-1">{hint}</p>}
+    {children}
+  </div>
+);
+
+const SelectField = ({ options, placeholder }: any) => (
+  <div className="relative">
+    <select className="modal-input appearance-none pr-10 cursor-pointer">
+      {placeholder && <option value="">{placeholder}</option>}
+      {options.map((o: string) => <option key={o}>{o}</option>)}
+    </select>
+    <ChevronDown size={15} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+  </div>
+);
+
+const SectionLabel = ({ icon, label, color }: any) => (
+  <div className={`flex items-center gap-2 ${color} text-[10px] font-black uppercase tracking-widest border-b border-slate-100 pb-2`}>
+    {icon} {label}
+  </div>
+);
+
+const UploadBox = ({ icon, label, hint }: any) => (
+  <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center bg-slate-50 hover:bg-blue-50/50 hover:border-blue-200 transition-all cursor-pointer group gap-2">
+    <div className="bg-white p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform">{icon}</div>
+    <p className="text-xs font-bold text-slate-600 text-center">{label}</p>
+    {hint && <p className="text-[10px] text-slate-400 uppercase font-black text-center">{hint}</p>}
+  </div>
+);
+
+const MiniCalendar = () => {
+  const [selected, setSelected] = useState(10);
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  return (
+    <div className="border border-slate-100 rounded-2xl p-5 bg-slate-50/50">
+      <div className="flex justify-between items-center mb-4">
+        <button className="p-1.5 hover:bg-white rounded-lg transition-colors"><ChevronLeft size={16} className="text-slate-400" /></button>
+        <span className="text-sm font-black text-slate-700">October 2023</span>
+        <button className="p-1.5 hover:bg-white rounded-lg transition-colors"><ChevronRight size={16} className="text-slate-400" /></button>
+      </div>
+      <div className="grid grid-cols-7 gap-1 text-center">
+        {['S','M','T','W','T','F','S'].map(d => (
+          <span key={d} className="text-[10px] font-black text-slate-300 pb-2">{d}</span>
+        ))}
+        {days.map(n => (
+          <button key={n} onClick={() => setSelected(n)}
+            className={`py-1.5 rounded-xl text-xs font-bold transition-all
+              ${selected === n ? 'bg-blue-600 text-white shadow-md shadow-blue-100' : 'text-slate-600 hover:bg-white'}`}>
+            {n}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 };
 

@@ -12,7 +12,7 @@ import {
   Edit
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import DeleteConfirmationModal from './DeleteModal';
+import DeleteConfirmationModal from './Delete';
 
 const INITIAL_DATA = [
   { id: 'PEN-1029', issueDate: 'Oct 24, 2023', residentName: 'John Doe', unit: 'A-102', penaltyType: 'Late Payment', amount: 50.00, description: 'Maintenance bill for Oct overdue by 10 days', status: 'Outstanding' },

@@ -29,6 +29,8 @@ const navigationConfig = {
   "society-admin": [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: Users, label: "Resident Directory", href: "/residentDirectory" },
+      { icon: Building, label: "My Society", href: "/my-society" },
+
     { icon: Megaphone, label: "Notice Board", href: "/noticeBoard" },
     { icon: CreditCard, label: "Finances", href: "/finances" },
     { icon: Bell, label: "NotificationHub", href: "/notificationHub" },
@@ -125,7 +127,7 @@ const handleLogout = async () => {
           isResidentialAdmin && (sidebarOpen ? "translate-x-0" : "-translate-x-full"),
           
           // Society Admin toggle sidebar
-          isSocietyAdmin && (sidebarOpen ? "translate-x-0" : "-translate-x-full mt-16 lg:mt-20 shadow-xl"),
+isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-translate-x-full mt-16 lg:mt-20 shadow-xl"),
           
           // Member sidebar
           isMember && (sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0")
@@ -176,6 +178,7 @@ const handleLogout = async () => {
       </aside>
 
       {/* 2. TOP HEADER */}
+      
       {isSocietyOrResidential ? (
         /* HEADER A: Society Admin & Residential Admin  */
         <header className="fixed top-0 left-0 right-0 z-[80] bg-white border-b border-slate-100 h-16 lg:h-20 shadow-sm">
@@ -196,7 +199,7 @@ const handleLogout = async () => {
             </div>
 
             {role === "society-admin" && (
-              <div className="hidden xl:flex items-center gap-1">
+              <div className="hidden lg:flex items-center gap-1">
                 {societyAdminNavbarLinks.map((link) => {
                   const isActive = location.pathname === link.href;
                   return (
@@ -246,18 +249,19 @@ const handleLogout = async () => {
       )}
 
       {/* 3. MAIN CONTENT AREA */}
-      <div className={cn(
-        "transition-all duration-300", 
-        (isSuperAdmin || isMember) && "lg:pl-64", 
-        isResidentialAdmin && (sidebarOpen ? "lg:pl-64" : "lg:pl-0")
-      )}>
-        <main className={cn(
-          "p-4 lg:p-8 min-h-screen",
-          isSocietyOrResidential ? "pt-24 lg:pt-32" : "pt-20 lg:pt-8"
-        )}>
-          {children}
-        </main>
-      </div>
+    <div className={cn(
+  "transition-all duration-300", 
+  (isSuperAdmin || isMember) && "lg:pl-64", 
+  isResidentialAdmin && (sidebarOpen ? "lg:pl-64" : "lg:pl-0"),
+  isSocietyAdmin && (sidebarOpen ? "pl-64" : "pl-0")
+)}>
+  <main className={cn(
+    "p-4 lg:p-8 min-h-screen",
+    isSocietyOrResidential ? "pt-24 lg:pt-32" : "pt-20 lg:pt-8"
+  )}>
+    {children}
+  </main>
+</div>
 
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[65] lg:hidden" onClick={() => setSidebarOpen(false)} />

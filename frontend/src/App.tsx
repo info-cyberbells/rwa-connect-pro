@@ -51,6 +51,11 @@ import AdminSettings from "./pages/SocietyAdmin/AdminSettings";
 import NotificationHub from "./pages/SocietyAdmin/NotificationHub";
 import Maintenance from "./pages/SocietyAdmin/Maintenance";
 import AddPenaltyFine from "./pages/SocietyAdmin/AddPenaltyFine";
+import MySociety from "./pages/SocietyAdmin/MySociety";
+
+
+
+
 
 import{DashboardLayout} from "./components/layout/DashboardLayout"
 import ResidentialDashboard from "./pages/ResidentialHub/ResidentialDashboard"
@@ -127,7 +132,8 @@ const App = () => (
           <Route path="/notificationHub/*" element={<NotificationHub />} />
           <Route path="/maintenance/*" element={<Maintenance/>} />
          <Route path="/addPenaltyFine/*" element={<AddPenaltyFine/>} /> 
-
+         {/* <Route path="/delete/*" element={<Delete/>} />  */}
+<Route path="/my-society/*" element={<MySociety />} />
          
 {/* --- RESIDENTIAL ADMIN ROUTES (With Sidebar) --- */}
 <Route 
