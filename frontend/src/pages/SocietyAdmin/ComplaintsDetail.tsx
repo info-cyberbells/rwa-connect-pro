@@ -6,7 +6,7 @@ import {
 
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { getComplaints, getComplaintStats } from "../../features/admin/adminSlice";
+import { getComplaints, getComplaintStats ,updateComplaintStatus } from "../../features/admin/adminSlice";
 
 interface Ticket {
   _id: string;
@@ -18,6 +18,11 @@ interface Ticket {
   description: string;
   status: string;
   adminRemarks?: string;
+    assignedTo?: {
+    name: string;
+    contact: string;
+  };
+
   timeAgo: string;
 }
 
@@ -25,18 +30,19 @@ const ComplaintsDetail: React.FC = () => {
   const dispatch = useAppDispatch();
   const { complaints } = useAppSelector((state) => state.admin);
 
-  const tickets = ((complaints as any)?.complaints || complaints || []).map((c: any) => ({
-    _id: c._id,
-    title: c.title,
-    resident: c.submittedBy?.name || "Resident",
-    location: c.location,
-    category: c.type?.replace("_", " ").toUpperCase(),
-    priority: (c.priority?.toUpperCase() || "LOW") as "HIGH" | "MEDIUM" | "LOW",
-    description: c.description,
-    status: c.status,
-    adminRemarks: c.adminRemarks,
-    timeAgo: new Date(c.createdAt).toLocaleString(),
-  }));
+const tickets = ((complaints as any)?.complaints || complaints || []).map((c: any) => ({
+  _id: c._id,
+  title: c.title,
+  resident: c.submittedBy?.name || "Resident",
+  location: c.location,
+  category: c.type?.replace("_", " ").toUpperCase(),
+  priority: (c.priority?.toUpperCase() || "LOW") as "HIGH" | "MEDIUM" | "LOW",
+  description: c.description,
+  status: c.status,
+  adminRemarks: c.adminRemarks,
+  assignedTo: c.assignedTo,
+  timeAgo: new Date(c.createdAt).toLocaleString(),
+}));
 
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,8 +59,29 @@ const ComplaintsDetail: React.FC = () => {
       setSelectedTicketId(ticketWithReply?._id || tickets[0]._id);
     }
   }, [tickets, selectedTicketId]);
+  
+const handleResolve = () => {
+  if (!activeTicket) return;
 
-  const filteredTickets = tickets.filter(t =>
+  dispatch(
+    updateComplaintStatus({
+      id: activeTicket._id,
+      status: "resolved"
+    })
+  );
+};
+// const handleInProgress = () => {
+//   if (!activeTicket) return;
+
+//   dispatch(
+//     updateComplaintStatus({
+//       id: activeTicket._id,
+//       status: "in_progress"
+//     })
+//   );
+// };
+  
+const filteredTickets = tickets.filter(t =>
     t.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.resident?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -192,83 +219,91 @@ const ComplaintsDetail: React.FC = () => {
                       <button className="p-2 text-slate-400 hover:bg-slate-50 rounded-xl border border-slate-100 transition-colors">
                         <MoreVertical size={16} />
                       </button>
-                      <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm shadow-emerald-100 transition-all flex items-center gap-1.5">
-                        <CheckCircle size={13} /> Resolve
-                      </button>
+                   <button
+  onClick={handleResolve}
+  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm shadow-emerald-100 transition-all flex items-center gap-1.5"
+>
+  <CheckCircle size={13} /> Resolve
+</button>
+{/* <button
+  onClick={handleInProgress}
+  className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-black"
+>
+  In Progress
+</button> */}
                     </div>
                   </div>
                 </div>
 
                 {/* Chat Area */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              {/* Complaint Details */}
+<div className="flex-1 overflow-y-auto p-6 space-y-6">
 
-                  {/* Resident Message */}
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-slate-200 overflow-hidden flex-shrink-0 shadow-sm">
-                      <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${activeTicket.resident}`} alt="avatar" />
-                    </div>
-                    <div className="flex flex-col max-w-lg">
-                      <span className="text-[11px] font-bold text-slate-500 mb-1.5 ml-1">{activeTicket.resident}</span>
-                      <div className="bg-white border border-slate-100 px-4 py-3 rounded-2xl rounded-tl-sm text-sm text-slate-700 shadow-sm leading-relaxed">
-                        {activeTicket.description}
-                      </div>
-                      <span className="text-[10px] text-slate-400 mt-1.5 ml-1 flex items-center gap-1">
-                        <Clock size={9} /> {activeTicket.timeAgo}
-                      </span>
-                    </div>
-                  </div>
+  {/* Complaint Description */}
+  <div className="bg-white border border-slate-200 rounded-xl p-5">
+    <h3 className="text-sm font-bold text-slate-700 mb-2">
+      Complaint Description
+    </h3>
 
-                  {/* Admin Reply */}
-                  {activeTicket.adminRemarks && (
-                    <div className="flex items-start gap-3 justify-end">
-                      <div className="flex flex-col items-end max-w-lg">
-                        <span className="text-[11px] font-bold text-slate-500 mb-1.5 mr-1">Admin</span>
-                        <div className="bg-blue-600 px-4 py-3 rounded-2xl rounded-tr-sm text-sm text-white shadow-sm shadow-blue-100 leading-relaxed">
-                          {activeTicket.adminRemarks}
-                        </div>
-                        <span className="text-[10px] text-slate-400 mt-1.5 mr-1">Just now</span>
-                      </div>
-                      <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs font-black flex-shrink-0 shadow-sm shadow-blue-100">
-                        AD
-                      </div>
-                    </div>
-                  )}
+    <p className="text-sm text-slate-600 leading-relaxed">
+      {activeTicket.description}
+    </p>
 
-                  {/* Internal Note */}
-                  {activeTicket.adminRemarks && (
-                    <div className="bg-amber-50 border border-amber-200/60 rounded-2xl p-4 max-w-lg">
-                      <div className="flex items-center gap-2 text-amber-700 text-[11px] font-black mb-2 uppercase tracking-wide">
-                        <div className="w-5 h-5 bg-amber-100 rounded-lg flex items-center justify-center">
-                          <Lock size={10} />
-                        </div>
-                        Internal Note
-                      </div>
-                      <p className="text-sm text-amber-800 leading-relaxed">{activeTicket.adminRemarks}</p>
-                    </div>
-                  )}
-                </div>
+    <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
+      <Clock size={12}/> {activeTicket.timeAgo}
+    </p>
+  </div>
 
-                {/* Reply Input */}
-                <div className="px-6 py-4 bg-white border-t border-slate-100 flex-shrink-0">
-                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 focus-within:border-blue-300 focus-within:bg-white transition-all">
-                    <button className="text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0">
-                      <Paperclip size={18} />
-                    </button>
-                    <input
-                      type="text"
-                      placeholder="Type your reply..."
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
-                      className="flex-1 bg-transparent text-sm outline-none text-slate-700 placeholder-slate-400"
-                    />
-                    <button
-                      className={`p-2 rounded-xl text-white flex-shrink-0 transition-all ${replyText.trim() ? "bg-blue-600 hover:bg-blue-700 shadow-sm" : "bg-slate-200 cursor-not-allowed"}`}
-                      disabled={!replyText.trim()}
-                    >
-                      <Send size={16} />
-                    </button>
-                  </div>
-                </div>
+  {/* Admin Response */}
+  {activeTicket.adminRemarks && (
+    <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+      <h3 className="text-sm font-bold text-blue-700 mb-2">
+        Admin Response
+      </h3>
+
+      <p className="text-sm text-blue-800 leading-relaxed">
+        {activeTicket.adminRemarks}
+      </p>
+    </div>
+  )}
+
+{activeTicket.assignedTo && (
+  <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+    <h3 className="text-sm font-bold text-amber-700 mb-2">
+      Assigned Plumber
+    </h3>
+
+    <p className="text-sm text-amber-800">
+      Name: {activeTicket.assignedTo.name}
+    </p>
+
+    <p className="text-sm text-amber-800">
+      Contact: {activeTicket.assignedTo.contact}
+    </p>
+  </div>
+)}
+</div>
+
+               {/* Reply Input */}
+<div className="px-6 py-2 bg-white border-t border-slate-100">
+
+  <textarea
+    placeholder="Write admin response..."
+    value={replyText}
+    onChange={(e) => setReplyText(e.target.value)}
+    className="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-blue-400"
+  />
+
+  <div className="flex justify-end mt-3">
+    <button
+      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+      disabled={!replyText.trim()}
+    >
+      Send Response
+    </button>
+  </div>
+
+</div>
               </>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center p-8">

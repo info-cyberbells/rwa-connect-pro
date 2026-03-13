@@ -35,6 +35,8 @@ interface AdminState {
   profile: any | null;
   complaints: any[];
 complaintStats: any;
+  notices: any[];
+  noticesLoading: boolean;
 }
 const initialState: AdminState = {
   isLoading: false,
@@ -46,6 +48,8 @@ const initialState: AdminState = {
   profile: null,
   complaints: [],
   complaintStats: null,
+  notices: [],
+noticesLoading: false,
 };
 
 // ─── Async Thunks ─────────────────────────────────────────────────────────────
@@ -186,6 +190,130 @@ export const getComplaintStats = createAsyncThunk(
       return data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch stats");
+    }
+  }
+)
+// updateComplaintStatus
+export const updateComplaintStatus = createAsyncThunk(
+  "admin/updateComplaintStatus",
+  async ({ id, status }: { id: string; status: string }, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.patch(`/complaints/${id}/status`, {
+        status
+      });
+      return data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to update status");
+    }
+  }
+);
+// getNotices
+export const getNotices = createAsyncThunk(
+  "admin/getNotices",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get("/notices");
+      return data.notices || data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch notices");
+    }
+  }
+);
+export const createNotice = createAsyncThunk(
+  "admin/createNotice",
+  async (noticeData: any, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+
+      formData.append("title", noticeData.title);
+      formData.append("description", noticeData.description);
+      formData.append("category", noticeData.category);
+      formData.append("priority", noticeData.priority);
+      formData.append("visibleFrom", noticeData.visibleFrom);
+      formData.append("visibleUntil", noticeData.visibleUntil);
+      formData.append("isPinned", noticeData.isPinned);
+      formData.append("targetAudience", noticeData.targetAudience);
+
+      if (noticeData.images) {
+        formData.append("images", noticeData.images);
+      }
+
+      const { data } = await axiosInstance.post("/notices", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to create notice"
+      );
+    }
+  }
+);
+// pinNotice (toggle)
+export const pinNotice = createAsyncThunk(
+  "admin/pinNotice",
+  async (noticeId: string, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.patch(`/notices/${noticeId}/pin`);
+      return data.notice || data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to pin notice");
+    }
+  }
+);
+// deleteNotice
+export const deleteNotice = createAsyncThunk(
+  "admin/deleteNotice",
+  async (noticeId: string, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.delete(`/notices/${noticeId}`);
+      return noticeId;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to delete notice"
+      );
+    }
+  }
+);
+// updateNotice
+export const updateNotice = createAsyncThunk(
+  "admin/updateNotice",
+  async (
+    { id, noticeData }: { id: string; noticeData: any },
+    { rejectWithValue }
+  ) => {
+    try {
+      const formData = new FormData();
+
+      formData.append("title", noticeData.title);
+      formData.append("description", noticeData.description);
+      formData.append("category", noticeData.category);
+      formData.append("priority", noticeData.priority);
+      formData.append("visibleFrom", noticeData.visibleFrom);
+      formData.append("visibleUntil", noticeData.visibleUntil);
+      formData.append("isPinned", noticeData.isPinned);
+      formData.append("targetAudience", noticeData.targetAudience);
+
+      if (noticeData.images) {
+        formData.append("images", noticeData.images);
+      }
+
+      const { data } = await axiosInstance.patch(
+        `/notices/${id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      return data.notice || data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to update notice"
+      );
     }
   }
 );
@@ -329,7 +457,6 @@ const adminSlice = createSlice({
   state.isLoading = false;
   state.error = action.payload as string;
 })
-
 // getComplaintStats
 .addCase(getComplaintStats.pending, (state) => {
   state.isLoading = true;
@@ -342,6 +469,111 @@ const adminSlice = createSlice({
   state.isLoading = false;
   state.error = action.payload as string;
 })
+
+
+// updateComplaintStatus
+.addCase(updateComplaintStatus.pending, (state) => {
+  state.isLoading = true;
+  state.error = null;
+})
+
+.addCase(updateComplaintStatus.fulfilled, (state, action: any) => {
+  state.isLoading = false;
+
+  const updatedComplaint = action.payload.complaint;
+
+  const index = state.complaints.findIndex(
+    (c: any) => c._id === updatedComplaint._id
+  );
+
+  if (index !== -1) {
+    state.complaints[index] = updatedComplaint;
+  }
+})
+
+.addCase(updateComplaintStatus.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// getNotices
+.addCase(getNotices.pending, (state) => {
+  state.noticesLoading = true;
+})
+.addCase(getNotices.fulfilled, (state, action: PayloadAction<any[]>) => {
+  state.noticesLoading = false;
+  state.notices = action.payload;
+})
+.addCase(getNotices.rejected, (state, action) => {
+  state.noticesLoading = false;
+  state.error = action.payload as string;
+})
+
+.addCase(createNotice.pending, (state) => {
+  state.isLoading = true;
+})
+
+.addCase(createNotice.fulfilled, (state) => {
+  state.isLoading = false;
+  state.isSuccess = true;
+})
+
+.addCase(createNotice.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// pinNotice
+.addCase(pinNotice.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(pinNotice.fulfilled, (state, action: PayloadAction<any>) => {
+  state.isLoading = false;
+  const updated = action.payload;
+  const index = state.notices.findIndex((n: any) => n._id === updated._id);
+  if (index !== -1) {
+    state.notices[index] = updated;
+  }
+})
+.addCase(pinNotice.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// deleteNotice
+.addCase(deleteNotice.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(deleteNotice.fulfilled, (state, action: PayloadAction<string>) => {
+  state.isLoading = false;
+
+  state.notices = state.notices.filter(
+    (notice: any) => notice._id !== action.payload
+  );
+})
+.addCase(deleteNotice.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// updateNotice
+.addCase(updateNotice.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(updateNotice.fulfilled, (state, action: PayloadAction<any>) => {
+  state.isLoading = false;
+
+  const updated = action.payload;
+
+  const index = state.notices.findIndex(
+    (n: any) => n._id === updated._id
+  );
+
+  if (index !== -1) {
+    state.notices[index] = updated;
+  }
+})
+.addCase(updateNotice.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+
   }
 });
 

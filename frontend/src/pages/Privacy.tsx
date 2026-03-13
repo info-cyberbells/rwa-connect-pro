@@ -1,127 +1,195 @@
 import { motion } from "framer-motion";
 import { PublicLayout } from "@/components/layout/PublicLayout";
+import { ShieldCheck, Database, Lock, Users, Mail } from "lucide-react";
 
 export default function Privacy() {
+ const sections = [
+  {
+    icon: ShieldCheck,
+    title: "Introduction",
+    content:
+      "SocietySmartHub ('we', 'our', 'us') is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your information when you use our platform.",
+  },
+  {
+    icon: Database,
+    title: "Information We Collect",
+    list: [
+      "Personal details such as name, email, phone number and flat number",
+      "Society details including society name and address",
+      "Payment proof and transaction references",
+      "Usage data like IP address, device info and log data",
+    ],
+  },
+  {
+    icon: Users,
+    title: "How We Use Your Information",
+    list: [
+      "To manage society operations",
+      "For user verification and authentication",
+      "To process and track payments",
+      "To send notifications and announcements",
+      "To improve our platform services",
+    ],
+  },
+  {
+    icon: Lock,
+    title: "Data Security",
+    content:
+      "We implement strong technical and organizational security measures including encrypted communication, secure servers and regular audits to protect your personal information.",
+  },
+  {
+    icon: Users,
+    title: "Data Sharing",
+    list: [
+      "Society administrators for operational management",
+      "Trusted service providers that help operate our platform",
+      "Legal authorities when required by law",
+      "Payment providers for secure transaction processing",
+    ],
+  },
+  {
+    icon: Database,
+    title: "Data Storage and Retention",
+    content:
+      "We store your personal data only as long as necessary for providing services, complying with legal obligations, and resolving disputes.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "User Rights",
+    list: [
+      "Access your personal information",
+      "Update or correct inaccurate data",
+      "Request deletion of your personal information",
+      "Withdraw consent for certain data processing activities",
+    ],
+  },
+  {
+    icon: Database,
+    title: "Cookies and Tracking",
+    content:
+      "We use cookies and similar technologies to enhance your browsing experience, analyze usage patterns and improve platform performance.",
+  },
+  {
+    icon: Lock,
+    title: "Third Party Services",
+    content:
+      "Our platform may integrate with third-party services such as payment gateways or analytics tools. These services have their own privacy policies governing the use of your information.",
+  },
+  {
+    icon: Users,
+    title: "Children's Privacy",
+    content:
+      "SocietySmartHub services are intended for adults. We do not knowingly collect personal information from individuals under the age of 18.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Policy Updates",
+    content:
+      "We may update this Privacy Policy from time to time. Changes will be posted on this page with the updated revision date.",
+  },
+];
+
   return (
     <PublicLayout>
-      <section className="section-padding">
-        <div className="container mx-auto container-padding">
-          <div className="max-w-4xl mx-auto">
+      <div className="bg-gradient-to-b from-blue-50 via-white to-white min-h-screen">
+
+        {/* Header */}
+        <section className="py-20 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-3xl mx-auto px-6"
+          >
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4">
+              Privacy Policy
+            </h1>
+
+            <p className="text-slate-500">
+              Your privacy matters to us. Learn how Society Smart Hub protects your information.
+            </p>
+
+            <p className="text-sm text-blue-600 mt-2">
+              Last Updated • March 2026
+            </p>
+          </motion.div>
+        </section>
+
+        {/* Sections */}
+        <section className="pb-20">
+          <div className="max-w-4xl mx-auto px-6 space-y-6">
+
+            {sections.map((section, index) => {
+              const Icon = section.icon;
+
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white border border-slate-100 rounded-2xl p-7 shadow-sm hover:shadow-lg transition-all"
+                >
+
+                  <div className="flex items-start gap-4">
+
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                      <Icon size={18} className="text-blue-600" />
+                    </div>
+
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-800 mb-2">
+                        {index + 1}. {section.title}
+                      </h2>
+
+                      {section.content && (
+                        <p className="text-slate-600 text-sm leading-relaxed">
+                          {section.content}
+                        </p>
+                      )}
+
+                      {section.list && (
+                        <ul className="list-disc pl-5 mt-2 space-y-2 text-slate-600 text-sm">
+                          {section.list.map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+
+                  </div>
+
+                </motion.div>
+              );
+            })}
+
+            {/* Contact Box */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-12"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              className="mt-10 bg-blue-600 text-white rounded-2xl p-8 text-center shadow-lg"
             >
-              <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
-                Privacy Policy
-              </h1>
-              <p className="text-muted-foreground">
-                Last updated: December 5, 2024
+
+              <Mail className="mx-auto mb-3" size={26} />
+
+              <h3 className="text-xl font-semibold mb-2">
+                Have Questions?
+              </h3>
+
+              <p className="text-blue-100 text-sm mb-4">
+                If you have any questions regarding this privacy policy, feel free to contact our support team.
               </p>
+
+              <button className="bg-white text-blue-600 px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-50 transition">
+                privacy@societysmarthub.com
+              </button>
+
             </motion.div>
 
-            <div className="prose prose-lg max-w-none space-y-8">
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">1. Introduction</h2>
-                <p className="text-muted-foreground">
-                  SocietySmartHub ("we," "our," or "us") is committed to protecting your privacy. 
-                  This Privacy Policy explains how we collect, use, disclose, and safeguard your 
-                  information when you use our society management platform.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">2. Information We Collect</h2>
-                <p className="text-muted-foreground mb-4">We collect the following types of information:</p>
-                <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                  <li><strong>Personal Information:</strong> Name, email address, phone number, flat/unit number, Aadhaar number (for verification purposes only)</li>
-                  <li><strong>Society Information:</strong> Society name, address, committee details</li>
-                  <li><strong>Payment Information:</strong> Payment proof documents, transaction references</li>
-                  <li><strong>Usage Data:</strong> Log data, device information, IP addresses</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">3. How We Use Your Information</h2>
-                <p className="text-muted-foreground mb-4">We use the collected information for:</p>
-                <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                  <li>Providing and maintaining our services</li>
-                  <li>Member verification and authentication</li>
-                  <li>Processing and tracking payments</li>
-                  <li>Sending notifications and announcements</li>
-                  <li>Customer support and communication</li>
-                  <li>Improving our platform and services</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">4. Data Security</h2>
-                <p className="text-muted-foreground">
-                  We implement appropriate technical and organizational security measures to protect 
-                  your personal information. This includes encryption of data in transit and at rest, 
-                  secure servers, and regular security audits. However, no method of transmission over 
-                  the Internet is 100% secure.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">5. Data Sharing</h2>
-                <p className="text-muted-foreground mb-4">We do not sell your personal information. We may share data with:</p>
-                <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                  <li><strong>Society Administrators:</strong> For managing society operations</li>
-                  <li><strong>Service Providers:</strong> Who assist in operating our platform</li>
-                  <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">6. Your Rights</h2>
-                <p className="text-muted-foreground mb-4">You have the right to:</p>
-                <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                  <li>Access your personal data</li>
-                  <li>Correct inaccurate data</li>
-                  <li>Request deletion of your data</li>
-                  <li>Withdraw consent for data processing</li>
-                  <li>Data portability</li>
-                </ul>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">7. Cookies</h2>
-                <p className="text-muted-foreground">
-                  We use cookies and similar technologies to enhance your experience, analyze usage, 
-                  and provide personalized content. You can control cookie settings through your browser.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">8. Children's Privacy</h2>
-                <p className="text-muted-foreground">
-                  Our services are not intended for users under 18 years of age. We do not knowingly 
-                  collect personal information from children.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">9. Changes to This Policy</h2>
-                <p className="text-muted-foreground">
-                  We may update this Privacy Policy from time to time. We will notify you of any 
-                  changes by posting the new policy on this page and updating the "Last updated" date.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-heading font-bold mb-4">10. Contact Us</h2>
-                <p className="text-muted-foreground">
-                  If you have questions about this Privacy Policy, please contact us at:<br />
-                  Email: privacy@societysmarthub.com<br />
-                  Phone: +91 12345 67890
-                </p>
-              </section>
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+      </div>
     </PublicLayout>
   );
 }
