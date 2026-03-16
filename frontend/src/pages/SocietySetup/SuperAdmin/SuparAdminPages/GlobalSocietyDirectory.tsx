@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Building2,
   MapPin,
@@ -12,23 +12,31 @@ import {
 } from 'lucide-react';
 import Sidebar from '@/pages/SocietySetup/SuperAdmin/components/Sidebar';
 import { useNavigate } from 'react-router-dom';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useDispatch } from 'react-redux';
+import { AppDispatch, RootState, useAppSelector } from '@/store/store';
+import { getAllSocietiesSuperAdminThunk } from '@/features/Superadmin/superAdminSlice';
 
 const GlobalSocietyDirectory: React.FC = () => {
-  return (
-    <div className="flex min-h-screen bg-[#F8FAFC] font-sans overflow-x-hidden">
-      {/* Sidebar */}
-      <Sidebar />
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { societies, loading, error} = useAppSelector((state: RootState) => state.superAdmin);
+  
+  useEffect(()=>{
+    dispatch(getAllSocietiesSuperAdminThunk());
+  },[])
+
+  
+
+  return (
+    <DashboardLayout role="super-admin">
+    <div className="flex min-h-screen overflow-x-hidden">
       {/* Main */}
-<main className="flex-1 p-4 sm:p-6 lg:p-10 transition-all duration-300 overflow-x-hidden lg:ml-64">        {/* Header */}
+      <main className="flex-1">        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 mt-5 lg:mt-0">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="bg-blue-600 w-2 h-2 rounded-full animate-ping" />
-              <span className="text-blue-600 font-black text-[10px] uppercase tracking-[0.4em]">
-                Live Network Nodes
-              </span>
-            </div>
 
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
               Global Society <span className="text-blue-600">Directory</span>
@@ -39,7 +47,9 @@ const GlobalSocietyDirectory: React.FC = () => {
             </p>
           </div>
 
-          <button className="w-full sm:w-auto bg-blue-600 text-white px-5 py-3 rounded-2xl flex items-center justify-center gap-3 text-sm hover:bg-blue-700 transition">
+          <button
+          onClick={()=>navigate("/super-admin/register-society")}
+          className="w-full sm:w-auto bg-blue-600 text-white px-5 py-3 rounded-2xl flex items-center justify-center gap-3 text-sm hover:bg-blue-700 transition">
             New Society
           </button>
         </div>
@@ -89,7 +99,7 @@ const GlobalSocietyDirectory: React.FC = () => {
                       Management
                     </th>
                     <th className="hidden lg:table-cell px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">
-                      Plan
+                      Status
                     </th>
                     <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400 text-right">
                       Action
@@ -98,42 +108,78 @@ const GlobalSocietyDirectory: React.FC = () => {
                 </thead>
 
                 <tbody className="divide-y">
-                  <NodeRow
-                    name="Green Valley"
-                    id="NODE-451"
-                    city="Gurugram"
-                    type="Premium"
-                    units="240"
-                    admin="A. Sharma"
-                    status="Active"
-                  />
-                  <NodeRow
-                    name="Skyline Residency"
-                    id="NODE-229"
-                    city="Mumbai"
-                    type="Luxury"
-                    units="120"
-                    admin="P. Patel"
-                    status="Active"
-                  />
-                  <NodeRow
-                    name="The Royal Palms"
-                    id="NODE-108"
-                    city="Bangalore"
-                    type="Essential"
-                    units="85"
-                    admin="S. Kumar"
-                    status="Pending"
-                  />
-                  <NodeRow
-                    name="Sapphire Towers"
-                    id="NODE-092"
-                    city="Pune"
-                    type="Premium"
-                    units="410"
-                    admin="R. Mehta"
-                    status="Active"
-                  />
+                  {loading &&
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <tr key={index} className="animate-pulse">
+                      {/* Name + Logo */}
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-slate-200"></div>
+                          <div className="space-y-2">
+                            <div className="h-3 w-32 bg-slate-200 rounded"></div>
+                            <div className="h-2 w-20 bg-slate-100 rounded"></div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* City */}
+                      <td className="px-4 py-4">
+                        <div className="h-3 w-24 bg-slate-200 rounded"></div>
+                      </td>
+
+                      {/* Units */}
+                      <td className="px-4 py-4 text-center">
+                        <div className="h-6 w-12 bg-slate-100 rounded-lg mx-auto"></div>
+                      </td>
+
+                      {/* Admin (md+) */}
+                      <td className="hidden md:table-cell px-4 py-4">
+                        <div className="h-3 w-24 bg-slate-200 rounded"></div>
+                      </td>
+
+                      {/* Status (lg+) */}
+                      <td className="hidden lg:table-cell px-4 py-4">
+                        <div className="h-5 w-20 bg-slate-100 rounded-full"></div>
+                      </td>
+
+                      {/* Action */}
+                      <td className="px-4 py-4 text-right">
+                        <div className="h-8 w-28 bg-slate-200 rounded-xl ml-auto"></div>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {error && !loading && (
+                    <tr>
+                      <td colSpan={6} className="text-center py-6 text-sm text-red-500 font-medium">
+                        {error}
+                      </td>
+                    </tr>
+                  )}
+
+                  {!loading && !error && societies?.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="text-center py-6 text-sm text-slate-500">
+                        No societies found
+                      </td>
+                    </tr>
+                  )}
+
+                  {!loading &&
+                    !error &&
+                    societies?.map((society: any) => (
+                      <NodeRow
+                        key={society._id}
+                        id={society._id}
+                        logo={society.logoURL}
+                        name={society.name}
+                        city={society.address?.city}
+                        units={society.totalUnits}
+                        admin={society.createdBy?.name}
+                        status={society.isActive ? "Active" : "Inactive"}
+                        type={society.isActive ? "Active" : "Inactive"}
+                      />
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -143,10 +189,10 @@ const GlobalSocietyDirectory: React.FC = () => {
           <div className="p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
               <ShieldCheck size={16} className="text-emerald-500" />
-              Security Verified Grid · Total 42
+              Security Verified Grid
             </div>
 
-            <div className="flex flex-wrap gap-2 justify-center sm:justify-end">
+            {/* <div className="flex flex-wrap gap-2 justify-center sm:justify-end">
               <button className="w-10 h-10 rounded-xl border flex items-center justify-center">
                 <ChevronLeft size={18} />
               </button>
@@ -162,11 +208,12 @@ const GlobalSocietyDirectory: React.FC = () => {
               <button className="w-10 h-10 rounded-xl border flex items-center justify-center">
                 <ChevronRight size={18} />
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </main>
     </div>
+    </DashboardLayout>
   );
 };
 
@@ -177,16 +224,20 @@ const FilterTag = ({ label }: { label: string }) => (
   </button>
 );
 
-const NodeRow = ({ name, id, city, type, units, admin, status }: any) => {
+const NodeRow = ({ name, id, logo ,city, type, units, admin, status }: any) => {
   const navigate = useNavigate();
 
   return (
     <tr className="hover:bg-blue-50 transition">
       <td className="px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center">
-            <Building2 size={18} />
-          </div>
+              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center">
+                {logo ? (
+                  <img src={logo} alt="Logo" className="w-10 h-10 rounded-xl object-cover" />
+                ) : (
+                  <Building2 size={18} />
+                )}
+              </div>
           <div>
             <p className="font-bold text-sm">{name}</p>
             <span className="text-[10px] text-slate-400">{id}</span>
@@ -225,7 +276,7 @@ const NodeRow = ({ name, id, city, type, units, admin, status }: any) => {
 
       <td className="px-4 py-4 text-right">
         <button
-          onClick={() => navigate(`/globalSocietyDirectory/${id}`)}
+          onClick={() => navigate(`/super-admin/globalSocietyDirectory/${id}`)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 text-xs font-bold rounded-xl hover:bg-blue-600 hover:text-white transition"
         >
           <span className="hidden sm:inline">View Details</span>

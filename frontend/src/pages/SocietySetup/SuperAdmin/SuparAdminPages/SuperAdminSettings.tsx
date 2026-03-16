@@ -10,6 +10,7 @@ import {
   Edit2,
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 const SuperAdminSettings = () => {
   const [activeTab, setActiveTab] = useState('Personal Info');
@@ -27,12 +28,12 @@ const SuperAdminSettings = () => {
   const tabs = ['Personal Info', 'Security', 'Preferences'];
   
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900">
-      {/* Sidebar*/}
-      <Sidebar />
+    <DashboardLayout role='super-admin'>
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
+      
 
       {/*Main Content  */}
-      <div className="transition-all duration-300 md:ml-64 p-4 sm:p-6 lg:p-8 pt-20 md:pt-8">
+      <div className="transition-all duration-300">
         <div className="max-w-7xl mx-auto">
           
           {/* Header Section */}
@@ -217,6 +218,7 @@ const SuperAdminSettings = () => {
         </div>
       </div>
     </div>
+    </DashboardLayout>
   );
 };
 

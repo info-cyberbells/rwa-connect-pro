@@ -5,16 +5,19 @@ import {
   Info, Clock, FileText, CheckCircle2, Hash
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 const SupportTickets: React.FC = () => {
   const [internalMode, setInternalMode] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC] font-sans">
-      <Sidebar />
+
+    <DashboardLayout role="super-admin" >
+    <div className="flex min-h-screen font-sans">
+    
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col md:ml-64 w-full transition-all duration-300">
+      <div className="transition-all duration-300">
 
         {/* Header */}
  <header className="min-h-[80px] md:h-20 px-4 md:px-8 bg-white border-b border-slate-100 flex flex-col md:flex-row items-start md:items-center justify-between sticky top-0 z-30 pt-20 md:pt-0 gap-3 md:gap-0 overflow-hidden w-full">
@@ -212,6 +215,7 @@ const SupportTickets: React.FC = () => {
         </div>
       </div>
     </div>
+    </DashboardLayout>
   );
 };
 

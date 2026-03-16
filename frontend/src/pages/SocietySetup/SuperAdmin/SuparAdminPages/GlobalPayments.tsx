@@ -5,6 +5,7 @@ import {
   ArrowUpRight, AlertCircle
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 const GlobalPayments: React.FC = () => {
   const [search, setSearch] = useState('');
@@ -23,11 +24,12 @@ const GlobalPayments: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC] font-sans">
-      <Sidebar />
+    <DashboardLayout role='super-admin' >
+    <div className="flex min-h-screen font-sans">
+   
 
       {/* Main Content Area */}
-      <main className="flex-1 md:ml-64 w-full p-4 md:p-8 transition-all">
+      <main className="w-full transition-all">
         
         {/* Header Section  */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 pt-16 md:pt-0">
@@ -170,6 +172,7 @@ const GlobalPayments: React.FC = () => {
         </div>
       </main>
     </div>
+    </DashboardLayout>
   );
 };
 

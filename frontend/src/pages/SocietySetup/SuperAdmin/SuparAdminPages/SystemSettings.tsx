@@ -11,6 +11,7 @@ import {
 
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 const SystemSettings = () => {
   const [platformName, setPlatformName] = useState('SocietyHub Pro');
@@ -45,10 +46,11 @@ const SystemSettings = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 pb-24">
-      <Sidebar />
+    <DashboardLayout role="super-admin">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 pb-24">
+    
 
-      <header className="max-w-7xl mx-auto px-4 pt-20 pb-6 flex justify-between items-start md:ml-64 md:pt-10">
+      <header className="max-w-7xl mx-auto px-4 pb-6 flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold text-slate-800">System Settings</h1>
           <p className="text-slate-500 mt-1">Configure global platform parameters and management rules.</p>
@@ -60,7 +62,7 @@ const SystemSettings = () => {
         </button>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 space-y-6 md:ml-64">
+      <main className="max-w-7xl mx-auto px-4 space-y-6 ">
         {/* General Configuration Section */}
         <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex items-center gap-3">
@@ -284,6 +286,7 @@ const SystemSettings = () => {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 };
 

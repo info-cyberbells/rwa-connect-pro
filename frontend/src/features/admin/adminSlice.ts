@@ -37,6 +37,12 @@ interface AdminState {
 complaintStats: any;
   notices: any[];
   noticesLoading: boolean;
+    charges: any[];  
+      selectedCharge: any | null;
+        payments: any[];
+
+ 
+
 }
 const initialState: AdminState = {
   isLoading: false,
@@ -50,6 +56,10 @@ const initialState: AdminState = {
   complaintStats: null,
   notices: [],
 noticesLoading: false,
+charges: [],
+selectedCharge: null,
+payments: [],
+
 };
 
 // ─── Async Thunks ─────────────────────────────────────────────────────────────
@@ -193,13 +203,17 @@ export const getComplaintStats = createAsyncThunk(
     }
   }
 )
-// updateComplaintStatus
+// updateComplaintStatus — adminRemarks 
 export const updateComplaintStatus = createAsyncThunk(
   "admin/updateComplaintStatus",
-  async ({ id, status }: { id: string; status: string }, { rejectWithValue }) => {
+  async (
+    { id, status, adminRemarks }: { id: string; status: string; adminRemarks?: string },
+    { rejectWithValue }
+  ) => {
     try {
       const { data } = await axiosInstance.patch(`/complaints/${id}/status`, {
-        status
+        status,
+        ...(adminRemarks && { adminRemarks }), 
       });
       return data;
     } catch (err: any) {
@@ -314,6 +328,139 @@ export const updateNotice = createAsyncThunk(
       return rejectWithValue(
         err.response?.data?.message || "Failed to update notice"
       );
+    }
+  }
+);
+// createCharge
+export const createCharge = createAsyncThunk(
+  "admin/createCharge",
+  async (chargeData: any, { rejectWithValue }) => {
+    try {
+      const isFormData = chargeData instanceof FormData;
+
+      const { data } = await axiosInstance.post("/charges", chargeData, {
+        headers: isFormData
+          ? { "Content-Type": "multipart/form-data" }
+          : { "Content-Type": "application/json" },
+      });
+
+      return data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to create charge"
+      );
+    }
+  }
+);
+// getCharges
+export const getCharges = createAsyncThunk(
+  "admin/getCharges",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get("/charges");
+      return data.charges || data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch charges"
+      );
+    }
+  }
+);
+// getChargeById
+export const getChargeById = createAsyncThunk(
+  "admin/getChargeById",
+  async (chargeId: string, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get(`/charges/${chargeId}`);
+      return data.charge || data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch charge"
+      );
+    }
+  }
+);
+// updateCharge
+export const updateCharge = createAsyncThunk(
+  "admin/updateCharge",
+  async ({ id, chargeData }: { id: string; chargeData: any }, { rejectWithValue }) => {
+    try {
+      const isFormData = chargeData instanceof FormData;
+
+      const { data } = await axiosInstance.patch(`/charges/${id}`, chargeData, {
+        headers: isFormData
+          ? { "Content-Type": "multipart/form-data" }
+          : { "Content-Type": "application/json" },
+      });
+
+      return data.charge || data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to update charge"
+      );
+    }
+  }
+);
+// deleteCharge
+export const deleteCharge = createAsyncThunk(
+  "admin/deleteCharge",
+  async (chargeId: string, { rejectWithValue }) => {
+    try {
+      await axiosInstance.delete(`/charges/${chargeId}`);
+      return chargeId; // deleted id wapas bhejo
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to delete charge"
+      );
+    }
+  }
+);
+// getPayments
+export const getPayments = createAsyncThunk(
+  "admin/getPayments",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get("/payments");
+      return data.payments || data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch payments"
+      );
+    }
+  }
+);
+
+// approvePayment
+export const approvePayment = createAsyncThunk(
+  "admin/approvePayment",
+  async (paymentId: string, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.patch(
+        `/payments/${paymentId}/review`,  
+        { status: "approved" }            
+      );
+      return data.payment || data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to approve payment"
+      );
+    }
+  }
+);
+export const rejectPayment = createAsyncThunk(
+  "admin/rejectPayment",
+  async (
+    { paymentId, rejectionReason }: { paymentId: string; rejectionReason: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data } = await axiosInstance.patch(
+        `/payments/${paymentId}/review`,
+        { status: "rejected", rejectionReason }
+      );
+      return data.payment || data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to reject payment");
     }
   }
 );
@@ -573,7 +720,127 @@ const adminSlice = createSlice({
   state.isLoading = false;
   state.error = action.payload as string;
 })
+.addCase(getCharges.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(getCharges.fulfilled, (state, action) => {
+  state.isLoading = false;
+  state.charges = action.payload;
+})
+.addCase(getCharges.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// createCharge
+.addCase(createCharge.pending, (state) => {
+  state.isLoading = true;
+})
 
+.addCase(createCharge.fulfilled, (state, action: any) => {
+  state.isLoading = false;
+  state.isSuccess = true;
+
+  state.charges.unshift(action.payload.charge);
+})
+
+.addCase(createCharge.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// getChargeById
+.addCase(getChargeById.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(getChargeById.fulfilled, (state, action: PayloadAction<any>) => {
+  state.isLoading = false;
+  state.selectedCharge = action.payload;
+})
+.addCase(getChargeById.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// updateCharge
+.addCase(updateCharge.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(updateCharge.fulfilled, (state, action: PayloadAction<any>) => {
+  state.isLoading = false;
+  state.isSuccess = true;
+
+  // ✅ List mein bhi update ho jaaye
+  const updated = action.payload;
+  const index = state.charges.findIndex((c: any) => c._id === updated._id);
+  if (index !== -1) {
+    state.charges[index] = updated;
+  }
+
+  // ✅ selectedCharge bhi update karo
+  state.selectedCharge = updated;
+})
+.addCase(updateCharge.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// deleteCharge
+.addCase(deleteCharge.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(deleteCharge.fulfilled, (state, action: PayloadAction<string>) => {
+  state.isLoading = false;
+  // ✅ List se hata do
+  state.charges = state.charges.filter(
+    (c: any) => c._id !== action.payload
+  );
+})
+.addCase(deleteCharge.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// getPayments
+.addCase(getPayments.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(getPayments.fulfilled, (state, action: PayloadAction<any[]>) => {
+  state.isLoading = false;
+  state.payments = action.payload;
+})
+.addCase(getPayments.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+
+// approvePayment
+.addCase(approvePayment.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(approvePayment.fulfilled, (state, action: PayloadAction<any>) => {
+  state.isLoading = false;
+  const updated = action.payload;
+  const index = state.payments.findIndex((p: any) => p._id === updated._id);
+  if (index !== -1) {
+    state.payments[index] = updated;
+  }
+})
+.addCase(approvePayment.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
+// rejectPayment
+.addCase(rejectPayment.pending, (state) => {
+  state.isLoading = true;
+})
+.addCase(rejectPayment.fulfilled, (state, action: PayloadAction<any>) => {
+  state.isLoading = false;
+  const updated = action.payload;
+  const index = state.payments.findIndex((p: any) => p._id === updated._id);
+  if (index !== -1) {
+    state.payments[index] = updated;
+  }
+})
+.addCase(rejectPayment.rejected, (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload as string;
+})
   }
 });
 

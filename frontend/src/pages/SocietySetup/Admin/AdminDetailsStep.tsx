@@ -1,205 +1,522 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
-  Building, User, Lock, Home, ShieldCheck, Upload, CheckCircle, ArrowRight, Eye, HelpCircle 
+  User, Lock, Home, ShieldCheck, Upload, CheckCircle, 
+  ArrowRight, Eye, HelpCircle, ChevronDown, FileText, 
+  Check, Info
 } from 'lucide-react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { clearCreatedSociety, createSocietyAdminBySuperAdmin } from '@/features/Superadmin/superAdminSlice';
+import { AppDispatch, RootState, useAppSelector } from "@/store/store";
+import { useDispatch } from "react-redux";
+import { useNavigate } from 'react-router-dom';
 
 const AdminDetailsStep = () => {
-  // --- KYC state ---
-  const [govIdFile, setGovIdFile] = useState<File | null>(null);
-  const [addressFile, setAddressFile] = useState<File | null>(new File([], "document_v2.pdf"));
 
-  // --- Handlers ---
-  const handleGovIdUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setGovIdFile(e.target.files[0]);
+      const dispatch = useDispatch<AppDispatch>();
+  
+      const { createdSociety } = useAppSelector((state: RootState) => state.superAdmin);
+
+      const societyId = createdSociety?.society?._id;
+
+      const navigate = useNavigate();
+
+
+  // ---------------- FORM STATE ----------------
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    countryCode: "+1",
+    phone: "",
+    designation: "",
+    password: "",
+    towerBlock: "",
+    flatNumber: "",
+    pincode: "",
+    city: "",
+    state: "",
+    govIdFile: null,
+    addressFile: null,
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  // ---------------- HANDLERS ----------------
+  const handleChange = (e) => {
+      const { name, value } = e.target;
+
+      setFormData(prev => ({ ...prev, [name]: value }));
+
+      // remove error when user types
+      setErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    };
+
+  const handleFileChange = (e, fieldName) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        [fieldName]: file,
+      }));
+
+      setErrors(prev => ({
+        ...prev,
+        [fieldName]: ""
+      }));
     }
   };
 
-  const handleAddressChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setAddressFile(e.target.files[0]);
+  const handleSubmit = async () => {
+  const newErrors: any = {};
+
+  Object.keys(formData).forEach((key) => {
+    if (!formData[key] && key !== "govIdFile" && key !== "addressFile") {
+      newErrors[key] = "Required";
     }
+  });
+
+  if (!societyId) {
+    console.error("❌ Society ID not found in Redux");
+    return;
+  }
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+  const payload = {
+    name: formData.name,
+    email: formData.email,
+    phone: `${formData.countryCode}${formData.phone}`,
+    password: formData.password,
+    societyId: societyId ,
+    designation: formData.designation,
+    flatNumber: formData.flatNumber,
+    towerBlock: formData.towerBlock,
+
+    address: {
+      line1: formData.flatNumber + ", Tower " + formData.towerBlock,
+      city: formData.city,
+      state: formData.state,
+      pincode: formData.pincode,
+    },
+
+    kyc: {
+      aadhaarNumber: "XXXX-XXXX-5678", // Replace if dynamic
+      panNumber: "FGHIJ5678K",         // Replace if dynamic
+      governmentIdUrl: formData.govIdFile?.name || null,
+      addressProofUrl: formData.addressFile?.name || null,
+    },
   };
 
+  try {
+    const response = await dispatch(
+      createSocietyAdminBySuperAdmin(payload)
+    ).unwrap();
+
+    console.log("🎉 Society Admin Created:", response);
+
+    // Reset form
+    setFormData({
+      name: "",
+      email: "",
+      countryCode: "+1",
+      phone: "",
+      designation: "",
+      password: "SuperSecret123!",
+      towerBlock: "",
+      flatNumber: "",
+      pincode: "",
+      city: "",
+      state: "",
+      govIdFile: null,
+      addressFile: null,
+    });
+
+    dispatch(clearCreatedSociety());
+
+    navigate("/super-admin/globalSocietyDirectory");
+
+
+  } catch (error) {
+    console.error("❌ Admin creation failed:", error);
+  }
+};
+
+  // Helper for input styling
+const inputClass = (field) =>
+  `w-full bg-[#F8FAFC] border rounded-2xl py-3.5 px-5 outline-none transition-all font-medium text-[#6B7280] placeholder:text-slate-300
+  ${errors[field] ? "border-red-500 focus:border-red-500 focus:ring-red-500/10" : "border-[#E2E8F0] focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5"}`;
   return (
-    <div className="min-h-screen bg-[#FDFDFF] relative overflow-hidden flex flex-col font-sans">
+
+    <DashboardLayout role='super-admin'>
+    <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 relative overflow-hidden flex flex-col">
       
-      {/* --- 1. NAVBAR --- */}
-      <nav className="sticky top-0 z-50 bg-white/70 backdrop-blur-2xl border-b border-slate-100/50 px-10 py-5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
-            <Building className="text-white" size={22} />
-          </div>
-          <span className="font-black text-slate-900 text-xl tracking-tighter ">Luxe<span className="text-blue-600 not-italic">Society</span></span>
-        </div>
+      {/* Background Decorative Blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <main className="relative z-10 w-full max-w-4xl mx-auto px-6 py-12 flex-1">
         
-        <div className="hidden lg:flex items-center gap-8">
-          <div className="flex items-center gap-6 border-r border-slate-100 pr-8">
-            {['IDENTITY', 'STRUCTURE', 'ADDRESS', 'SETTINGS'].map((step) => (
-              <span key={step} className="text-[10px] font-black text-slate-300 tracking-[0.2em]">{step}</span>
-            ))}
-            <span className="text-[10px] font-black text-blue-600 tracking-[0.2em] flex items-center gap-2">
-               <div className="w-5 h-5 bg-blue-600 rounded-full text-white flex items-center justify-center text-[8px]">5</div> ADMIN
-            </span>
-          </div>
-          <HelpCircle size={20} className="text-slate-300 cursor-pointer" />
-          <div className="w-10 h-10 rounded-full bg-orange-100 border-2 border-white shadow-sm overflow-hidden">
-             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="user" />
-          </div>
-        </div>
-      </nav>
-
-      {/* --- 2. BACKGROUND ELEMENTS --- */}
-      <div className="absolute top-20 left-[-5%] w-[400px] h-[400px] bg-blue-400/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
-
-      <main className="relative z-10 w-full max-w-4xl mx-auto px-6 py-10 flex-1 flex flex-col items-center">
-        
-        {/* --- 3. HEADER --- */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-[800] text-slate-900 tracking-tighter mb-2 ">Society Admin Details</h1>
-          <p className="text-slate-400 font-medium">Assign the super administrator who will oversee all society operations.</p>
+        {/* HEADER */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-extrabold text-[#0F172A] tracking-tight mb-3">Society Admin Details</h1>
+          <p className="text-slate-500 font-medium">Assign the super administrator who will oversee all society operations.</p>
         </div>
 
-        {/* --- 4. FORM CARD --- */}
-        <div className="w-full bg-white rounded-[3rem] p-12 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.03)] border border-slate-50 space-y-12">
+        {/* MAIN FORM CARD */}
+        <div className="bg-white rounded-[2.5rem] p-10 md:p-14 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-50 space-y-12">
           
-          {/* Section: Personal Info */}
-          <div className="space-y-6">
-            <h3 className="flex items-center gap-2 text-[11px] font-black text-blue-600 uppercase tracking-[0.2em]">
-              <User size={16} /> Personal Information
-            </h3>
+          {/* SECTION 1: Personal Info */}
+          <section>
+            <h3 className="flex items-center gap-2 text-sm font-bold text-[#0F172A] uppercase tracking-wider mb-5"><User size={18} className='text-[#135BEC]' /> Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input type="text" placeholder="Full Name (e.g. Alexander Pierce)" className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl py-4 px-6 focus:bg-white focus:border-blue-400 outline-none transition-all font-medium text-slate-700 placeholder:text-slate-300" />
-              <input type="email" placeholder="Email Address" className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl py-4 px-6 focus:bg-white focus:border-blue-400 outline-none transition-all font-medium text-slate-700 placeholder:text-slate-300" />
-              <div className="flex gap-4">
-                <select className="w-24 bg-slate-50/50 border border-slate-100 rounded-2xl px-4 focus:bg-white outline-none font-bold text-slate-400">
-                  <option>+91</option>
-                </select>
-                <input type="tel" placeholder="Phone Number" className="flex-1 bg-slate-50/50 border border-slate-100 rounded-2xl py-4 px-6 focus:bg-white focus:border-blue-400 outline-none transition-all font-medium text-slate-700" />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#334155] ml-1">Full Name</label>
+                <input 
+                  name="name"
+                  type="text" 
+                  placeholder="e.g. Alexander Pierce" 
+                  className={inputClass("name")} 
+                  value={formData.name}
+                  onChange={handleChange}
+                />
               </div>
-              <select className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl py-4 px-6 focus:bg-white outline-none font-medium text-slate-400">
-                <option>Select Designation / Role</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Section: Login Credentials */}
-          <div className="space-y-6">
-            <h3 className="flex items-center gap-2 text-[11px] font-black text-blue-600 uppercase tracking-[0.2em]">
-              <Lock size={16} /> Login Credentials
-            </h3>
-            <div className="max-w-md space-y-3">
-              <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Admin Password</label>
-              <div className="relative">
-                <input type="password" value="SuperSecret123!" className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl py-4 px-6 pr-14 focus:bg-white focus:border-blue-400 outline-none transition-all font-bold text-slate-700" />
-                <Eye className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 cursor-pointer" size={18} />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#334155] ml-1">Email Address</label>
+                <input 
+                  name="email"
+                  type="email" 
+                  placeholder="alexander@society.com" 
+                  className={inputClass("email")} 
+                  value={formData.email}
+                  onChange={handleChange}
+                />
               </div>
-              <div className="flex items-center justify-between px-1">
-                <div className="flex gap-1 w-3/4">
-                  <div className="h-1.5 flex-1 bg-green-500 rounded-full" />
-                  <div className="h-1.5 flex-1 bg-green-500 rounded-full" />
-                  <div className="h-1.5 flex-1 bg-green-500 rounded-full" />
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#334155] ml-1">Phone Number</label>
+                <div className="flex gap-3">
+                  <div className="relative min-w-[100px]">
+                    <select 
+                      name="countryCode"
+                      className={`${inputClass("countryCode")} appearance-none pr-10`}
+                      value={formData.countryCode}
+                      onChange={handleChange}
+                    >
+                      <option>+1</option>
+                      <option>+91</option>
+                      <option>+44</option>
+                    </select>
+                    <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
+                  <input 
+                    name="phone"
+                    type="tel" 
+                    placeholder="123 456 7890" 
+                    className={inputClass("phone")} 
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
                 </div>
-                <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Strong</span>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#334155] ml-1">Designation</label>
+                <div className="relative">
+                  <select 
+                    name="designation"
+                    className={`${inputClass("designation")} appearance-none pr-10 text-slate-400`}
+                    value={formData.designation}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Role</option>
+                    <option>Chairman</option>
+                    <option>Secretary</option>
+                    <option>Treasurer</option>
+                  </select>
+                  <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* Section: Residence Details */}
-          <div className="space-y-6">
-            <h3 className="flex items-center gap-2 text-[11px] font-black text-blue-600 uppercase tracking-[0.2em]">
-              <Home size={16} /> Residence Details
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <input type="text" placeholder="Tower/Block (e.g. Wing A)" className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl py-4 px-6 focus:bg-white outline-none" />
-              <input type="text" placeholder="Flat Number" className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl py-4 px-6 focus:bg-white outline-none" />
-              <input type="text" placeholder="Pincode" className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl py-4 px-6 focus:bg-white outline-none" />
-            </div>
-          </div>
-
-          {/* Section: KYC Verification */}
-          <div className="space-y-6">
-            <h3 className="flex items-center gap-2 text-[11px] font-black text-blue-600 uppercase tracking-[0.2em]">
-              <ShieldCheck size={16} /> KYC Verification
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* SECTION 2: Login Credentials */}
+          <section>
+            <h3 className="flex items-center gap-2 text-sm font-bold text-[#0F172A] uppercase tracking-wider mb-5"><Lock size={18} className='text-[#135BEC]' /> Login Credentials</h3>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#334155] ml-1">Admin Password</label>
+                <div className="relative">
+                  <input 
+                    name="password"
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="SuperSecret123!" 
+                    className={`${inputClass("password")} pr-12`} 
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  <button 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-blue-500 transition-colors"
+                  >
+                    <Eye size={20} />
+                  </button>
+                </div>
+              </div>
               
-              {/* Government ID Upload */}
-              <div className="border-2 border-dashed border-slate-100 rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 hover:border-blue-200 transition-colors cursor-pointer bg-slate-50/30">
-                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-slate-400">
-                  <Upload size={24} />
+              {/* Password Strength */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                  <span className="text-slate-300">Strength</span>
+                  <span className="text-emerald-500">Strong</span>
                 </div>
-                <div className="text-center">
-                  <p className="text-sm font-black text-slate-700 uppercase tracking-tight">Government ID</p>
-                  <p className="text-[10px] text-slate-400 font-medium">Passport or Driver's License</p>
-                  {govIdFile && (
-                    <p className="text-[10px] text-green-500 font-bold italic underline mt-1">{govIdFile.name}</p>
-                  )}
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 w-[60%] rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
                 </div>
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.png"
-                  onChange={handleGovIdUpload}
-                  className="hidden"
-                  id="gov-id-upload"
-                />
-                <label
-                  htmlFor="gov-id-upload"
-                  className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] border-b border-blue-600 pb-0.5 cursor-pointer"
-                >
-                  Choose File
-                </label>
+                <p className="text-[10px] text-slate-400 font-medium">Use 8+ characters with a mix of letters, numbers & symbols.</p>
               </div>
-
-              {/* Address Proof */}
-              <div className="border-2 border-slate-100 rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 bg-slate-50/50 relative overflow-hidden">
-                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-green-100">
-                  <CheckCircle size={20} />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-black text-slate-700 uppercase tracking-tight">Address Proof</p>
-                  <p className="text-[10px] text-green-500 font-bold italic underline">
-                    {addressFile ? addressFile.name : "No file uploaded"}
-                  </p>
-                </div>
-                <input
-                  type="file"
-                  accept=".pdf,.jpg,.png"
-                  onChange={handleAddressChange}
-                  className="hidden"
-                  id="address-upload"
-                />
-                <label
-                  htmlFor="address-upload"
-                  className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] hover:text-slate-600 cursor-pointer"
-                >
-                  Change
-                </label>
-              </div>
-
             </div>
+          </section>
+
+          {/* SECTION 3: Residence Details */}
+          <section>
+            <h3 className="flex items-center gap-2 text-sm font-bold text-[#0F172A] uppercase tracking-wider mb-5"><Home size={18} className='text-[#135BEC]' /> Residence Details</h3>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#334155] ml-1">Tower/Block</label>
+                  <input 
+                    name="towerBlock"
+                    type="text" 
+                    placeholder="e.g. Wing A" 
+                    className={inputClass("towerBlock")} 
+                    value={formData.towerBlock}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#334155] ml-1">Flat Number</label>
+                  <input 
+                    name="flatNumber"
+                    type="text" 
+                    placeholder="102" 
+                    className={inputClass("flatNumber")} 
+                    value={formData.flatNumber}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#334155] ml-1">Pincode</label>
+                  <input 
+                    name="pincode"
+                    type="text" 
+                    placeholder="123456" 
+                    className={inputClass("pincode")} 
+                    value={formData.pincode}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#334155] ml-1">City</label>
+                  <input 
+                    name="city"
+                    type="text" 
+                    placeholder="Manhattan" 
+                    className={inputClass("city")} 
+                    value={formData.city}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#334155] ml-1">State</label>
+                  <input 
+                    name="state"
+                    type="text" 
+                    placeholder="New York" 
+                    className={inputClass("state")} 
+                    value={formData.state}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* SECTION 4: KYC Verification */}
+          <section>
+          <h3 className="flex items-center gap-2 text-sm font-bold text-[#0F172A] uppercase tracking-wider mb-5">
+            <ShieldCheck size={18} className='text-[#135BEC]' /> KYC Verification
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* ---------------- Government ID ---------------- */}
+            <div
+              className={`relative rounded-[2rem] p-8 flex flex-col items-center justify-center text-center space-y-3 transition-all cursor-pointer ${
+                errors.govIdFile
+                  ? "border-2 border-red-500"
+                  : formData.govIdFile
+                  ? "bg-[#F4F9F7] border border-emerald-100 shadow-sm"
+                  : "border-2 border-dashed border-slate-100 hover:border-blue-200"
+              }`}
+            >
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                className="hidden"
+                id="govIdUpload"
+                onChange={(e) => handleFileChange(e, "govIdFile")}
+              />
+
+              {formData.govIdFile ? (
+                <>
+                  <div className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <Check size={20} />
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-700">
+                      Government ID
+                    </h4>
+                    <p className="text-xs text-emerald-600 font-medium mt-1">
+                      {formData.govIdFile.name}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("govIdUpload").click()}
+                    className="text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-slate-600 transition-colors"
+                  >
+                    Change
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 group-hover:text-blue-500 transition-colors">
+                    <FileText size={24} />
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-700">
+                      Government ID
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Passport or Driver's License
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("govIdUpload").click()}
+                    className="text-blue-600 text-xs font-bold flex items-center gap-1 hover:underline"
+                  >
+                    <Upload size={12} /> Choose File
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* ---------------- Address Proof ---------------- */}
+            <div
+              className={`relative rounded-[2rem] p-8 flex flex-col items-center justify-center text-center space-y-3 transition-all cursor-pointer ${
+                errors.addressFile
+                  ? "border-2 border-red-500"
+                  : formData.addressFile
+                  ? "bg-[#F4F9F7] border border-emerald-100 shadow-sm"
+                  : "border-2 border-dashed border-slate-100 hover:border-blue-200"
+              }`}
+            >
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                className="hidden"
+                id="addressUpload"
+                onChange={(e) => handleFileChange(e, "addressFile")}
+              />
+
+              {formData.addressFile ? (
+                <>
+                  <div className="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <Check size={20} />
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-700">
+                      Address Proof
+                    </h4>
+                    <p className="text-xs text-emerald-600 font-medium mt-1">
+                      {formData.addressFile.name}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("addressUpload").click()}
+                    className="text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-slate-600 transition-colors"
+                  >
+                    Change
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300">
+                    <FileText size={24} />
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-700">
+                      Address Proof
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Utility bill or bank statement
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("addressUpload").click()}
+                    className="text-blue-600 text-xs font-bold flex items-center gap-1 hover:underline"
+                  >
+                    <Upload size={12} /> Choose File
+                  </button>
+                </>
+              )}
+            </div>
+
           </div>
+        </section>
+
         </div>
       </main>
 
-      {/* --- 5. STICKY FOOTER --- */}
-      <footer className="sticky bottom-0 bg-white/80 backdrop-blur-2xl border-t border-slate-100 px-16 py-8 flex justify-between items-center z-50 shadow-2xl">
+      {/* FIXED FOOTER */}
+      <footer className="sticky bottom-0 bg-white border-t border-slate-100 px-10 py-6 flex justify-between items-center z-30">
         <div className="flex flex-col">
-          <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest italic leading-none mb-1 text-xs">FINAL STEP</span>
-          <span className="text-sm font-bold text-slate-600">5 of 5: Setup Admin</span>
+          <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Final Step</span>
+          <span className="text-sm font-bold text-slate-800">5 of 5: Setup Admin</span>
         </div>
-
-        <div className="flex items-center gap-10">
-           <button className="text-slate-400 font-black text-xs uppercase tracking-[0.2em] hover:text-slate-700 transition-colors">
+        
+        <div className="flex items-center gap-6">
+          <button className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors">
             Cancel
-           </button>
-           <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-[2rem] font-bold text-sm flex items-center gap-4 shadow-[0_20px_40px_-12px_rgba(37,99,235,0.4)] transition-all hover:scale-105 active:scale-50 group uppercase tracking-widest">
-             Create Society Admin <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-           </button>
+          </button>
+          <button 
+            onClick={handleSubmit}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-full font-bold text-sm flex items-center gap-3 shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95"
+          >
+            Create Society Admin <ArrowRight size={18} />
+          </button>
         </div>
       </footer>
     </div>
+    </DashboardLayout>
   );
 };
 

@@ -56,21 +56,19 @@ const getTimeAgo = (dateStr: string): string => {
   if (diffDays === 1) return 'Yesterday';
   return `${diffDays} days ago`;
 };
-
 const getPriorityColor = (priority: string) => {
   switch (priority?.toLowerCase()) {
-    case 'urgent': return 'bg-red-50 text-red-600 border-red-100';
-    case 'high':   return 'bg-orange-50 text-orange-600 border-orange-100';
-    case 'medium': return 'bg-yellow-50 text-yellow-600 border-yellow-100';
-    default:       return 'bg-green-50 text-green-600 border-green-100';
+    case 'critical': return 'bg-red-50 text-red-600 border-red-100';    // ✅
+    case 'high':     return 'bg-orange-50 text-orange-600 border-orange-100';
+    case 'medium':   return 'bg-yellow-50 text-yellow-600 border-yellow-100';
+    default:         return 'bg-green-50 text-green-600 border-green-100';
   }
 };
-
 // ─── Constants ──────────────────────────────────────────────────────────────
-const TABS = ['All Notices', 'Official', 'Events', 'General'];
-const CATEGORIES = ['official', 'events', 'general', 'maintenance', 'safety', 'community', 'alert'];
-const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
-const AUDIENCES = ['all', 'residents', 'staff', 'owners'];
+const TABS = ['All Notices', 'Alert', 'Urgent', 'General', 'Event', 'Maintenance'];
+const CATEGORIES = ['alert', 'urgent', 'general', 'event', 'maintenance'];
+const PRIORITIES = ['low', 'medium', 'high', 'critical'];
+const AUDIENCES = ['all', 'owners', 'tenants'];
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 const NoticeBoard = () => {

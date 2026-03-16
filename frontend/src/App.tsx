@@ -16,19 +16,19 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
+ 
 // Dashboard Pages
 import SuperAdminDashboard from "./pages/dashboard/SuperAdminDashboard";
 import SocietyAdminDashboard from "./pages/dashboard/SocietyAdminDashboard";
 import MemberDashboard from "./pages/dashboard/MemberDashboard";
-
+ 
 import NotFound from "./pages/NotFound";
 // import Admin from "./pages/SocietySetup/Admin/Admin"
-
-import SocietyIdentitySetup from "./pages/SocietySetup/SuperAdmin/SocietyIdentitySetup"
-import StructureStep from "./pages/SocietySetup/User/StructureStep"
-import AddressStep from "./pages/SocietySetup/User/AddressStep"
-import FinalizeSetup from "./pages/SocietySetup/User/FinalizeSetup"
+ 
+import SocietyIdentitySetup from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietyRegistrationPages/SocietyIdentitySetup"
+import StructureStep from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietyRegistrationPages/StructureStep"
+import AddressStep from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietyRegistrationPages/AddressStep"
+import FinalizeSetup from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietyRegistrationPages/FinalizeSetup"
 import AdminDetailsStep from "./pages/SocietySetup/Admin/AdminDetailsStep"
 import AdminDashboard from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/AdminDashboard"
 import GlobalSocietyDirectory from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/GlobalSocietyDirectory"
@@ -40,7 +40,7 @@ import DocumentCenter from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/Docu
 import SecurityAndPreferences from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SecurityAndPreferences"
 import SuperAdminSettings from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SuperAdminSettings"
 import SystemSettings from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SystemSettings";
-
+ 
 import { Sidebar } from "lucide-react";
 import Dashboard from "./pages/SocietyAdmin/Dashboard";
 import ResidentDirectory from "./pages/SocietyAdmin/ResidentDirectory";
@@ -51,22 +51,18 @@ import AdminSettings from "./pages/SocietyAdmin/AdminSettings";
 import NotificationHub from "./pages/SocietyAdmin/NotificationHub";
 import Maintenance from "./pages/SocietyAdmin/Maintenance";
 import AddPenaltyFine from "./pages/SocietyAdmin/AddPenaltyFine";
-import MySociety from "./pages/SocietyAdmin/MySociety";
-
-
-
-
-
+ 
 import{DashboardLayout} from "./components/layout/DashboardLayout"
-import ResidentialDashboard from "./pages/ResidentialHub/ResidentialDashboard"
-import ResidentialPayments from "./pages/ResidentialHub/ResidentialPayments"
-import ResidentialsocietyNotices from "./pages/ResidentialHub/ResidentialSocietyNotices"
-import ResidentialSupport from "./pages/ResidentialHub/ResidentialSupport"
-import ProfileHub from "./pages/ResidentialHub/ProfileHub";
-
-
+import ResidentialDashboard from "./pages/ResidentialUser/ResidentialDashboard.tsx"
+import ResidentialPayments from "./pages/ResidentialUser/ResidentialPayments.tsx"
+import ResidentialsocietyNotices from "./pages/ResidentialUser/ResidentialSocietyNotices.tsx"
+import ResidentialSupport from "./pages/ResidentialUser/ResidentialSupport.tsx"
+import ProfileHub from "./pages/ResidentialUser/ProfileHub.tsx";
+import SocietySetupContainer from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietySetupContainer.tsx";
+ 
+ 
 const queryClient = new QueryClient();
-
+ 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -86,21 +82,34 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
+ 
           {/* Super Admin Routes */}
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
           <Route path="/super-admin/*" element={<SuperAdminDashboard />} />
-
+          <Route path="/super-admin/globalSocietyDirectory" element={<GlobalSocietyDirectory />} />
+          <Route path="/super-admin/globalSocietyDirectory/:id" element={<SocietyDetails />} />
+          <Route path="/super-admin/register-society" element={<SocietySetupContainer />} />
+          <Route path="/super-admin/globalPayments" element={<GlobalPayments />} />
+          <Route path="/super-admin/support-Tickets" element={<SupportTickets />} />
+          <Route path="/super-admin/document-center" element={<DocumentCenter />} />
+          <Route path="/super-admin/Settings" element={<SuperAdminSettings />} />
+           <Route path="/super-admin/securityAndPreferences" element={<SecurityAndPreferences />} />
+          <Route path="/systemSettings/*" element={<SystemSettings />} />
+ 
+ 
+ 
+ 
+ 
           {/* Society Admin Routes */}
           {/* <Route path="/society-admin" element={<SocietyAdminDashboard />} /> */}
-
+ 
           {/* Member Routes */}
           <Route path="/member" element={<MemberDashboard />} />
           <Route path="/member/*" element={<MemberDashboard />} />
-
+ 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
-
+ 
           {/*  Super Admin Routes */}
           {/* <Route path="/admin/*" element={<Admin />} /> */}
           <Route path="/societyIdentitySetup/*" element={<SocietyIdentitySetup />} />
@@ -108,19 +117,14 @@ const App = () => (
           <Route path="/addressStep/*" element={< AddressStep />} />
           <Route path="/finalizeSetup/*" element={< FinalizeSetup />} />
           <Route path="/adminDetailsStep/*" element={< AdminDetailsStep />} />
-
+ 
           <Route path="/sidebar/*" element={<Sidebar />} />
           <Route path="/adminDashboard/*" element={<AdminDashboard />} />
-          <Route path="/globalSocietyDirectory" element={<GlobalSocietyDirectory />} />
-          <Route path="/globalSocietyDirectory/:id" element={<SocietyDetails />} />
-          <Route path="/globalPayments/*" element={<GlobalPayments />} />
-          <Route path="/support-Tickets/*" element={<SupportTickets />} />
+         
           <Route path="/notificationsHub/*" element={<NotificationsHub />} />
-          <Route path="/documentCenter/*" element={<DocumentCenter />} />
-          <Route path="/superAdminSettings/*" element={<SuperAdminSettings />} />
-          <Route path="/securityAndPreferences/*" element={<SecurityAndPreferences />} />
-          <Route path="/systemSettings/*" element={<SystemSettings />} />
-
+         
+         
+ 
           {/* Society Admin Routes */}
           <Route path="/society-admin/*" element={<SocietyAdminDashboard />} />
           <Route path="/dashboard/*" element={<Dashboard />} />
@@ -131,35 +135,22 @@ const App = () => (
           <Route path="/adminSettings/*" element={<AdminSettings />} />
           <Route path="/notificationHub/*" element={<NotificationHub />} />
           <Route path="/maintenance/*" element={<Maintenance/>} />
-         <Route path="/addPenaltyFine/*" element={<AddPenaltyFine/>} /> 
-         {/* <Route path="/delete/*" element={<Delete/>} />  */}
-<Route path="/my-society/*" element={<MySociety />} />
-         
-{/* --- RESIDENTIAL ADMIN ROUTES (With Sidebar) --- */}
-<Route 
-  element={
-    <DashboardLayout role="residential-admin">
-      {/* We use Outlet here to render nested child routes within the DashboardLayout */}
-      <Outlet /> 
-    </DashboardLayout>
-  }
->
-  {/* All these paths will now render within the DashboardLayout alongside the Sidebar */}
-  <Route path="/residentialDashboard" element={<ResidentialDashboard />} />
-  <Route path="/residentialPayments" element={<ResidentialPayments />} />
-  <Route path="/societyNotices" element={<ResidentialsocietyNotices />} />  
-  <Route path="/residentialSupport" element={<ResidentialSupport/>} />  
-  <Route path="/profileHub" element={<ProfileHub/>} />  
-</Route>
-        
-
-
-
-
+         <Route path="/addPenaltyFine/*" element={<AddPenaltyFine/>} />
+          {/* All these paths will now render within the DashboardLayout alongside the Sidebar */}
+          <Route path="/residentialDashboard" element={<ResidentialDashboard />} />
+          <Route path="/member/payments" element={<ResidentialPayments />} />
+          <Route path="/member/notices" element={<ResidentialsocietyNotices />} />  
+          <Route path="/member/support" element={<ResidentialSupport/>} />  
+          <Route path="/member/profile" element={<ProfileHub/>} />
+       
+ 
+ 
+ 
+ 
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
-
+ 
 export default App;

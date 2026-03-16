@@ -6,7 +6,7 @@ import {
 
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { getComplaints, getComplaintStats ,updateComplaintStatus } from "../../features/admin/adminSlice";
+import { getComplaints, getComplaintStats, updateComplaintStatus } from "../../features/admin/adminSlice";
 
 interface Ticket {
   _id: string;
@@ -18,11 +18,10 @@ interface Ticket {
   description: string;
   status: string;
   adminRemarks?: string;
-    assignedTo?: {
+  assignedTo?: {
     name: string;
     contact: string;
   };
-
   timeAgo: string;
 }
 
@@ -30,19 +29,24 @@ const ComplaintsDetail: React.FC = () => {
   const dispatch = useAppDispatch();
   const { complaints } = useAppSelector((state) => state.admin);
 
-const tickets = ((complaints as any)?.complaints || complaints || []).map((c: any) => ({
-  _id: c._id,
-  title: c.title,
-  resident: c.submittedBy?.name || "Resident",
-  location: c.location,
-  category: c.type?.replace("_", " ").toUpperCase(),
-  priority: (c.priority?.toUpperCase() || "LOW") as "HIGH" | "MEDIUM" | "LOW",
-  description: c.description,
-  status: c.status,
-  adminRemarks: c.adminRemarks,
-  assignedTo: c.assignedTo,
-  timeAgo: new Date(c.createdAt).toLocaleString(),
-}));
+  const tickets = ((complaints as any)?.complaints || complaints || []).map((c: any) => ({
+    _id: c._id,
+    title: c.title,
+    resident: c.submittedBy?.name || "Resident",
+    location: c.location,
+    category: c.type?.replace("_", " ").toUpperCase(),
+    priority: (c.priority?.toUpperCase() || "LOW") as "HIGH" | "MEDIUM" | "LOW",
+    description: c.description,
+    status: c.status,
+    adminRemarks: c.adminRemarks,
+    assignedTo: c.assignedTo,
+    timeAgo: new Date(c.createdAt).toLocaleString(),
+  }));
+
+  // ── Stats counts (live from Redux state) ──
+  const activeCount     = tickets.filter(t => t.status === "open").length;
+  const resolvedCount   = tickets.filter(t => t.status === "resolved").length;
+  const inProgressCount = tickets.filter(t => t.status === "in_progress").length;
 
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,29 +63,28 @@ const tickets = ((complaints as any)?.complaints || complaints || []).map((c: an
       setSelectedTicketId(ticketWithReply?._id || tickets[0]._id);
     }
   }, [tickets, selectedTicketId]);
-  
-const handleResolve = () => {
-  if (!activeTicket) return;
 
-  dispatch(
-    updateComplaintStatus({
+  const handleResolve = () => {
+    if (!activeTicket) return;
+    dispatch(updateComplaintStatus({ id: activeTicket._id, status: "resolved" }));
+  };
+
+  const handleSendResponse = () => {
+    if (!activeTicket || !replyText.trim()) return;
+    dispatch(updateComplaintStatus({
       id: activeTicket._id,
-      status: "resolved"
-    })
-  );
-};
-// const handleInProgress = () => {
-//   if (!activeTicket) return;
+      status: "in_progress",
+      adminRemarks: replyText.trim()
+    }));
+    setReplyText("");
+  };
 
-//   dispatch(
-//     updateComplaintStatus({
-//       id: activeTicket._id,
-//       status: "in_progress"
-//     })
-//   );
-// };
-  
-const filteredTickets = tickets.filter(t =>
+  const handleInProgress = () => {
+    if (!activeTicket) return;
+    dispatch(updateComplaintStatus({ id: activeTicket._id, status: "in_progress" }));
+  };
+
+  const filteredTickets = tickets.filter(t =>
     t.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.resident?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -92,6 +95,7 @@ const filteredTickets = tickets.filter(t =>
     open:        { label: "Open",        cls: "bg-rose-50 text-rose-600 border-rose-100" },
     in_progress: { label: "In Progress", cls: "bg-amber-50 text-amber-600 border-amber-100" },
     resolved:    { label: "Resolved",    cls: "bg-emerald-50 text-emerald-600 border-emerald-100" },
+    closed:      { label: "Closed",      cls: "bg-slate-100 text-slate-500 border-slate-200" },
   };
   const getStatus = (s: string) => statusConfig[s] || { label: s, cls: "bg-slate-100 text-slate-500 border-slate-200" };
 
@@ -101,13 +105,31 @@ const filteredTickets = tickets.filter(t =>
 
         {/* ── Top Bar ── */}
         <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100 flex-shrink-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
             <h1 className="text-lg font-black text-slate-800 tracking-tight">Complaints</h1>
+
+            {/* Total */}
             <span className="ml-1 bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-0.5 rounded-lg border border-blue-100">
               {tickets.length} total
             </span>
+
+            {/* Open / Active */}
+            <span className="bg-rose-50 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded-lg border border-rose-100">
+              {activeCount} open
+            </span>
+
+            {/* In Progress */}
+            <span className="bg-amber-50 text-amber-600 text-[10px] font-black px-2 py-0.5 rounded-lg border border-amber-100">
+              {inProgressCount} in progress
+            </span>
+
+            {/* Resolved */}
+            <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2 py-0.5 rounded-lg border border-emerald-100">
+              {resolvedCount} resolved
+            </span>
           </div>
+
           <button className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl transition-colors">
             <Filter size={13} /> Filter
           </button>
@@ -219,91 +241,80 @@ const filteredTickets = tickets.filter(t =>
                       <button className="p-2 text-slate-400 hover:bg-slate-50 rounded-xl border border-slate-100 transition-colors">
                         <MoreVertical size={16} />
                       </button>
-                   <button
-  onClick={handleResolve}
-  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm shadow-emerald-100 transition-all flex items-center gap-1.5"
->
-  <CheckCircle size={13} /> Resolve
-</button>
-{/* <button
-  onClick={handleInProgress}
-  className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-black"
->
-  In Progress
-</button> */}
+                      <button
+                        onClick={handleResolve}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm shadow-emerald-100 transition-all flex items-center gap-1.5"
+                      >
+                        <CheckCircle size={13} /> Resolve
+                      </button>
+                      <button
+                        onClick={handleInProgress}
+                        className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-black"
+                      >
+                        In Progress
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Chat Area */}
-              {/* Complaint Details */}
-<div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {/* Complaint Details */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
-  {/* Complaint Description */}
-  <div className="bg-white border border-slate-200 rounded-xl p-5">
-    <h3 className="text-sm font-bold text-slate-700 mb-2">
-      Complaint Description
-    </h3>
+                  {/* Complaint Description */}
+                  <div className="bg-white border border-slate-200 rounded-xl p-5">
+                    <h3 className="text-sm font-bold text-slate-700 mb-2">
+                      Complaint Description
+                    </h3>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      {activeTicket.description}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
+                      <Clock size={12} /> {activeTicket.timeAgo}
+                    </p>
+                  </div>
 
-    <p className="text-sm text-slate-600 leading-relaxed">
-      {activeTicket.description}
-    </p>
+                  {/* Admin Response */}
+                  {activeTicket.adminRemarks && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+                      <h3 className="text-sm font-bold text-blue-700 mb-2">
+                        Admin Response
+                      </h3>
+                      <p className="text-sm text-blue-800 leading-relaxed">
+                        {activeTicket.adminRemarks}
+                      </p>
+                    </div>
+                  )}
 
-    <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
-      <Clock size={12}/> {activeTicket.timeAgo}
-    </p>
-  </div>
+                  {/* Assigned To */}
+                  {activeTicket.assignedTo && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+                      <h3 className="text-sm font-bold text-amber-700 mb-2">
+                        Assigned Plumber
+                      </h3>
+                      <p className="text-sm text-amber-800">Name: {activeTicket.assignedTo.name}</p>
+                      <p className="text-sm text-amber-800">Contact: {activeTicket.assignedTo.contact}</p>
+                    </div>
+                  )}
+                </div>
 
-  {/* Admin Response */}
-  {activeTicket.adminRemarks && (
-    <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
-      <h3 className="text-sm font-bold text-blue-700 mb-2">
-        Admin Response
-      </h3>
-
-      <p className="text-sm text-blue-800 leading-relaxed">
-        {activeTicket.adminRemarks}
-      </p>
-    </div>
-  )}
-
-{activeTicket.assignedTo && (
-  <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-    <h3 className="text-sm font-bold text-amber-700 mb-2">
-      Assigned Plumber
-    </h3>
-
-    <p className="text-sm text-amber-800">
-      Name: {activeTicket.assignedTo.name}
-    </p>
-
-    <p className="text-sm text-amber-800">
-      Contact: {activeTicket.assignedTo.contact}
-    </p>
-  </div>
-)}
-</div>
-
-               {/* Reply Input */}
-<div className="px-6 py-2 bg-white border-t border-slate-100">
-
-  <textarea
-    placeholder="Write admin response..."
-    value={replyText}
-    onChange={(e) => setReplyText(e.target.value)}
-    className="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-blue-400"
-  />
-
-  <div className="flex justify-end mt-3">
-    <button
-      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"
-      disabled={!replyText.trim()}
-    >
-      Send Response
-    </button>
-  </div>
-
-</div>
+                {/* Reply Input */}
+                <div className="px-6 py-2 bg-white border-t border-slate-100">
+                  <textarea
+                    placeholder="Write admin response..."
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    className="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-blue-400"
+                  />
+                  <div className="flex justify-end mt-3">
+                    <button
+                      onClick={handleSendResponse}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+                      disabled={!replyText.trim()}
+                    >
+                      Send Response
+                    </button>
+                  </div>
+                </div>
               </>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center p-8">

@@ -1,36 +1,40 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { 
+import {
    Menu, X, LogOut, User, Bell, Megaphone,
-  LayoutDashboard, Users, CreditCard, FileText, 
-  Settings, MessageSquare, ClipboardList, Shield, Building, 
-  Home, UserCheck, HardHat, ShieldCheck,Wrench,AlertOctagon
+  LayoutDashboard, Users, CreditCard, FileText,
+  Settings, MessageSquare, ClipboardList, Shield, Building,
+  Home, UserCheck, HardHat, ShieldCheck,Wrench,AlertOctagon,LucideFileText, Ticket
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import authService from "@/auth/authServices";
 import { useDispatch } from "react-redux";
-
-
-
+ 
+ 
+ 
 interface DashboardLayoutProps {
   children: React.ReactNode;
   role: "super-admin" | "society-admin" | "member" | "residential-admin";
 }
-
+ 
 const navigationConfig = {
   "super-admin": [
     { icon: LayoutDashboard, label: "Dashboard", href: "/super-admin" },
-    { icon: Building, label: "Societies", href: "/super-admin/societies" },
-    { icon: Users, label: "Society Admins", href: "/super-admin/admins" },
-    { icon: CreditCard, label: "Subscriptions", href: "/super-admin/subscriptions" },
+    { icon: Building, label: "Societies", href: "/super-admin/globalSocietyDirectory" },
+    // { icon: Users, label: "Society Admins", href: "/super-admin/admins" },
+    { icon: CreditCard, label: "Payments", href: "/super-admin/globalPayments" },
+    { icon: Ticket, label: "Support Tickets", href: "/super-admin/support-tickets" },
+    { icon: LucideFileText, label: "Documents Center", href: "/super-admin/document-center" },
     { icon: Settings, label: "Settings", href: "/super-admin/settings" },
+    { icon: Settings, label: "Security Preferences", href: "/super-admin/securityAndPreferences" },
+    { icon: Settings, label: "System Settings", href: "/super-admin/systemSettings" },
   ],
   "society-admin": [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: Users, label: "Resident Directory", href: "/residentDirectory" },
       { icon: Building, label: "My Society", href: "/my-society" },
-
+ 
     { icon: Megaphone, label: "Notice Board", href: "/noticeBoard" },
     { icon: CreditCard, label: "Finances", href: "/finances" },
     { icon: Bell, label: "NotificationHub", href: "/notificationHub" },
@@ -59,7 +63,7 @@ const navigationConfig = {
     { icon: User, label: "Profile", href: "/member/profile" },
   ],
 };
-
+ 
 const societyAdminNavbarLinks = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Resident Directory", href: "/residentDirectory" },
@@ -67,44 +71,44 @@ const societyAdminNavbarLinks = [
   { label: "Complaints", href: "/complaintsDetail" },
   { label: "Notices", href: "/noticeBoard" },
 ];
-
+ 
 const roleLabels = {
   "super-admin": "Super Admin",
   "society-admin": "Society Admin",
   "residential-admin": "Residential Admin",
   member: "Member",
 };
-
+ 
 export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const navigation = navigationConfig[role] || [];
-
+ 
   // Role based checks
   const isSuperAdmin = role === "super-admin";
   const isResidentialAdmin = role === "residential-admin";
   const isSocietyAdmin = role === "society-admin";
   const isMember = role === "member";
   const isSocietyOrResidential = isSocietyAdmin || isResidentialAdmin;
-
+ 
 const dispatch = useDispatch();
-
+ 
 const handleLogout = async () => {
   try {
     await authService.logout(); // Call API
-
-
+ 
+ 
     toast({
       title: "Logged Out",
       description: "You have been successfully logged out.",
     });
-
+ 
     navigate("/login", { replace: true });
     localStorage.clear()
   } catch (error) {
     console.error("Logout failed:", error);
-
+ 
     toast({
       title: "Logout Failed",
       description: "Something went wrong.",
@@ -114,21 +118,21 @@ const handleLogout = async () => {
 };
   return (
     <div className="min-h-screen bg-muted/30">
-      
+     
       {/* 1. SIDEBAR */}
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-[100] w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out",
-          
+         
           // Super Admin sidebar
           isSuperAdmin && (sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"),
-          
+         
           // Residential Admin  toggle  sidebar
           isResidentialAdmin && (sidebarOpen ? "translate-x-0" : "-translate-x-full"),
-          
+         
           // Society Admin toggle sidebar
 isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-translate-x-full mt-16 lg:mt-20 shadow-xl"),
-          
+         
           // Member sidebar
           isMember && (sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0")
         )}
@@ -142,13 +146,13 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
               <span className="font-bold text-lg text-slate-800 tracking-tight">SocietySmartHub</span>
             </div>
           </div>
-
+ 
           <div className="px-6 py-4">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold uppercase">
               <Shield size={12} /> {roleLabels[role]}
             </span>
           </div>
-
+ 
           <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
@@ -168,7 +172,7 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
               );
             })}
           </nav>
-
+ 
           <div className="p-4 border-t border-slate-100 bg-slate-50/50">
             <button onClick={handleLogout} className="flex items-center gap-3 w-full px-4 py-2 text-sm font-semibold text-red-500">
               <LogOut className="w-4 h-4" /> Logout
@@ -176,16 +180,16 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
           </div>
         </div>
       </aside>
-
+ 
       {/* 2. TOP HEADER */}
-      
+     
       {isSocietyOrResidential ? (
         /* HEADER A: Society Admin & Residential Admin  */
         <header className="fixed top-0 left-0 right-0 z-[80] bg-white border-b border-slate-100 h-16 lg:h-20 shadow-sm">
           <nav className="h-full flex items-center justify-between px-6">
             <div className="flex items-center gap-4">
-              <button 
-                onClick={() => setSidebarOpen(!sidebarOpen)} 
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="p-2 hover:bg-slate-50 rounded-lg text-slate-600 transition-all"
               >
                 {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
@@ -197,7 +201,7 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
                 <span className="text-lg font-bold text-slate-800 hidden md:block">SocietySmartHub</span>
               </div>
             </div>
-
+ 
             {role === "society-admin" && (
               <div className="hidden lg:flex items-center gap-1">
                 {societyAdminNavbarLinks.map((link) => {
@@ -211,7 +215,7 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
                 })}
               </div>
             )}
-
+ 
             <div className="flex items-center gap-4">
               <button className="p-2 text-slate-400 relative"><Bell size={20} /></button>
               <div className="flex items-center gap-3 border-l pl-4">
@@ -226,9 +230,9 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
             </div>
           </nav>
         </header>
-        
+       
       ) : (/* HEADER B: Super Admin & Members   */
-        
+       
         <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-lg border-b border-border lg:ml-64">
           <div className="flex items-center justify-between h-16 px-4 lg:px-8">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-muted">
@@ -247,11 +251,11 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
           </div>
         </header>
       )}
-
+ 
       {/* 3. MAIN CONTENT AREA */}
     <div className={cn(
-  "transition-all duration-300", 
-  (isSuperAdmin || isMember) && "lg:pl-64", 
+  "transition-all duration-300",
+  (isSuperAdmin || isMember) && "lg:pl-64",
   isResidentialAdmin && (sidebarOpen ? "lg:pl-64" : "lg:pl-0"),
   isSocietyAdmin && (sidebarOpen ? "pl-64" : "pl-0")
 )}>
@@ -262,10 +266,10 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
     {children}
   </main>
 </div>
-
+ 
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[65] lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
     </div>
   );
-}
+} 

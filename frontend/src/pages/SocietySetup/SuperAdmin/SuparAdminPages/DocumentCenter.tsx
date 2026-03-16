@@ -14,6 +14,7 @@ import {
   BarChart3 
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 const DocCard = ({ title, size, date, icon: Icon, color }) => (
   <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group">
@@ -62,13 +63,9 @@ const SectionHeader = ({ title, count, badgeColor }) => (
 
 const DocumentCenter = () => {
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans">
-      {/* Sidebar Placeholder */}
-      <Sidebar />
-
-      {/* Main Content */}
-      <main className="flex-1 md:ml-64 p-4 md:p-10 lg:p-12">
-        <div className="max-w-6xl mx-auto">
+    <DashboardLayout role="super-admin">
+    <div className="flex min-h-screen">    
+        <div className="w-full">
           
           {/* Top Header */}
           <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pt-10 md:pt-0">
@@ -140,8 +137,9 @@ const DocumentCenter = () => {
           </section>
 
         </div>
-      </main>
+   
     </div>
+    </DashboardLayout>
   );
 };
 

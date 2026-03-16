@@ -13,6 +13,8 @@ import {
   Globe,
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+
 
 const SecurityAndPreferences = () => {
   const [activeTab, setActiveTab] = useState('Security');
@@ -33,11 +35,10 @@ const SecurityAndPreferences = () => {
   );
 
   return (
+    <DashboardLayout role="super-admin">
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans antialiased flex">
-      <Sidebar />
-      
-     
-<div className="flex-1 w-full md:pl-64 min-h-screen">
+         
+<div className="flex-1 w-full min-h-screen">
 <div className="max-w-7xl mx-auto px-4 pt-24 pb-12 sm:px-6 lg:px-8 md:pt-8">          
           {/* --- PAGE HEADER --- */}
 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
@@ -191,6 +192,7 @@ const SecurityAndPreferences = () => {
         </div>
       </div>
     </div>
+    </DashboardLayout>
   );
 };
 
