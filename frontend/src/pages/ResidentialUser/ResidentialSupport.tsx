@@ -475,6 +475,12 @@ const ResidentialSupport = () => {
                 myComplaints?.complaints?.map((ticket) => (
                   <div
                     key={ticket._id}
+                    onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedComplaintId(ticket._id);
+                          setDetailsOpen(true);
+                          dispatch(viewComplaintDetails(ticket._id));
+                        }}
                     className="group p-5 flex items-center gap-5 hover:bg-slate-50/80 transition-all cursor-pointer"
                   >
                     <div className="w-6 sm:w-14 h-6 sm:h-14 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0 border border-slate-100 transition-transform group-hover:scale-105">
@@ -503,12 +509,12 @@ const ResidentialSupport = () => {
                       </span>
                       <ChevronRight
                         size={20}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedComplaintId(ticket._id);
-                          setDetailsOpen(true);
-                          dispatch(viewComplaintDetails(ticket._id));
-                        }}
+                        // onClick={(e) => {
+                        //   e.stopPropagation();
+                        //   setSelectedComplaintId(ticket._id);
+                        //   setDetailsOpen(true);
+                        //   dispatch(viewComplaintDetails(ticket._id));
+                        // }}
                         className="text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all"
                       />
                     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Mail, 
   Phone, 
@@ -11,10 +11,14 @@ import {
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store/store';
+import { getSecurityInfo } from '@/features/Superadmin/superAdminSlice';
 
 const SuperAdminSettings = () => {
   const [activeTab, setActiveTab] = useState('Personal Info');
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(true);
+
 
   const profile = {
     name: "John Doe",

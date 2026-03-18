@@ -26,9 +26,18 @@ const navigationConfig = {
     { icon: CreditCard, label: "Payments", href: "/super-admin/globalPayments" },
     { icon: Ticket, label: "Support Tickets", href: "/super-admin/support-tickets" },
     { icon: LucideFileText, label: "Documents Center", href: "/super-admin/document-center" },
-    { icon: Settings, label: "Settings", href: "/super-admin/settings" },
-    { icon: Settings, label: "Security Preferences", href: "/super-admin/securityAndPreferences" },
-    { icon: Settings, label: "System Settings", href: "/super-admin/systemSettings" },
+    // { icon: Settings, label: "Settings", href: "/super-admin/settings" },
+    // { icon: Settings, label: "Security Preferences", href: "/super-admin/securityAndPreferences" },
+    // { icon: Settings, label: "System Settings", href: "/super-admin/systemSettings" },
+    {
+      icon: Settings,
+      label: "Setting",
+      children: [
+        { label: "Account Settings", href: "/super-admin/settings" },
+        { label: "Security Preferences", href: "/super-admin/securityAndPreferences" },
+        { label: "System Settings", href: "/super-admin/systemSettings" },
+      ],
+    },
   ],
   "society-admin": [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
@@ -84,6 +93,7 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const navigation = navigationConfig[role] || [];
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
  
   // Role based checks
   const isSuperAdmin = role === "super-admin";
@@ -93,6 +103,13 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const isSocietyOrResidential = isSocietyAdmin || isResidentialAdmin;
  
 const dispatch = useDispatch();
+
+const toggleMenu = (label: string) => {
+  setOpenMenus((prev) => ({
+    ...prev,
+    [label]: !prev[label],
+  }));
+};
  
 const handleLogout = async () => {
   try {
@@ -154,23 +171,66 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
           </div>
  
           <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  onClick={() => setSidebarOpen(false)}
+           {navigation.map((item) => {
+            const isParent = !!item.children;
+            const isOpen = openMenus[item.label];
+
+            const isChildActive =
+              item.children?.some((child) => child.href === location.pathname);
+
+            const isActive = location.pathname === item.href || isChildActive;
+
+            return (
+              <div key={item.label}>
+                <div
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                    isActive ? "bg-blue-600 text-white shadow-md" : "text-slate-500 hover:bg-slate-50"
+                    "flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer",
+                    isActive
+                      ? "bg-blue-600 text-white shadow-md"
+                      : "text-slate-500 hover:bg-slate-50"
                   )}
+                  onClick={() => {
+                    if (isParent) toggleMenu(item.label);
+                    else {
+                      navigate(item.href);
+                      setSidebarOpen(false);
+                    }
+                  }}
                 >
-                  <item.icon className={cn("w-5 h-5", isActive ? "text-white" : "text-slate-400")} />
-                  {item.label}
-                </Link>
-              );
-            })}
+                  <div className="flex items-center gap-3">
+                    <item.icon className={cn("w-5 h-5", isActive ? "text-white" : "text-slate-400")} />
+                    {item.label}
+                  </div>
+
+                  {isParent && <span>{isOpen ? "▾" : "▸"}</span>}
+                </div>
+
+                {isParent && isOpen && (
+                  <div className="ml-8 mt-1 space-y-1">
+                    {item.children.map((child) => {
+                      const isChildActive = location.pathname === child.href;
+
+                      return (
+                        <Link
+                          key={child.label}
+                          to={child.href}
+                          onClick={() => setSidebarOpen(false)}
+                          className={cn(
+                            "block px-3 py-2 rounded-lg text-sm",
+                            isChildActive
+                              ? "bg-blue-100 text-blue-700 font-semibold"
+                              : "text-slate-500 hover:bg-slate-50"
+                          )}
+                        >
+                          {child.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
           </nav>
  
           <div className="p-4 border-t border-slate-100 bg-slate-50/50">
@@ -233,23 +293,51 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
        
       ) : (/* HEADER B: Super Admin & Members   */
        
-        <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-lg border-b border-border lg:ml-64">
-          <div className="flex items-center justify-between h-16 px-4 lg:px-8">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-muted">
-              <Menu className="w-6 h-6" />
-            </button>
-            <div className="flex items-center gap-4 ml-auto">
-              <button className="relative p-2 rounded-lg hover:bg-muted"><Bell className="w-5 h-5" /></button>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md"><User className="w-4 h-4" /></div>
-                <div className="hidden sm:block">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-xs text-muted-foreground">{roleLabels[role]}</p>
-                </div>
-              </div>
-            </div>
+        // <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-lg border-b border-border lg:ml-64">
+        //   <div className="flex items-center justify-between h-16 px-4 lg:px-8">
+        //     <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-muted">
+        //       <Menu className="w-6 h-6" />
+        //     </button>
+        //     <div className="flex items-center gap-4 ml-auto">
+        //       <button className="relative p-2 rounded-lg hover:bg-muted"><Bell className="w-5 h-5" /></button>
+        //       <div className="flex items-center gap-3">
+        //         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md"><User className="w-4 h-4" /></div>
+        //         <div className="hidden sm:block">
+        //           <p className="text-sm font-medium">John Doe</p>
+        //           <p className="text-xs text-muted-foreground">{roleLabels[role]}</p>
+        //         </div>
+        //       </div>
+        //     </div>
+        //   </div>
+        // </header>
+       <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-lg border-b border-border lg:ml-64">
+  <div className="flex items-center justify-between h-16 px-4 lg:px-8">
+    <div className="flex items-center gap-3">
+      <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg hover:bg-muted">
+        <Menu className="w-6 h-6" />
+      </button>
+      {(() => {
+        const activeItem = navigation.find(item => item.href === location.pathname);
+        return activeItem ? (
+          <div className="flex items-center gap-2 text-blue-600">
+            <activeItem.icon className="w-5 h-5" />
+            <span className="text-sm font-semibold">{activeItem.label}</span>
           </div>
-        </header>
+        ) : null;
+      })()}
+    </div>
+    <div className="flex items-center gap-4 ml-auto">
+      <button className="relative p-2 rounded-lg hover:bg-muted"><Bell className="w-5 h-5" /></button>
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md"><User className="w-4 h-4" /></div>
+        <div className="hidden sm:block">
+          <p className="text-sm font-medium">John Doe</p>
+          <p className="text-xs text-muted-foreground">{roleLabels[role]}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
       )}
  
       {/* 3. MAIN CONTENT AREA */}
@@ -261,7 +349,7 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
 )}>
   <main className={cn(
     "p-4 lg:p-8 min-h-screen",
-    isSocietyOrResidential ? "pt-24 lg:pt-32" : "pt-20 lg:pt-8"
+    isSocietyOrResidential ? "pt-24 lg:pt-32" : " lg:pt-8"
   )}>
     {children}
   </main>

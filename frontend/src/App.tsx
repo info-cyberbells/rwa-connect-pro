@@ -94,7 +94,7 @@ const App = () => (
           <Route path="/super-admin/document-center" element={<DocumentCenter />} />
           <Route path="/super-admin/Settings" element={<SuperAdminSettings />} />
            <Route path="/super-admin/securityAndPreferences" element={<SecurityAndPreferences />} />
-          <Route path="/systemSettings/*" element={<SystemSettings />} />
+          <Route path="/super-admin/systemSettings" element={<SystemSettings />} />
  
  
  

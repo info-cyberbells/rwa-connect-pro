@@ -86,12 +86,89 @@ export const toggleUserStatusBySuperAdminService = async (id: string): Promise<a
 }
  
  
+ //SUPERADMIN GET SECURITY INFO
+ export const getSecurityInfoService = async(): Promise<any>=>{
+  const response = await axiosInstance.get(
+    AUTHROUTES.SUPERADMIN_GET_SECURITY_INFO
+  );
+  return response.data;
+ }
+
+ //SUPERADMIN GET ACTIVE SESSIONS
+ export const getActiveSessionsService = async(): Promise<any>=>{
+  const response = await axiosInstance.get(
+    AUTHROUTES.SUPERADMIN_GET_ACTIVE_SESSIONS
+  );
+  return response.data;
+ }
+
+ //SUPERADMIN REVOKE SPECFIC SESSIONS
+ export const revokeActiveSessionService = async (id: string): Promise<any>=>{
+  const response = await axiosInstance.delete(
+    `${AUTHROUTES.SUPERADMIN_REVOKE_SPECIFIC_SESSION}/${id}`
+  );
+  return response.data
+ }
  
+ // SUPERADMIN SYSTEM SETTINGS
+ export const systemSettingsService = async (): Promise<any>=>{
+  const response = await axiosInstance.get(
+    AUTHROUTES.SUPERADMIN_SYSTEM_SETTINGS
+  );
+  return response.data;
+ }
  
- 
- 
- 
- 
+ // SUPER ADMIN UPDATE PALTFROM CONFIG
+export const updatePlatformConfigService = async(payload: any): Promise<any>=>{
+  const response = await axiosInstance.patch(
+    AUTHROUTES.SUPERADMIN_UPDATE_PLATFORM_CONFIG,
+    payload
+  );
+  return response.data;
+}
+
+//SUPERADMIN UPDATE NOTIFICATION RULE
+export const updateNotificationRulesService = async(payload: any): Promise<any>=>{
+  const response = await axiosInstance.patch(
+    AUTHROUTES.SUPERADMIN_UPDATE_NOTIFICATION_RULES,
+    payload
+  );
+  return response.data;
+}
+
+// SUPERADMIN GETALL SUBSCRIPTION PLAN
+export const getAllSubscriptionService = async(): Promise<any>=>{
+  const response = await axiosInstance.get(
+    AUTHROUTES.SUPERADMIN_GETALL_SUBSCRIPTIONS_PALN
+  );
+  return response.data;
+}
+
+// SUPERADMIN ADD NEW SUBSCRIPTION PLAN
+export const addNewSubscriptionPlanService = async(payload: any): Promise<any>=>{
+  const response = await axiosInstance.post(
+    AUTHROUTES.SUPERADMIN_POST_SUBSCRIPTION_PLAN,
+    payload
+  );
+  return response.data;
+}
+
+// SUPERADMIN UPADTE SUBSCRIPTION PALN
+export const updateSubscriptionPlanService = async(id: string, payload: any): Promise<any>=>{
+  const response =  await axiosInstance.patch(
+    `${AUTHROUTES.SUPERADMIN_UPDATE_SUBSCRIPTION_PLAN}/${id}`,
+    payload
+  );
+  return response.data;
+}
+
+// SUPERADMIN DELETE SUBSCRIPTION PALN
+ export const deleteSubscriptionPlanService = async(id: string): Promise<any>=>{
+  const response = await axiosInstance.delete(
+    `${AUTHROUTES.SUPERADMIN_DELETE_SUBSCRIPTION_PLAN}/${id}`
+  );
+  return response.data;
+ }
  
  
  

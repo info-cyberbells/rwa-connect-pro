@@ -10,6 +10,20 @@ export const AUTHROUTES = {
     SUPERADMIN_CREATE_SOCIETY_ADMIN: "/superadmin/admins",
  
     SUPERADMIN_TOGGLE_USER_STATUS: "/superadmin/users",
+
+    SUPERADMIN_GET_SECURITY_INFO: '/superadmin/settings/security',
+    SUPERADMIN_GET_ACTIVE_SESSIONS: '/superadmin/settings/sessions',
+    SUPERADMIN_REVOKE_SPECIFIC_SESSION: '/superadmin/settings/sessions',
+
+    SUPERADMIN_SYSTEM_SETTINGS: '/superadmin/settings/platform',
+    SUPERADMIN_UPDATE_PLATFORM_CONFIG: '/superadmin/settings/platform',
+    SUPERADMIN_UPDATE_NOTIFICATION_RULES: '/superadmin/settings/notifications',
+
+
+    SUPERADMIN_GETALL_SUBSCRIPTIONS_PALN: '/superadmin/settings/plans',
+    SUPERADMIN_POST_SUBSCRIPTION_PLAN: '/superadmin/settings/plans',
+    SUPERADMIN_UPDATE_SUBSCRIPTION_PLAN: '/superadmin/settings/plans',
+    SUPERADMIN_DELETE_SUBSCRIPTION_PLAN: '/superadmin/settings/plans',
  
  
     // SOCIETY USER ROUTES
