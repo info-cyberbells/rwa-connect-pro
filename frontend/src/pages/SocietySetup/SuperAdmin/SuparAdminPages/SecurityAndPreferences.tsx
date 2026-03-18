@@ -1,197 +1,593 @@
-import React, { useState } from 'react';
-import { 
-  Shield, 
-  ShieldCheck, 
-  Lock, 
-  Smartphone, 
-  Laptop, 
-  KeyRound, 
-  MessageSquare, 
+import React, { useEffect, useState } from "react";
+import {
+  ShieldCheck,
+  Lock,
+  Smartphone,
+  Monitor,
+  Shield,
   CheckCircle2,
-  ChevronRight,
-  UserCircle,
+  Key,
+  SmartphoneNfc,
   Globe,
-} from 'lucide-react';
-import Sidebar from '../components/Sidebar';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
+  ChevronRight,
+  Moon,
+  MessageSquare,
+} from "lucide-react";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import {
+  getActiveSessions,
+  getSecurityInfo,
+  revokeActiveSession,
+} from "@/features/Superadmin/superAdminSlice";
+import { useToast } from "@/hooks/use-toast";
 
+// --- HELPER COMPONENTS ---
+
+const ProfileDetail = ({ label, value, valueClass = "font-bold" }) => (
+  <div className="flex justify-between items-center text-[13px]">
+    <span className="text-slate-400 font-bold tracking-tight uppercase text-[10px]">
+      {label}
+    </span>
+    <span className={`text-slate-700 ${valueClass}`}>{value}</span>
+  </div>
+);
+
+const ToggleButton = ({ active, onToggle, variant = "soft" }) => {
+  // Variant "primary" for security blue, "soft" for notification lavender-blue
+  const activeColor = variant === "primary" ? "bg-[#3b82f6]" : "bg-[#adc6ff]";
+
+  return (
+    <div
+      onClick={onToggle}
+      className={`w-14 h-[30px] rounded-full p-1 cursor-pointer transition-all duration-300 flex items-center shadow-inner ${active ? activeColor : "bg-[#e2e8f0]"}`}
+    >
+      <div
+        className={`w-[22px] h-[22px] bg-white rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-all duration-300 transform ${active ? "translate-x-6.5" : "translate-x-0"}`}
+      />
+    </div>
+  );
+};
+
+const PreferenceRow = ({ label, active, onToggle }) => (
+  <div className="flex items-center justify-between">
+    <span className="text-[13px] font-bold text-slate-500 tracking-tight">
+      {label}
+    </span>
+    <ToggleButton active={active} onToggle={onToggle} variant="soft" />
+  </div>
+);
 
 const SecurityAndPreferences = () => {
-  const [activeTab, setActiveTab] = useState('Security');
-  const [is2FAEnabled, setIs2FAEnabled] = useState(true);
-  const [notifications, setNotifications] = useState({
-    email: true,
-    push: true,
-    sms: false
+  const [data, setData] = useState({
+    profile: {
+      name: "System Admin",
+      role: "Super Admin View",
+      subRole: "Internal Access Control",
+      securityLevel: "Enhanced",
+      lastLogin: "2 mins ago",
+      adminId: "#8821-SA",
+      accessLevel: 10,
+    },
+    security: {
+      lastPasswordChange: "Jan 12, 2024",
+      passwordUpdateInterval: 90,
+      twoFactorEnabled: true,
+      authMethods: [
+        {
+          id: "app",
+          name: "Authenticator App",
+          detail: "Connected to Google Auth",
+          active: true,
+        },
+        {
+          id: "sms",
+          name: "SMS Verification",
+          detail: "Not configured",
+          active: false,
+        },
+      ],
+      sessions: [
+        {
+          id: 1,
+          device: 'MacBook Pro 16"',
+          location: "New Delhi, India",
+          ip: "192.168.1.1",
+          status: "Current Session",
+          isPrimary: true,
+          type: "desktop",
+        },
+        {
+          id: 2,
+          device: "iPhone 15 Pro",
+          location: "Mumbai, India",
+          ip: "10.0.0.45",
+          status: "Active",
+          isPrimary: false,
+          type: "mobile",
+        },
+        {
+          id: 3,
+          device: "Windows Workstation",
+          location: "Bengaluru, India",
+          ip: "172.16.2.8",
+          status: "Active",
+          isPrimary: false,
+          type: "desktop",
+        },
+      ],
+    },
+    preferences: {
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+      },
+      display: {
+        language: "English (US)",
+        darkMode: false,
+      },
+    },
   });
 
-  const Toggle = ({ enabled, setEnabled }) => (
-    <button 
-      onClick={() => setEnabled(!enabled)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${enabled ? 'bg-blue-600' : 'bg-slate-200'}`}
-    >
-      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
-    </button>
-  );
+  const { toast } = useToast();
+  const [loadingSessionId, setLoadingSessionId] = useState<string | null>(null);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const {
+    securityInfo,
+    activeSessions,
+    loading,
+    loading2,
+    loading3,
+    error,
+    error2,
+    error3,
+  } = useSelector((state: RootState) => state.superAdmin);
+
+  const [activeTab, setActiveTab] = useState("Security");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          dispatch(getSecurityInfo()),
+          dispatch(getActiveSessions()),
+        ]);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  const togglePreference = (key) => {
+    setData((prev) => ({
+      ...prev,
+      preferences: {
+        ...prev.preferences,
+        notifications: {
+          ...prev.preferences.notifications,
+          [key]: !prev.preferences.notifications[key],
+        },
+      },
+    }));
+  };
+
+  const toggleTwoFactor = () => {
+    setData((prev) => ({
+      ...prev,
+      security: {
+        ...prev.security,
+        twoFactorEnabled: !prev.security.twoFactorEnabled,
+      },
+    }));
+  };
+
+  const toggleDarkMode = () => {
+    setData((prev) => ({
+      ...prev,
+      preferences: {
+        ...prev.preferences,
+        display: {
+          ...prev.preferences.display,
+          darkMode: !prev.preferences.display.darkMode,
+        },
+      },
+    }));
+  };
+
+  const handleLogoutSession = async (sessionId: string) => {
+    try {
+      setLoadingSessionId(sessionId);
+
+      await dispatch(revokeActiveSession(sessionId)).unwrap();
+
+      toast({
+        title: "Session Revoked",
+        description: "User session logged out successfully",
+      });
+
+      dispatch(getActiveSessions());
+    } catch (err: any) {
+      console.error("Logout failed:", err);
+
+      toast({
+        title: "Failed to Logout",
+        description: err || "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingSessionId(null);
+    }
+  };
 
   return (
     <DashboardLayout role="super-admin">
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans antialiased flex">
-         
-<div className="flex-1 w-full min-h-screen">
-<div className="max-w-7xl mx-auto px-4 pt-24 pb-12 sm:px-6 lg:px-8 md:pt-8">          
-          {/* --- PAGE HEADER --- */}
-<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-              <div className='w-full'>
-              <div className="flex flex-wrap items-center gap-3 mb-2">
-                <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
+      <div className="min-h-screen text-slate-900">
+        <div className="max-w-6xl mx-auto">
+          {/* HEADER SECTION */}
+          <header className="mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+              <div>
+                <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
                   Security & Preferences
                 </h1>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] sm:text-xs font-bold border border-emerald-200 whitespace-nowrap">
-                  <ShieldCheck size={14} /> Verified Admin
+                <p className="text-slate-400 text-sm mt-1 font-medium">
+                  Configure internal administrative safety protocols and
+                  interface settings.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 bg-[#eafbf0] text-[#48c774] px-3 py-1.5 rounded-full border border-[#d8f6e4] w-fit h-fit shadow-sm">
+                <CheckCircle2 size={14} strokeWidth={2.5} />
+                <span className="text-[10px] font-black uppercase tracking-wider">
+                  Verified Admin
                 </span>
               </div>
-              <p className="text-slate-500 text-sm md:text-base max-w-2xl">
-                Configure internal administrative safety protocols, manage active sessions, and personalize your interface settings.
-              </p>
             </div>
-          </div>
+          </header>
 
-          {/* --- MAIN CONTENT GRID --- */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            {/* LEFT COLUMN */}
+          {/* TWO COLUMN GRID */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-8">
+            {/* LEFT COLUMN: PROFILE & HEALTH */}
             <div className="lg:col-span-4 space-y-6">
-              <div className="p-8 rounded-[2.5rem] text-center border border-slate-100 bg-white shadow-sm">
-                <div className="relative inline-block mb-6">
-                  <div className="w-24 h-24 rounded-3xl flex items-center border-4 border-white shadow-xl justify-center bg-slate-50 ">
-                    <Shield size={42} className="text-slate-400 opacity-60" />
-                    <div className="absolute -bottom-1 -right-1 p-2 bg-blue-600 rounded-xl border-4 border-white shadow-lg">
-                      <UserCircle size={20} className="text-white" />
-                    </div>
+              <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-10 flex flex-col items-center text-center">
+                <div className="relative mb-6">
+                  <div className="w-24 h-24 bg-[#f1f5f9] border border-slate-100 rounded-[1.5rem] flex items-center justify-center shadow-inner">
+                    <Shield
+                      size={48}
+                      className="text-slate-300"
+                      strokeWidth={1}
+                    />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 bg-[#3b82f6] p-2.5 rounded-xl border-4 border-white shadow-lg text-white">
+                    <ShieldCheck size={18} />
                   </div>
                 </div>
-                <h2 className="text-xl font-bold mb-1 text-slate-900">Super Admin View</h2>
-                <p className="text-blue-600 text-[10px] font-bold uppercase tracking-wider mb-8">Internal Access Control</p>
-                
-                <div className="space-y-4 pt-6 border-t border-slate-50 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-medium">Security Level</span>
-                    <span className="text-emerald-500 font-bold">Enhanced</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400 font-medium">Last Login</span>
-                    <span className="font-bold text-slate-700">2 mins ago</span>
-                  </div>
+
+                <h2 className="text-2xl font-bold text-slate-800 mb-1 leading-tight">
+                  {securityInfo?.name || "Loading..."}
+                </h2>
+                <p className="text-blue-500 text-[13px] font-bold tracking-tight mb-8">
+                  Internal Access Control
+                </p>
+
+                <div className="w-full space-y-5 pt-2 border-t border-slate-50 mt-2">
+                  <ProfileDetail
+                    label="Security Level"
+                    value={securityInfo?.securityLevel || "-"}
+                    valueClass="text-[#40c057] uppercase font-bold"
+                  />
+                  <ProfileDetail
+                    label="Last Login"
+                    value={
+                      securityInfo?.lastLoginAt
+                        ? new Date(securityInfo.lastLoginAt).toLocaleString()
+                        : "-"
+                    }
+                  />
+                  <ProfileDetail
+                    label="Admin ID"
+                    value={securityInfo?.adminId || "-"}
+                    valueClass="font-mono text-slate-400"
+                  />
                 </div>
               </div>
 
-              <div className="bg-[#0B1221] text-white p-7 rounded-[2.5rem] shadow-xl relative overflow-hidden">
-                <div className="flex justify-between items-center mb-6">
-                  <div className="w-10 h-10 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-300">
-                    <Lock size={20} />
+              <div className="bg-[#0f172a] rounded-[2rem] p-8 text-white relative overflow-hidden shadow-xl shadow-slate-200">
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="bg-white/10 p-2.5 rounded-xl border border-white/5">
+                      <Lock size={18} className="text-blue-400" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+                      System Health
+                    </span>
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">System Health</span>
-                </div>
-                <h3 className="text-lg font-bold mb-2">Encrypted Session</h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-8">
-                  Your current session is protected with end-to-end encryption.
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-2">
-                    <div className="w-7 h-7 rounded-full bg-blue-600 border-2 border-[#0B1221] flex items-center justify-center text-[8px] font-bold">SSL</div>
-                    <div className="w-7 h-7 rounded-full bg-purple-600 border-2 border-[#0B1221] flex items-center justify-center text-[8px] font-bold">AES</div>
+
+                  <h3 className="text-lg font-bold mb-2">Encrypted Session</h3>
+                  <p className="text-[11px] text-slate-400 leading-relaxed mb-8">
+                    Your current administrative session is protected with
+                    end-to-end encryption.
+                  </p>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                      {["SSL", "AES", "2FA"].map((protocol) => (
+                        <div
+                          key={protocol}
+                          className="w-7 h-7 rounded-full bg-blue-600 border-2 border-[#0f172a] flex items-center justify-center text-[8px] font-black shadow-lg"
+                        >
+                          {protocol}
+                        </div>
+                      ))}
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                      Protocols Active
+                    </span>
                   </div>
-                  <span className="text-xs text-slate-500 font-semibold">Active</span>
                 </div>
               </div>
             </div>
 
-            {/* RIGHT COLUMN */}
-            <div className="lg:col-span-8 space-y-8">
-              <div className="rounded-[2.5rem] border border-slate-100 bg-white shadow-sm overflow-hidden">
-                <div className="flex px-6 sm:px-8 pt-6 border-b border-slate-100">
-                  {['Security', 'Preferences'].map((tab) => (
+            {/* RIGHT COLUMN: SECURITY SETTINGS */}
+            <div className="lg:col-span-8">
+              <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden h-full">
+                <div className="flex px-8 border-b border-slate-100">
+                  {["Security", "Preferences"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`pb-4 px-4 text-sm font-bold transition-all relative ${activeTab === tab ? 'text-blue-600' : 'text-slate-400 hover:text-slate-500'}`}
+                      className={`py-6 px-4 text-sm font-bold relative transition-all tracking-tight ${activeTab === tab ? "text-blue-600" : "text-slate-300 hover:text-slate-500"}`}
                     >
                       {tab}
                       {activeTab === tab && (
-                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full shadow-[0_-4px_10px_rgba(37,99,235,0.2)]" />
                       )}
                     </button>
                   ))}
                 </div>
 
-                <div className="p-6 sm:p-8 md:p-10 space-y-12">
-                  {activeTab === 'Security' ? (
-                    <>
-                      <section>
-                        <h3 className="text-lg font-bold text-slate-900 mb-2">Password Management</h3>
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-3xl border border-slate-100 bg-slate-50/50 mt-4">
-                          <div className="flex items-center gap-4 w-full">
-                            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex-shrink-0 flex items-center justify-center">
-                              <KeyRound size={22} />
-                            </div>
-                            <div>
-                              <p className="text-sm font-bold text-slate-700">Last changed: Jan 12, 2024</p>
-                              <p className="text-xs text-slate-400">Recommended update every 90 days</p>
-                            </div>
-                          </div>
-                          <button className="w-full sm:w-auto px-6 py-2.5 rounded-2xl text-sm font-bold border border-slate-200 bg-white hover:bg-slate-50 shadow-sm transition-all">
-                            Change
-                          </button>
-                        </div>
-                      </section>
+                <div className="p-10 space-y-12">
+                  <section>
+                    <h3 className="text-lg font-bold text-slate-800 mb-1">
+                      Password Management
+                    </h3>
+                    <p className="text-sm text-slate-400 mb-6 font-medium">
+                      Regularly updating your password enhances system
+                      integrity.
+                    </p>
 
-                      <section>
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-lg font-bold text-slate-900">2FA Settings</h3>
-                          <Toggle enabled={is2FAEnabled} setEnabled={setIs2FAEnabled} />
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-[#f8fafc] border border-slate-100 rounded-2xl shadow-sm">
+                      <div className="flex items-center gap-4">
+                        <div className="bg-[#e2e8f0] p-2.5 rounded-xl text-slate-400 shadow-inner">
+                          <MessageSquare size={20} />
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className={`p-5 rounded-3xl border flex items-center gap-4 ${is2FAEnabled ? 'border-blue-200 bg-blue-50/30' : 'border-slate-100 opacity-60'}`}>
-                            <Smartphone size={20} className={is2FAEnabled ? 'text-blue-600' : 'text-slate-400'} />
-                            <div className="flex-1">
-                              <h4 className="text-sm font-bold">Authenticator App</h4>
-                              <p className="text-xs text-slate-500">Active</p>
-                            </div>
-                          </div>
-                        </div>
-                      </section>
-                    </>
-                  ) : (
-                    <section className="space-y-8">
-                      <div>
-                        <h3 className="text-lg font-bold text-slate-900 mb-6">Notifications</h3>
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-semibold text-slate-600">Email Notifications</span>
-                            <Toggle enabled={notifications.email} setEnabled={() => setNotifications({...notifications, email: !notifications.email})} />
-                          </div>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">
+                            Last changed: {data.security.lastPasswordChange}
+                          </p>
+                          <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide">
+                            Recommended update every{" "}
+                            {data.security.passwordUpdateInterval} days
+                          </p>
                         </div>
                       </div>
-                    </section>
-                  )}
-                </div>
-              </div>
+                      <button className="px-6 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-sm hover:border-slate-300 transition-all active:scale-95">
+                        Change Password
+                      </button>
+                    </div>
+                  </section>
 
-              {/* ACTION FOOTER */}
-              <div className="flex flex-col sm:flex-row justify-end items-center gap-4">
-                <button className="w-full sm:w-auto px-8 py-3 rounded-2xl text-sm font-bold bg-white border border-slate-200 text-slate-500">
-                  Discard
-                </button>
-                <button className="w-full sm:w-auto px-8 py-3 rounded-2xl text-sm font-bold bg-blue-600 text-white shadow-lg shadow-blue-500/20">
-                  Save Changes
-                </button>
+                  <section>
+                    <div className="flex items-center justify-between mb-8">
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-1">
+                          Two-Factor Authentication
+                        </h3>
+                        <p className="text-sm text-slate-400 font-medium">
+                          Add an extra layer of security to your admin account.
+                        </p>
+                      </div>
+                      {/* Primary Blue Variant for Security */}
+                      <ToggleButton
+                        active={data.security.twoFactorEnabled}
+                        onToggle={toggleTwoFactor}
+                        variant="primary"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {data.security.authMethods.map((method) => (
+                        <div
+                          key={method.id}
+                          className={`
+                        p-5 border-2 rounded-2xl flex items-center gap-4 transition-all
+                        ${method.active ? "bg-[#f1f7ff] border-[#d9e8ff] shadow-sm" : "bg-white border-slate-100 opacity-60"}
+                      `}
+                        >
+                          <div
+                            className={`p-2.5 rounded-xl ${method.active ? "bg-white text-blue-600 shadow-sm border border-blue-50" : "bg-slate-50 text-slate-300"}`}
+                          >
+                            {method.id === "app" ? (
+                              <Smartphone size={20} />
+                            ) : (
+                              <MessageSquare size={20} />
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-800">
+                              {method.name}
+                            </p>
+                            <p
+                              className={`text-[11px] font-bold ${method.active ? "text-blue-500" : "text-slate-400"}`}
+                            >
+                              {method.detail}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="text-lg font-bold text-slate-800 mb-6 tracking-tight">
+                      Active Sessions
+                    </h3>
+                    <div className="space-y-4">
+                      {loading3 ? (
+                        <div className="space-y-3">
+                          {[1, 2, 3].map((i) => (
+                            <div
+                              key={i}
+                              className="h-16 bg-slate-100 animate-pulse rounded-xl"
+                            />
+                          ))}
+                        </div>
+                      ) : error3 ? (
+                        <div className="text-red-500 text-sm font-semibold">
+                          {error3}
+                        </div>
+                      ) : activeSessions?.sessions?.length === 0 ? (
+                        <div className="text-slate-400 text-sm text-center py-6">
+                          No active sessions found
+                        </div>
+                      ) : (
+                        activeSessions?.sessions?.map((session) => (
+                          <div
+                            key={session.sessionId}
+                            className="p-4 bg-white border border-slate-50 rounded-2xl flex items-center justify-between group hover:border-slate-200 transition-all hover:shadow-sm"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="bg-[#f8fafc] p-3 rounded-xl text-slate-300 group-hover:bg-blue-50 group-hover:text-blue-400 transition-colors">
+                                {session.userAgent
+                                  ?.toLowerCase()
+                                  ?.includes("mobile") ? (
+                                  <Smartphone size={20} />
+                                ) : (
+                                  <Monitor size={20} />
+                                )}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-bold text-slate-800">
+                                    {session.userAgent || "Unknown Device"}
+                                  </p>
+                                  {session.isCurrent && (
+                                    <span className="text-[10px] font-bold text-[#48c774] flex items-center gap-1.5 uppercase tracking-wider">
+                                      <span className="w-1 h-1 bg-[#48c774] rounded-full" />{" "}
+                                      Current Session
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wide">
+                                  {session.ip || "Unknown IP"}
+                                </p>
+                              </div>
+                            </div>
+
+                            {session.isCurrent ? (
+                              <span className="text-[10px] font-bold text-slate-400 bg-[#f1f5f9] px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-inner">
+                                Current
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() =>
+                                  handleLogoutSession(session.sessionId)
+                                }
+                                disabled={
+                                  loadingSessionId === session.sessionId
+                                }
+                                className="text-[11px] font-bold text-red-400 hover:text-red-600 uppercase tracking-widest transition-colors disabled:opacity-50"
+                              >
+                                {loadingSessionId === session.sessionId
+                                  ? "Logging out..."
+                                  : "Log Out"}
+                              </button>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </section>
+                </div>
               </div>
             </div>
           </div>
+
+          {/* PREFERENCES SECTION */}
+          <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-10 mb-8">
+            <h3 className="text-lg font-bold text-slate-800 mb-10 tracking-tight">
+              Notification & Display Preferences
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24">
+              <div className="space-y-7">
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-300 mb-4">
+                  Notifications
+                </h4>
+                <PreferenceRow
+                  label="Email Alerts"
+                  active={data.preferences.notifications.email}
+                  onToggle={() => togglePreference("email")}
+                />
+                <PreferenceRow
+                  label="Push Notifications"
+                  active={data.preferences.notifications.push}
+                  onToggle={() => togglePreference("push")}
+                />
+                <PreferenceRow
+                  label="SMS Reports"
+                  active={data.preferences.notifications.sms}
+                  onToggle={() => togglePreference("sms")}
+                />
+              </div>
+
+              <div className="space-y-7">
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-300 mb-4">
+                  Display
+                </h4>
+                <div className="space-y-3">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    System Language
+                  </p>
+                  <div className="w-full p-4 bg-[#f8fafc] border border-slate-100 rounded-2xl flex items-center justify-between text-sm font-bold text-slate-700 cursor-pointer hover:bg-[#f1f5f9] transition-colors shadow-inner">
+                    <div className="flex items-center gap-3">
+                      <Globe size={18} className="text-slate-300" />
+                      {data.preferences.display.language}
+                    </div>
+                    <ChevronRight size={18} className="text-slate-200" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-4">
+                    <Moon size={18} className="text-slate-300" />
+                    <span className="text-sm font-bold text-slate-400 tracking-tight">
+                      Dark Mode
+                    </span>
+                  </div>
+                  <ToggleButton
+                    active={data.preferences.display.darkMode}
+                    onToggle={toggleDarkMode}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* FOOTER ACTIONS */}
+          <div className="flex flex-col sm:flex-row justify-end items-center gap-4">
+            <button className="w-full sm:w-auto px-10 py-4 bg-white border border-slate-200 rounded-2xl text-[13px] font-bold text-slate-500 hover:bg-slate-50 transition-all active:scale-95 shadow-sm">
+              Discard Changes
+            </button>
+            <button className="w-full sm:w-auto px-10 py-4 bg-[#3b82f6] text-white rounded-2xl text-[13px] font-bold shadow-xl shadow-blue-200 hover:bg-blue-600 transition-all transform hover:-translate-y-1 active:translate-y-0">
+              Update Security Protocols
+            </button>
+          </div>
         </div>
       </div>
-    </div>
     </DashboardLayout>
   );
 };

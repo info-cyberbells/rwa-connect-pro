@@ -40,6 +40,7 @@ const ResidentialPayments = () => {
   const [activeTab, setActiveTab] = useState("dues");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedChargeId, setSelectedChargeId] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const [submitDrawerOpen, setSubmitDrawerOpen] = useState(false);
   const [formErrors, setFormErrors] = useState({});
@@ -261,7 +262,13 @@ const ResidentialPayments = () => {
                 </span>
               </div>
               <p className="text-slate-400 text-xs flex items-center gap-1.5">
-                <Info size={14} /> Next billing cycle starts on Nov 01, 2023
+                <Info size={14} /> Next billing cycle starts on{" "}
+                {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
+                  .toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "2-digit",
+                    year: "numeric",
+                  })}
               </p>
             </div>
 
@@ -751,6 +758,8 @@ const ResidentialPayments = () => {
                           src={chargeDetails.charge?.proofImageUrl}
                           alt="Proof"
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                          onClick={() => setPreviewImage(chargeDetails.charge?.proofImageUrl)}
+
                         />
                         {/* <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                            <button className="bg-white px-4 py-2 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2">
@@ -825,7 +834,8 @@ const ResidentialPayments = () => {
                                 <img
                                   src={pay?.paymentScreenshotUrl}
                                   alt="Screenshot"
-                                  className="rounded-xl border border-slate-100 w-full h-32 object-cover"
+                                  className="rounded-xl border cursor-pointer border-slate-100 w-full h-32 object-cover"
+                                   onClick={() => setPreviewImage(pay?.paymentScreenshotUrl)}
                                   // onError={(e) => {
                                   //     e.target.src = 'https://placehold.co/600x400?text=Image+Not+Found';
                                   //     e.target.className = "rounded-xl border border-slate-100 w-full h-32 object-contain bg-slate-50 opacity-50";
@@ -1052,6 +1062,27 @@ const ResidentialPayments = () => {
           </div>
         </div>
       )}
+
+      {/* image previewImage */}
+              {previewImage && (
+          <div className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center">
+            
+            {/* Close button */}
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-5 right-5 text-white text-2xl font-bold"
+            >
+              ✕
+            </button>
+
+            {/* Image */}
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="max-w-[90%] max-h-[90%] rounded-lg shadow-lg"
+            />
+          </div>
+        )}
     </DashboardLayout>
   );
 };
