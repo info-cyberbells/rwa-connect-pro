@@ -42,10 +42,13 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         navigate("/super-admin");
         break;
       case "society_admin":
-        navigate("/society-admin");
+        navigate("/dashboard");
         break;
       case "user":
         navigate("/member");
+        break;
+      case "guard":
+        navigate("/daily-staff");
         break;
       default:
         navigate("/");

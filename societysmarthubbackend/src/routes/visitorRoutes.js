@@ -1,0 +1,78 @@
+import express from "express";
+
+const router = express.Router();
+
+import auth from "../middleware/auth.js";
+import { permit } from "../middleware/roles.js";
+
+import {
+  createVisitor,
+  approveVisitor,
+  rejectVisitor,
+  visitorExit,
+  visitorHistory,
+} from "../controllers/visitorController.js";
+
+import {
+  createVisitorValidation,
+  validationMiddleware,
+} from "../middleware/visitorValidation.js";
+
+// ==============================
+// MEMBER CREATE VISITOR
+// ==============================
+
+router.post(
+  "/create",
+  auth,
+  permit("user", "society_admin"),
+  createVisitorValidation,
+  validationMiddleware,
+  createVisitor,
+);
+
+// ==============================
+// GUARD APPROVE VISITOR
+// ==============================
+
+router.post(
+  "/approve",
+  auth,
+  permit("guard", "admin", "society_admin"),
+  approveVisitor,
+);
+
+// ==============================
+// GUARD REJECT VISITOR
+// ==============================
+
+router.post(
+  "/reject",
+  auth,
+  permit("guard", "admin", "society_admin"),
+  rejectVisitor,
+);
+
+// ==============================
+// GUARD MARK EXIT
+// ==============================
+
+router.post(
+  "/exit",
+  auth,
+  permit("guard", "admin", "society_admin"),
+  visitorExit,
+);
+
+// ==============================
+// MEMBER HISTORY
+// ==============================
+
+router.get(
+  "/history/:flatNumber",
+  auth,
+  permit("user", "society_admin", "admin", "guard"),
+  visitorHistory,
+);
+
+export default router;

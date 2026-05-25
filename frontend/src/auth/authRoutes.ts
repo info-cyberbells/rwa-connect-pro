@@ -31,5 +31,62 @@ export const AUTHROUTES = {
     USER_GET_MY_COMPLAINTS: '/complaints/my',
     USER_VIEW_COMPLAINT_DETAILS: '/complaints',
     USER_SUBMIT_COMPLAINTS: '/complaints',
+
+    // SOCIETY ADMIN ROUTES
+    ADMIN_GET_MY_SOCIETY: "/admin/society",
+    ADMIN_GET_RESIDENTS: "/admin/users",
+    ADMIN_CREATE_RESIDENT: "/admin/users",
+    ADMIN_RESIDENT_DETAILS: "/admin/users",
+    ADMIN_UPDATE_RESIDENT: "/admin/users",
+    ADMIN_TOGGLE_RESIDENT_STATUS: "/admin/users",
+    ADMIN_ADD_VEHICLE: "/admin/users",
+    ADMIN_DELETE_VEHICLE: "/admin/users",
+    ADMIN_USER_ACTIVITY: "/admin/users",
+    
+    ADMIN_GET_COMPLAINTS: "/complaints",
+    ADMIN_GET_COMPLAINT_STATS: "/complaints/stats",
+    ADMIN_UPDATE_COMPLAINT_STATUS: "/complaints",
+
+    ADMIN_GET_NOTICES: "/notices",
+    ADMIN_CREATE_NOTICE: "/notices",
+    ADMIN_UPDATE_NOTICE: "/notices",
+    ADMIN_DELETE_NOTICE: "/notices",
+    ADMIN_PIN_NOTICE: "/notices",
+
+    ADMIN_GET_CHARGES: "/charges",
+    ADMIN_CREATE_CHARGE: "/charges",
+    ADMIN_GET_CHARGE_DETAILS: "/charges",
+    ADMIN_UPDATE_CHARGE: "/charges",
+    ADMIN_DELETE_CHARGE: "/charges",
+
+    ADMIN_GET_PAYMENTS: "/payments",
+    ADMIN_REVIEW_PAYMENT: "/payments",
+
+    ADMIN_GET_DEACTIVATION_REQUESTS: "/admin/deactivation-requests",
+    ADMIN_REVIEW_DEACTIVATION_REQUEST: "/admin/deactivation-requests",
+
+    // DAILY STAFF ROUTES
+    STAFF_CREATE: "/staff/create",
+    STAFF_ENTRY: "/staff/entry",
+    STAFF_EXIT: "/staff/exit",
+    STAFF_GET_LOGS: "/staff/logs",
+    STAFF_BLOCK: "/staff/block",
+    STAFF_UNBLOCK: "/staff/unblock",
+    STAFF_BLOCKED_LIST: "/staff/blocked-list",
+    STAFF_SEARCH: "/staff/search",
+    STAFF_ATTENDANCE_HISTORY: "/staff/attendance-history",
+    STAFF_MARK_QR: "/staff/mark-qr", // [MODULE-A]: New QR attendance route
+
+    // DELIVERY ROUTES
+    DELIVERY_CREATE: "/delivery/create",
+    DELIVERY_EXIT: "/delivery/exit",
+    DELIVERY_LOGS: "/delivery/logs",
+
+    // VISITOR ROUTES
+    VISITOR_CREATE: "/visitors/create",
+    VISITOR_APPROVE: "/visitors/approve",
+    VISITOR_REJECT: "/visitors/reject",
+    VISITOR_EXIT: "/visitors/exit",
+    VISITOR_HISTORY: "/visitors/history",
 }
  

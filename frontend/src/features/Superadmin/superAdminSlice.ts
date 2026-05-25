@@ -1,6 +1,6 @@
 import { createSocietyAdminBySuperAdminService, createSocietyBySuperAdminService, getAllSocietiesSuperAdminService, getSocietyDetailsSuperAdminService } from "@/auth/authServices";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { clear } from "console";
+// import { clear } from "console";
 
 export const getAllSocietiesSuperAdminThunk = createAsyncThunk<
   any,

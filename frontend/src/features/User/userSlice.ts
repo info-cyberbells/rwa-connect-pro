@@ -1,4 +1,21 @@
-import { changeMyPasswordService, getAllActiveNoticesService, getAllNoticesByUserService, getFilterNoticesByUserService, getMyAllChargesServices, getMyComplaintDetailService, getMyComplaintsService, getMyProfileService, getMySingleChargeService, getSingleNoticeByUserService, getUserPaymentHistoryService, submitComplaintService, updateMyProfileService, userSubmitPaymentService } from "@/auth/authServices";
+import { 
+  changeMyPasswordService, 
+  getAllActiveNoticesService, 
+  getAllNoticesByUserService, 
+  getFilterNoticesByUserService, 
+  getMyAllChargesServices, 
+  getMyComplaintDetailService, 
+  getMyComplaintsService, 
+  getMyProfileService, 
+  getMySingleChargeService, 
+  getSingleNoticeByUserService, 
+  getUserPaymentHistoryService, 
+  submitComplaintService, 
+  updateMyProfileService, 
+  userSubmitPaymentService,
+  createVisitorService,
+  getVisitorHistoryService
+} from "@/auth/authServices";
 import { createAsyncThunk, createSlice, isRejectedWithValue } from "@reduxjs/toolkit";
 
 
@@ -16,6 +33,11 @@ interface UserState {
   paymentHistory: any[];
   myComplaints: any[];
   complaintDetails: any[];
+  // Visitor State
+  visitorData: any[];
+  visitorLoading: boolean;
+  createVisitorSuccess: boolean;
+  generatedCode: string | null;
 }
 
 const initialState: UserState = {
@@ -32,7 +54,46 @@ const initialState: UserState = {
   paymentHistory: [],
   myComplaints: [],
   complaintDetails: [],
+  // Visitor Initial State
+  visitorData: [],
+  visitorLoading: false,
+  createVisitorSuccess: false,
+  generatedCode: null,
 };
+
+// ... (existing thunks)
+
+// USER CREATE VISITOR THUNK
+export const createVisitor = createAsyncThunk<any, any, { rejectValue: any }>(
+  "user/createVisitor",
+  async (visitorData, { rejectWithValue }) => {
+    try {
+      const response = await createVisitorService(visitorData);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data || { message: "Visitor creation failed" }
+      );
+    }
+  }
+);
+
+// USER GET VISITOR HISTORY THUNK
+export const getVisitorHistory = createAsyncThunk<any, string, { rejectValue: string }>(
+  "user/getVisitorHistory",
+  async (flatNumber, { rejectWithValue }) => {
+    try {
+      const response = await getVisitorHistoryService(flatNumber);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch visitor history"
+      );
+    }
+  }
+);
+
+// ... (rest of the file)
 
 // GET MY PROFILE THUNK
 export const getMyProfile = createAsyncThunk< any,void, { rejectValue: string }>(
@@ -424,8 +485,42 @@ const userSlice = createSlice({
             state.submitError = action.payload;
         })
 
+        // USER CREATE VISITOR
+        .addCase(createVisitor.pending, (state) => {
+            state.visitorLoading = true;
+            state.error = null;
+            state.createVisitorSuccess = false;
+            state.generatedCode = null;
+        })
+        .addCase(createVisitor.fulfilled, (state, action) => {
+            state.visitorLoading = false;
+            state.createVisitorSuccess = true;
+            state.generatedCode = action.payload.verificationCode;
+            state.visitorData.unshift(action.payload.data);
+        })
+        .addCase(createVisitor.rejected, (state, action) => {
+            state.visitorLoading = false;
+            // SAFE CHECK: Ensure error is a string for React rendering
+            const errorPayload: any = action.payload;
+            state.error = errorPayload?.message || errorPayload?.error || (typeof errorPayload === 'string' ? errorPayload : "Visitor creation failed");
+            state.createVisitorSuccess = false;
+        })
+
+        // USER GET VISITOR HISTORY
+        .addCase(getVisitorHistory.pending, (state) => {
+            state.visitorLoading = true;
+        })
+        .addCase(getVisitorHistory.fulfilled, (state, action) => {
+            state.visitorLoading = false;
+            state.visitorData = action.payload.data || [];
+        })
+        .addCase(getVisitorHistory.rejected, (state, action) => {
+            state.visitorLoading = false;
+            state.error = action.payload as string;
+        });
+
     }
 })
 
-export const { clearChargeDetails, clearSingleNotice } = userSlice.actions;
+export const { clearChargeDetails, clearSingleNotice, clearUserError } = userSlice.actions;
 export default userSlice.reducer;

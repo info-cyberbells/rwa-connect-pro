@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
    Menu, X, LogOut, User, Bell, Megaphone,
   LayoutDashboard, Users, CreditCard, FileText,
-  Settings, MessageSquare, ClipboardList, Shield, Building,
+  Settings, MessageSquare, ClipboardList, Shield, Building, UserX,
   Home, UserCheck, HardHat, ShieldCheck,Wrench,AlertOctagon,LucideFileText, Ticket
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,8 +41,10 @@ const navigationConfig = {
     { icon: MessageSquare, label: "Complaints", href: "/complaintsDetail" },
     { icon: AlertOctagon, label: "Fine", href: "/addPenaltyFine" },
     { icon: Wrench, label: "Maintenance", href: "/maintenance" },
+    { icon: UserCheck, label: "Daily Staff", href: "/daily-staff" },
     { icon: ClipboardList, label: "Registrations", href: "/society-admin/registrations" },
     { icon: FileText, label: "Documents", href: "/society-admin/documents" },
+    { icon: UserX, label: "Deactivations", href: "/deactivationrequests" },
     { icon: Settings, label: "Settings", href: "/adminSettings" },
   ],
   "residential-admin": [
@@ -209,8 +211,7 @@ isSocietyAdmin && (sidebarOpen ? "translate-x-0 mt-16 lg:mt-20 shadow-xl" : "-tr
                   return (
                     <Link key={link.href} to={link.href} className={cn("px-4 py-2 text-sm font-semibold relative", isActive ? "text-blue-600" : "text-slate-500 hover:text-slate-800")}>
                       {link.label}
-                      {isActive && <div className="absolute bottom-[-22px] lg:bottom-[-30px] left-0 w-full h-0.5 bg-blue-600 rounded-full" />}
-                    </Link>
+{isActive && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full" />}                    </Link>
                   );
                 })}
               </div>

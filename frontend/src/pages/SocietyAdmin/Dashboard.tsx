@@ -68,11 +68,10 @@ const Dashboard = () => {
         </div>
 
         {/* ── Stats ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <StatCard title="Total Residents" value="124" trend="+3 this week" icon={<Users className="w-5 h-5 text-blue-600" />} color="bg-blue-50" />
           <StatCard title="Maintenance Collected" value="₹85k" trend="+12%" icon={<IndianRupee className="w-5 h-5 text-emerald-600" />} color="bg-emerald-50" />
           <StatCard title="Active Complaints" value="4" icon={<AlertTriangle className="w-5 h-5 text-orange-500" />} color="bg-orange-50" />
-          <StatCard title="Today's Visitors" value="8" icon={<UserCheck className="w-5 h-5 text-violet-600" />} color="bg-violet-50" />
         </div>
 
         {/* ── Quick Actions ── */}
