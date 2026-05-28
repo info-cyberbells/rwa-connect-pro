@@ -74,8 +74,10 @@ export const AUTHROUTES = {
     STAFF_UNBLOCK: "/staff/unblock",
     STAFF_BLOCKED_LIST: "/staff/blocked-list",
     STAFF_SEARCH: "/staff/search",
+    STAFF_DIRECTORY: "/staff/directory",
     STAFF_ATTENDANCE_HISTORY: "/staff/attendance-history",
     STAFF_MARK_QR: "/staff/mark-qr", // [MODULE-A]: New QR attendance route
+    STAFF_VERIFY: "/staff/verify-member", // [MODULE-C]: Staff verification route
 
     // DELIVERY ROUTES
     DELIVERY_CREATE: "/delivery/create",

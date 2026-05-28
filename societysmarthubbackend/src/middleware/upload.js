@@ -120,3 +120,13 @@ export const uploadUserIdProof = multer({
   fileFilter: imageFilter,
   limits: { fileSize: 5 * MB },
 }).single("idProofDoc");
+
+// [MODULE-C]: Staff Verification Documents (Aadhar + Police Clearance)
+export const uploadStaffDocuments = multer({
+  storage: createStorage("staff/documents"),
+  fileFilter: fileFilter, // Images + PDFs allowed
+  limits: { fileSize: 10 * MB },
+}).fields([
+  { name: "aadharCard", maxCount: 1 },
+  { name: "policeVerification", maxCount: 1 },
+]);

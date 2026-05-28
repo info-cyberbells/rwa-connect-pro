@@ -401,7 +401,10 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
     // DAILY STAFF SERVICES
 
     export const createStaffService = async (payload: any): Promise<any> => {
-    const response = await axiosInstance.post(AUTHROUTES.STAFF_CREATE, payload);
+    const isFormData = payload instanceof FormData;
+    const response = await axiosInstance.post(AUTHROUTES.STAFF_CREATE, payload, {
+    headers: isFormData ? { "Content-Type": "multipart/form-data" } : { "Content-Type": "application/json" },
+    });
     return response.data;
     };
 
@@ -435,6 +438,11 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
     return response.data;
     };
 
+    export const getStaffDirectoryService = async (): Promise<any> => {
+      const response = await axiosInstance.get(AUTHROUTES.STAFF_DIRECTORY);
+      return response.data;
+    };
+
     export const searchStaffService = async (params: any): Promise<any> => {
     const response = await axiosInstance.get(AUTHROUTES.STAFF_SEARCH, { params });
     return response.data;
@@ -449,6 +457,26 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
     export const markStaffAttendanceByQRService = async (payload: { uniqueId: string }): Promise<any> => {
     const response = await axiosInstance.post(AUTHROUTES.STAFF_MARK_QR, payload);
     return response.data;
+    };
+
+    // [MODULE-C]: VERIFY STAFF SERVICE
+    export const verifyStaffService = async (staffId: string, payload?: any): Promise<any> => {
+    const isFormData = payload instanceof FormData;
+    const response = await axiosInstance.patch(`${AUTHROUTES.STAFF_VERIFY}/${staffId}`, payload, {
+      headers: isFormData ? { "Content-Type": "multipart/form-data" } : { "Content-Type": "application/json" },
+    });
+    return response.data;
+    };
+
+    // [MODULE-D]: RATING SERVICES
+    export const addStaffRatingService = async (payload: { staffId: string, rating: number, review: string }): Promise<any> => {
+      const response = await axiosInstance.post("/ratings/add", payload);
+      return response.data;
+    };
+
+    export const getStaffReviewsService = async (staffId: string): Promise<any> => {
+      const response = await axiosInstance.get(`/ratings/staff/${staffId}`);
+      return response.data;
     };
 
     // DELIVERY SERVICES

@@ -3,13 +3,14 @@ import { motion } from "framer-motion";
 import { 
   CreditCard, Bell, FileText, MessageSquare, Upload, 
   CheckCircle, Clock, AlertCircle, UserPlus, ShieldCheck, 
-  XCircle, Loader2, Phone, MapPin, Info, Car 
+  XCircle, Loader2, Phone, MapPin, Info, Car, Users 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { createVisitor, getVisitorHistory, clearUserError, getMyProfile } from "../../features/User/userSlice";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const inputCls = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-400 focus:bg-white transition-colors placeholder:text-slate-400";
 
@@ -33,6 +34,7 @@ const paymentHistory = [
 
 export default function MemberDashboard() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
   const { profileData, visitorData, visitorLoading, createVisitorSuccess, generatedCode, error } = useAppSelector((state) => state.user);
 
@@ -121,13 +123,15 @@ export default function MemberDashboard() {
             <h1 className="text-3xl font-heading font-bold">Welcome, {user?.name || 'Resident'}!</h1>
             <p className="text-muted-foreground">{user?.unit?.flatNumber ? `Flat ${user.unit.flatNumber}` : 'Green Valley Apartments'}</p>
           </div>
-          <Button 
-            onClick={() => setShowAddModal(true)}
-            className="rounded-2xl h-12 px-6 font-bold shadow-lg shadow-primary/10"
-          >
-            <UserPlus className="w-5 h-5 mr-2" />
-            Pre-Approve Visitor
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => setShowAddModal(true)}
+              className="rounded-2xl h-12 px-6 font-bold shadow-lg shadow-primary/10"
+            >
+              <UserPlus className="w-5 h-5 mr-2" />
+              Pre-Approve Visitor
+            </Button>
+          </div>
         </div>
 
         {/* Quick Stats */}
@@ -135,7 +139,8 @@ export default function MemberDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-card rounded-2xl p-6 card-shadow"
+            className="bg-card rounded-2xl p-6 card-shadow cursor-pointer hover:scale-[1.02] transition-transform"
+            onClick={() => navigate('/member/payments')}
           >
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 rounded-xl bg-warning">
@@ -150,7 +155,8 @@ export default function MemberDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-card rounded-2xl p-6 card-shadow"
+            className="bg-card rounded-2xl p-6 card-shadow cursor-pointer hover:scale-[1.02] transition-transform"
+            onClick={() => navigate('/member/notices')}
           >
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 rounded-xl bg-info">
@@ -165,30 +171,32 @@ export default function MemberDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-card rounded-2xl p-6 card-shadow"
+            className="bg-card rounded-2xl p-6 card-shadow cursor-pointer hover:scale-[1.02] transition-transform"
+            onClick={() => navigate('/member/staff-directory')}
           >
             <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-xl bg-primary">
-                <FileText className="w-6 h-6 text-primary-foreground" />
+              <div className="p-3 rounded-xl bg-blue-600">
+                <Users className="w-6 h-6 text-white" />
               </div>
             </div>
-            <p className="text-3xl font-heading font-bold">5</p>
-            <p className="text-muted-foreground text-sm">Documents</p>
+            <p className="text-3xl font-heading font-bold">Explore</p>
+            <p className="text-muted-foreground text-sm">Staff Directory</p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-card rounded-2xl p-6 card-shadow"
+            className="bg-card rounded-2xl p-6 card-shadow cursor-pointer hover:scale-[1.02] transition-transform"
+            onClick={() => navigate('/member/support')}
           >
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 rounded-xl bg-success">
                 <MessageSquare className="w-6 h-6 text-primary-foreground" />
               </div>
             </div>
-            <p className="text-3xl font-heading font-bold">0</p>
-            <p className="text-muted-foreground text-sm">Open Tickets</p>
+            <p className="text-3xl font-heading font-bold">Support</p>
+            <p className="text-muted-foreground text-sm">Help Desk</p>
           </motion.div>
         </div>
 

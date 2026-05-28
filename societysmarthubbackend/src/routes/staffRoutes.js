@@ -16,6 +16,7 @@ import {
   blockedStaffList,
   getStaffAttendanceHistory,
   markAttendanceByQR, // [MODULE-A]: Added QR controller
+  verifyStaff, // [MODULE-C]: Added verification controller
 } from "../controllers/staffController.js";
 
 import {
@@ -23,12 +24,20 @@ import {
   validationMiddleware,
 } from "../middleware/staffValidation.js";
 
+import { uploadStaffDocuments } from "../middleware/upload.js"; // [MODULE-C]: Upload middleware
+
+// Test route to verify router is working
+router.get("/test", (req, res) => res.json({ message: "Staff routes are accessible" }));
+
+// ==============================
+// COMMUNITY STAFF DIRECTORY (Residents can view)
+// ==============================
+// Moving this to the top to ensure priority
+router.get("/directory", auth, permit("user", "admin", "society_admin", "guard"), staffLogs);
+
 // [MODULE-A]: QR Based Attendance Route (For Guard)
-router.post(
-  "/mark-qr",
-  auth,
-  permit("guard", "admin", "society_admin"),
-  markAttendanceByQR,
+router.post("/mark-qr",auth,permit("guard", "admin", "society_admin"),
+markAttendanceByQR,
 );
 
 // ==============================
@@ -39,9 +48,22 @@ router.post(
   "/create",
   auth,
   permit("admin", "society_admin"),
+  uploadStaffDocuments, // [MODULE-C]: Handle document uploads
   createStaffValidation,
   validationMiddleware,
   createStaff,
+);
+
+// ==============================
+// [MODULE-C]: ADMIN VERIFY STAFF
+// ==============================
+
+router.patch(
+  "/verify-member/:staffId",
+  auth,
+  permit("admin", "society_admin"),
+  uploadStaffDocuments, // Add this to handle file uploads
+  verifyStaff,
 );
 
 // ==============================

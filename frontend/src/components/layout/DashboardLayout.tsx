@@ -61,6 +61,7 @@ const navigationConfig = {
     { icon: CreditCard, label: "My Payments", href: "/member/payments" },
     { icon: Bell, label: "Notices", href: "/member/notices" },
     { icon: FileText, label: "Documents", href: "/member/documents" },
+    { icon: Users, label: "Staff Directory", href: "/member/staff-directory" },
     { icon: MessageSquare, label: "Support", href: "/member/support" },
     { icon: User, label: "Profile", href: "/member/profile" },
   ],

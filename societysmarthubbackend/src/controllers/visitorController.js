@@ -35,6 +35,8 @@ export const createVisitor = async (req, res) => {
     // Generate a unique 4-digit verification code
     const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
 
+    console.log(`Generating visitor for phone: ${visitorPhone}, Code: ${verificationCode}`);
+
     const newVisitor = await Visitor.create({
       society: req.user.society,
       visitorName,
@@ -48,11 +50,15 @@ export const createVisitor = async (req, res) => {
       verificationCode,
     });
 
+    // Explicitly add verificationCode to the response data to ensure it's returned
+    const responseData = newVisitor.toObject();
+    responseData.verificationCode = verificationCode;
+
     return res.status(201).json({
       success: true,
       message: "Visitor created successfully",
-      verificationCode, // Resident needs this to share with visitor
-      data: newVisitor,
+      verificationCode, // Top-level for easy access
+      data: responseData,
     });
   } catch (error) {
     console.error("Create Visitor Error:", error);

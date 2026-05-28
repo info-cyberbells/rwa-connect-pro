@@ -87,6 +87,39 @@ const staffSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+
+    // [MODULE-C]: Background Verification (BGV) & Document Vault
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    documents: [
+      {
+        docType: { type: String }, // e.g., "Aadhar Card", "Police Clearance"
+        docUrl: { type: String },
+      },
+    ],
+
+    verifiedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
+    verifiedAt: {
+      type: Date,
+      default: null,
+    },
+    // [MODULE-D]: Performance Metrics
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+    totalReviews: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

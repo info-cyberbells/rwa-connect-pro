@@ -59,6 +59,7 @@ import ResidentialDashboard from "./pages/ResidentialUser/ResidentialDashboard.t
 import ResidentialPayments from "./pages/ResidentialUser/ResidentialPayments.tsx"
 import ResidentialsocietyNotices from "./pages/ResidentialUser/ResidentialSocietyNotices.tsx"
 import ResidentialSupport from "./pages/ResidentialUser/ResidentialSupport.tsx"
+import StaffDirectory from "./pages/ResidentialUser/StaffDirectory";
 import ProfileHub from "./pages/ResidentialUser/ProfileHub.tsx";
 import SocietySetupContainer from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietySetupContainer.tsx";
 import MySociety from "./pages/SocietyAdmin/MySociety.tsx";
@@ -148,6 +149,7 @@ const App = () => (
           <Route path="/residentialDashboard" element={<ResidentialDashboard />} />
           <Route path="/member/payments" element={<ResidentialPayments />} />
           <Route path="/member/notices" element={<ResidentialsocietyNotices />} />  
+          <Route path="/member/staff-directory" element={<StaffDirectory />} />
           <Route path="/member/support" element={<ResidentialSupport/>} />  
           <Route path="/member/profile" element={<ProfileHub/>} />
        

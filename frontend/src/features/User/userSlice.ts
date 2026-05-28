@@ -14,9 +14,12 @@ import {
   updateMyProfileService, 
   userSubmitPaymentService,
   createVisitorService,
-  getVisitorHistoryService
+  getVisitorHistoryService,
+  addStaffRatingService,
+  getStaffReviewsService,
+  getStaffDirectoryService
 } from "@/auth/authServices";
-import { createAsyncThunk, createSlice, isRejectedWithValue } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 
 interface UserState {
@@ -38,6 +41,10 @@ interface UserState {
   visitorLoading: boolean;
   createVisitorSuccess: boolean;
   generatedCode: string | null;
+  // [MODULE-D]: Rating State
+  staffReviews: any[];
+  ratingLoading: boolean;
+  ratingSuccess: boolean;
 }
 
 const initialState: UserState = {
@@ -59,41 +66,14 @@ const initialState: UserState = {
   visitorLoading: false,
   createVisitorSuccess: false,
   generatedCode: null,
+  // [MODULE-D]: Rating Initial State
+  staffReviews: [],
+  ratingLoading: false,
+  ratingSuccess: false,
 };
 
-// ... (existing thunks)
 
-// USER CREATE VISITOR THUNK
-export const createVisitor = createAsyncThunk<any, any, { rejectValue: any }>(
-  "user/createVisitor",
-  async (visitorData, { rejectWithValue }) => {
-    try {
-      const response = await createVisitorService(visitorData);
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data || { message: "Visitor creation failed" }
-      );
-    }
-  }
-);
 
-// USER GET VISITOR HISTORY THUNK
-export const getVisitorHistory = createAsyncThunk<any, string, { rejectValue: string }>(
-  "user/getVisitorHistory",
-  async (flatNumber, { rejectWithValue }) => {
-    try {
-      const response = await getVisitorHistoryService(flatNumber);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch visitor history"
-      );
-    }
-  }
-);
-
-// ... (rest of the file)
 
 // GET MY PROFILE THUNK
 export const getMyProfile = createAsyncThunk< any,void, { rejectValue: string }>(
@@ -281,6 +261,75 @@ export const submitComplaint = createAsyncThunk<any, FormData, {rejectValue: str
         }
     }
 )
+// USER CREATE VISITOR THUNK
+export const createVisitor = createAsyncThunk<any, any, { rejectValue: any }>(
+  "user/createVisitor",
+  async (visitorData, { rejectWithValue }) => {
+    try {
+      const response = await createVisitorService(visitorData);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data || { message: "Visitor creation failed" }
+      );
+    }
+  }
+);
+
+// USER GET VISITOR HISTORY THUNK
+export const getVisitorHistory = createAsyncThunk<any, string, { rejectValue: string }>(
+  "user/getVisitorHistory",
+  async (flatNumber, { rejectWithValue }) => {
+    try {
+      const response = await getVisitorHistoryService(flatNumber);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch visitor history"
+      );
+    }
+  }
+);
+
+// [MODULE-D]: ADD STAFF RATING THUNK
+export const addStaffRating = createAsyncThunk(
+  "user/addStaffRating",
+  async (payload: { staffId: string, rating: number, review: string }, { rejectWithValue }) => {
+    try {
+      const response = await addStaffRatingService(payload);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to submit rating");
+    }
+  }
+);
+
+// [MODULE-D]: GET STAFF REVIEWS THUNK
+export const getStaffReviews = createAsyncThunk(
+  "user/getStaffReviews",
+  async (staffId: string, { rejectWithValue }) => {
+    try {
+      const response = await getStaffReviewsService(staffId);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch reviews");
+    }
+  }
+);
+
+// [MODULE-D]: GET STAFF DIRECTORY THUNK
+export const getStaffDirectory = createAsyncThunk(
+  "user/getStaffDirectory",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getStaffDirectoryService();
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch directory");
+    }
+  }
+);
+
 
 
 const userSlice = createSlice({
@@ -295,6 +344,9 @@ const userSlice = createSlice({
         },
         clearSingleNotice: (state) => {
             state.singleNotice = [];
+        },
+        resetRatingSuccess: (state) => {
+            state.ratingSuccess = false;
         }
     },
     extraReducers: (builder) => {
@@ -512,15 +564,55 @@ const userSlice = createSlice({
         })
         .addCase(getVisitorHistory.fulfilled, (state, action) => {
             state.visitorLoading = false;
-            state.visitorData = action.payload.data || [];
+            // The thunk already returns response.data (the array), so we use it directly
+            state.visitorData = action.payload || [];
         })
         .addCase(getVisitorHistory.rejected, (state, action) => {
             state.visitorLoading = false;
             state.error = action.payload as string;
+        })
+
+        // [MODULE-D]: STAFF RATINGS REDUCERS
+        .addCase(addStaffRating.pending, (state) => {
+          state.ratingLoading = true;
+          state.ratingSuccess = false;
+          state.error = null;
+        })
+        .addCase(addStaffRating.fulfilled, (state) => {
+          state.ratingLoading = false;
+          state.ratingSuccess = true;
+        })
+        .addCase(addStaffRating.rejected, (state, action) => {
+          state.ratingLoading = false;
+          state.error = action.payload as string;
+        })
+
+        .addCase(getStaffReviews.pending, (state) => {
+          state.ratingLoading = true;
+        })
+        .addCase(getStaffReviews.fulfilled, (state, action) => {
+          state.ratingLoading = false;
+          state.staffReviews = action.payload || [];
+        })
+        .addCase(getStaffReviews.rejected, (state, action) => {
+          state.ratingLoading = false;
+          state.error = action.payload as string;
+        })
+
+        .addCase(getStaffDirectory.pending, (state) => {
+          state.loading = true;
+        })
+        .addCase(getStaffDirectory.fulfilled, (state, action) => {
+          state.loading = false;
+          state.visitorData = action.payload || []; // Using visitorData as general staff storage for now
+        })
+        .addCase(getStaffDirectory.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload as string;
         });
 
     }
 })
 
-export const { clearChargeDetails, clearSingleNotice, clearUserError } = userSlice.actions;
+export const { clearChargeDetails, clearSingleNotice, clearUserError, resetRatingSuccess } = userSlice.actions;
 export default userSlice.reducer;

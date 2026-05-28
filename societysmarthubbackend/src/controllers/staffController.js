@@ -1,6 +1,7 @@
 import Staff from "../models/Staff.js";
 import StaffAttendance from "../models/StaffAttendance.js";
 import crypto from "crypto"; // For generating unique ID
+import mongoose from "mongoose";
 
 export const createStaff = async (req, res) => {
   try {
@@ -27,6 +28,23 @@ export const createStaff = async (req, res) => {
     // Format: SSH-XXXX (where XXXX is a random hex string)
     const uniqueId = `SSH-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 
+    // [MODULE-C]: Handle document uploads
+    const documentArray = [];
+    if (req.files) {
+      if (req.files.aadharCard) {
+        documentArray.push({
+          docType: "Aadhar Card",
+          docUrl: `/uploads/staff/documents/${req.files.aadharCard[0].filename}`,
+        });
+      }
+      if (req.files.policeVerification) {
+        documentArray.push({
+          docType: "Police Verification",
+          docUrl: `/uploads/staff/documents/${req.files.policeVerification[0].filename}`,
+        });
+      }
+    }
+
     const newStaff = await Staff.create({
       society: req.user.society,
       staffName,
@@ -37,6 +55,8 @@ export const createStaff = async (req, res) => {
       photo,
       guardId,
       uniqueId, // [MODULE-A]: Save the generated ID
+      documents: documentArray, // [MODULE-C]: Save document paths
+      isVerified: false, // [MODULE-C]: Default to unverified
     });
 
     return res.status(201).json({
@@ -562,6 +582,74 @@ export const markAttendanceByQR = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Something went wrong during QR scanning",
+      error: error.message,
+    });
+  }
+};
+
+// ==============================
+// [MODULE-C]: VERIFY STAFF DOCUMENTS
+// ==============================
+export const verifyStaff = async (req, res) => {
+  try {
+    const { staffId } = req.params;
+
+    if (!staffId) {
+      return res.status(400).json({
+        success: false,
+        message: "Staff ID is required",
+      });
+    }
+
+    const staff = await Staff.findOne({
+      _id: staffId,
+      society: req.user.society,
+    });
+
+    if (!staff) {
+      return res.status(404).json({
+        success: false,
+        message: "Staff not found",
+      });
+    }
+
+    // [MODULE-C]: If documents are uploaded during verification, add them
+    if (req.files) {
+      const documentArray = staff.documents || [];
+      if (req.files.aadharCard) {
+        documentArray.push({
+          docType: "Aadhar Card",
+          docUrl: `/uploads/staff/documents/${req.files.aadharCard[0].filename}`,
+        });
+      }
+      if (req.files.policeVerification) {
+        documentArray.push({
+          docType: "Police Verification",
+          docUrl: `/uploads/staff/documents/${req.files.policeVerification[0].filename}`,
+        });
+      }
+      staff.documents = documentArray;
+    }
+
+    staff.isVerified = true;
+    staff.verifiedBy = new mongoose.Types.ObjectId(req.user.id); 
+    staff.verifiedAt = new Date();
+
+    await staff.save();
+
+    // Fetch and populate verifiedBy to show Admin Name and Email
+    const updatedStaff = await Staff.findById(staff._id).populate("verifiedBy", "name email");
+
+    return res.status(200).json({
+      success: true,
+      message: `${staff.staffName} has been verified successfully`,
+      data: updatedStaff,
+    });
+  } catch (error) {
+    console.error("Verify Staff Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while verifying staff",
       error: error.message,
     });
   }

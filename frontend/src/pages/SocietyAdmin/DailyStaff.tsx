@@ -26,7 +26,8 @@ import {
  approveVisitor,
  rejectVisitor,
  markVisitorExit,
- markStaffAttendanceByQR // [MODULE-A]: New thunk import
+ markStaffAttendanceByQR, // [MODULE-A]: New thunk import
+ verifyStaff // [MODULE-C]: New thunk import
 } from "../../features/admin/adminSlice";
 import { toast } from "sonner";
 import StaffIDCard from "../../components/SocietySmartHub/StaffIDCard"; // [MODULE-A]: ID Card Component
@@ -37,10 +38,10 @@ const inputCls = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 p
 const DailyStaff = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const isAdmin = user?.role === 'admin' || user?.role === 'society_admin';
-
-  // [MODULE-A]: Stronger check for Guard role (checks Redux and localStorage for persistence)
+  
+  // Persistent Role Check: Ensures UI doesn't break on refresh
   const userRole = user?.role || localStorage.getItem("role");
+  const isAdmin = userRole === 'admin' || userRole === 'society_admin';
   const isGuard = userRole === 'guard'; 
 
   const { 
@@ -249,6 +250,15 @@ const DailyStaff = () => {
     });
   };
 
+  // [MODULE-C]: HANDLE STAFF VERIFICATION
+  const handleVerifyStaff = (staffId: string) => {
+    dispatch(verifyStaff({ staffId })).then((res: any) => {
+      if (res.payload?.success) {
+        toast.success("Staff verified successfully");
+      }
+    });
+  };
+
   // [MODULE-A]: HANDLE QR SCANNING LOGIC
   const handleQRScan = (scannedUniqueId: string) => {
     setShowQRScanner(false); // Close scanner immediately
@@ -268,8 +278,19 @@ const DailyStaff = () => {
   const handleCreateStaff = (e: React.FormEvent) => {
     e.preventDefault();
     if (newStaff.role.length === 0) return toast.error("Please select at least one role");
-    const payload = { ...newStaff, role: newStaff.role.join(", ") };
-    dispatch(createStaff(payload));
+    
+    // [MODULE-C]: Use FormData for document uploads
+    const formData = new FormData();
+    formData.append("staffName", newStaff.staffName);
+    formData.append("mobileNumber", newStaff.mobileNumber);
+    formData.append("role", newStaff.role.join(", "));
+    formData.append("flatNumber", newStaff.flatNumber);
+    formData.append("vehicleNumber", newStaff.vehicleNumber);
+    if (newStaff.photo) formData.append("photo", newStaff.photo);
+    if (newStaff.aadharCard) formData.append("aadharCard", newStaff.aadharCard);
+    if (newStaff.policeVerification) formData.append("policeVerification", newStaff.policeVerification);
+
+    dispatch(createStaff(formData));
   };
 
   const openHistory = (staff: any) => {
@@ -458,7 +479,14 @@ const DailyStaff = () => {
 
                           <div className="space-y-3">
                             <div>
-                              <h4 className="font-bold text-slate-800 leading-tight">{staff.staffName}</h4>
+                              <div className="flex items-center gap-1.5 leading-tight">
+                                <h4 className="font-bold text-slate-800">{staff.staffName}</h4>
+                                {staff.isVerified && (
+                                  <div className="bg-blue-600 rounded-full p-0.5" title="Verified Staff">
+                                    <Check className="text-white" size={8} strokeWidth={5} />
+                                  </div>
+                                )}
+                              </div>
                               <p className="text-[11px] font-bold text-blue-600 uppercase tracking-widest mt-0.5">{staff.role}</p>
                             </div>
 
@@ -473,49 +501,77 @@ const DailyStaff = () => {
                               </div>
                             </div>
 
-                            <div className="pt-4 border-t border-slate-50 flex flex-col gap-2">
-                              {!staff.todayLog ? (
-                                <button 
-                                  onClick={() => handleEntry(staff._id)}
-                                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-50"
-                                >
-                                  <LogIn size={14} /> Mark Entry
-                                </button>
-                              ) : !staff.todayLog.exitTime ? (
-                                <button 
-                                  onClick={() => handleExit(staff._id)}
-                                  className="w-full bg-rose-600 hover:bg-rose-700 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-rose-50"
-                                >
-                                  <LogOut size={14} /> Mark Exit
-                                </button>
-                              ) : (
-                                <div className="text-center py-2 bg-slate-50 rounded-xl text-[10px] font-bold text-slate-400 uppercase tracking-wider border border-slate-100">
-                                  Shift Done: {new Date(staff.todayLog.exitTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </div>
-                              )}
-                              <div className="flex gap-2">
+                            <div className="pt-4 border-t border-slate-50 space-y-3">
+                              {/* Primary Movement Action */}
+                              <div className="h-10">
+                                {!staff.todayLog ? (
+                                  <button 
+                                    onClick={() => handleEntry(staff._id)}
+                                    className="w-full h-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-50 active:scale-95"
+                                  >
+                                    <LogIn size={14} strokeWidth={3} /> Mark Entry
+                                  </button>
+                                ) : !staff.todayLog.exitTime ? (
+                                  <button 
+                                    onClick={() => handleExit(staff._id)}
+                                    className="w-full h-full bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-rose-50 active:scale-95"
+                                  >
+                                    <LogOut size={14} strokeWidth={3} /> Mark Exit
+                                  </button>
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-slate-50 rounded-xl text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-100">
+                                    Shift Done: {new Date(staff.todayLog.exitTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Secondary Admin Actions Grid */}
+                              <div className="grid grid-cols-2 gap-2">
                                 <button 
                                   onClick={() => openHistory(staff)}
-                                  className="flex-1 text-slate-400 hover:text-blue-600 py-1 text-[10px] font-bold uppercase tracking-tighter transition-all flex items-center justify-center gap-1 border border-transparent border-slate-100 hover:border-blue-100 rounded-lg"
+                                  className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 border border-slate-100 hover:border-blue-200 transition-all group"
+                                  title="View History"
                                 >
-                                  <Calendar size={12} /> History
+                                  <Calendar size={13} className="group-hover:scale-110 transition-transform" />
+                                  <span className="text-[10px] font-black uppercase tracking-tighter">History</span>
                                 </button>
                                 
-                                {/* [MODULE-A]: VIEW DIGITAL ID BUTTON */}
                                 <button 
                                   onClick={() => setShowIDCardModal(staff)}
-                                  className="flex-1 text-blue-600 hover:bg-blue-50 py-1 text-[10px] font-bold uppercase tracking-tighter transition-all flex items-center justify-center gap-1 border border-blue-100 rounded-lg shadow-sm shadow-blue-50"
+                                  className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-slate-50 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-100 hover:border-indigo-200 transition-all group"
+                                  title="Digital ID"
                                 >
-                                  <QrCode size={12} /> Digital ID
+                                  <QrCode size={13} className="group-hover:scale-110 transition-transform" />
+                                  <span className="text-[10px] font-black uppercase tracking-tighter">ID Card</span>
                                 </button>
 
                                 {isAdmin && (
-                                  <button 
-                                    onClick={() => setShowBlockModal(staff)}
-                                    className="flex-1 text-slate-400 hover:text-rose-600 py-1 text-[10px] font-bold uppercase tracking-tighter transition-all flex items-center justify-center gap-1 border border-transparent border-slate-100 hover:border-rose-100 rounded-lg"
-                                  >
-                                    <UserX size={12} /> Block
-                                  </button>
+                                  <>
+                                    <button 
+                                      onClick={() => handleVerifyStaff(staff._id)}
+                                      disabled={staff.isVerified}
+                                      className={`flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl transition-all group ${
+                                        staff.isVerified 
+                                        ? "bg-emerald-50 text-emerald-600 border border-emerald-100 cursor-default" 
+                                        : "bg-slate-50 text-slate-500 hover:bg-emerald-50 hover:text-emerald-600 border border-slate-100 hover:border-emerald-200"
+                                      }`}
+                                      title={staff.isVerified ? "Verified" : "Verify Staff"}
+                                    >
+                                      {staff.isVerified ? <ShieldCheck size={13} strokeWidth={3} /> : <ShieldAlert size={13} />}
+                                      <span className="text-[10px] font-black uppercase tracking-tighter">
+                                        {staff.isVerified ? "Verified" : "Verify"}
+                                      </span>
+                                    </button>
+
+                                    <button 
+                                      onClick={() => setShowBlockModal(staff)}
+                                      className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600 border border-slate-100 hover:border-rose-200 transition-all group"
+                                      title="Block Staff"
+                                    >
+                                      <UserX size={13} className="group-hover:scale-110 transition-transform" />
+                                      <span className="text-[10px] font-black uppercase tracking-tighter">Block</span>
+                                    </button>
+                                  </>
                                 )}
                               </div>
                             </div>
@@ -1179,7 +1235,7 @@ const DailyStaff = () => {
             </div>
 
             <form onSubmit={handleCreateStaff}>
-              <div className="p-6 space-y-4">
+              <div className="p-6 space-y-4 max-h-[65vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
@@ -1285,6 +1341,28 @@ const DailyStaff = () => {
                     value={newStaff.vehicleNumber}
                     onChange={(e) => setNewStaff({...newStaff, vehicleNumber: e.target.value})}
                   />
+                </div>
+
+                {/* [MODULE-C]: Document Upload Fields */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Aadhar Card (PDF/Image)</label>
+                    <input 
+                      type="file" 
+                      accept=".pdf,image/*"
+                      className={`${inputCls} py-1.5`}
+                      onChange={(e) => setNewStaff({...newStaff, aadharCard: e.target.files ? e.target.files[0] : null})}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Police Verification</label>
+                    <input 
+                      type="file" 
+                      accept=".pdf,image/*"
+                      className={`${inputCls} py-1.5`}
+                      onChange={(e) => setNewStaff({...newStaff, policeVerification: e.target.files ? e.target.files[0] : null})}
+                    />
+                  </div>
                 </div>
 
                 <div className="p-6 bg-slate-50 border border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-blue-50/50 hover:border-blue-200 transition-all group">

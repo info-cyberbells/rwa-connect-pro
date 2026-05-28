@@ -38,6 +38,7 @@ import {
   createStaffService,
   getStaffAttendanceHistoryService,
   markStaffAttendanceByQRService, // [MODULE-A]: New service import
+  verifyStaffService, // [MODULE-C]: New service import
   searchStaffService,
   getBlockedStaffService,
   createDeliveryService,
@@ -51,6 +52,18 @@ import {
 } from "../../auth/authServices";
 
 // ... existing interfaces
+
+// [MODULE-C]: VERIFY STAFF THUNK
+export const verifyStaff = createAsyncThunk(
+  "admin/verifyStaff",
+  async (args: { staffId: string; payload?: any }, { rejectWithValue }) => {
+    try {
+      return await verifyStaffService(args.staffId, args.payload);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Verification failed");
+    }
+  }
+);
 
 // [MODULE-A]: MARK STAFF ATTENDANCE BY QR THUNK
 export const markStaffAttendanceByQR = createAsyncThunk(
@@ -122,6 +135,7 @@ interface AdminState {
   // Visitor State
   visitorData: any[];
   visitorLoading: boolean;
+  generatedCode: string | null;
 }
 
 const initialState: AdminState = {
@@ -158,6 +172,7 @@ const initialState: AdminState = {
   // Visitor Initial State
   visitorData: [],
   visitorLoading: false,
+  generatedCode: null,
 };
 
 // ─── Visitor Thunks ─────────────────────────────────────────────────────────────
@@ -1083,9 +1098,18 @@ const adminSlice = createSlice({
       .addCase(getBlockedStaff.fulfilled, (state, action: PayloadAction<any[]>) => {
         state.blockedStaff = action.payload;
       })
+      .addCase(createStaff.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.isSuccess = false;
+      })
       .addCase(createStaff.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
+      })
+      .addCase(createStaff.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
       })
       .addCase(getStaffHistory.pending, (state) => {
         state.historyLoading = true;
@@ -1109,6 +1133,23 @@ const adminSlice = createSlice({
         state.isSuccess = true;
       })
       .addCase(markStaffAttendanceByQR.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      // [MODULE-C]: Verify Staff Reducers
+      .addCase(verifyStaff.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(verifyStaff.fulfilled, (state, action: any) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const updatedStaff = action.payload.data;
+        const index = state.staffData.findIndex((s) => s._id === updatedStaff._id);
+        if (index !== -1) {
+          state.staffData[index] = updatedStaff;
+        }
+      })
+      .addCase(verifyStaff.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })
@@ -1145,12 +1186,24 @@ const adminSlice = createSlice({
       })
 
       // Visitor Reducers
+      .addCase(createVisitor.pending, (state) => {
+        state.visitorLoading = true;
+        state.error = null;
+        state.isSuccess = false;
+        state.generatedCode = null;
+      })
       .addCase(createVisitor.fulfilled, (state, action: any) => {
-        state.isLoading = false;
+        state.visitorLoading = false;
         state.isSuccess = true;
+        state.generatedCode = action.payload.verificationCode;
         if (action.payload?.data) {
           state.visitorData.unshift(action.payload.data);
         }
+      })
+      .addCase(createVisitor.rejected, (state, action) => {
+        state.visitorLoading = false;
+        state.error = action.payload as string;
+        state.isSuccess = false;
       })
       .addCase(approveVisitor.fulfilled, (state, action: any) => {
         state.isLoading = false;
