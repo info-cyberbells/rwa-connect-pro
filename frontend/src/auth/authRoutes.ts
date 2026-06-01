@@ -76,7 +76,7 @@ export const AUTHROUTES = {
     STAFF_SEARCH: "/staff/search",
     STAFF_DIRECTORY: "/staff/directory",
     STAFF_ATTENDANCE_HISTORY: "/staff/attendance-history",
-    STAFF_MARK_QR: "/staff/mark-qr", // [MODULE-A]: New QR attendance route
+    STAFF_ONE_TIME_ENTRY: "/staff/one-time-entry",
     STAFF_VERIFY: "/staff/verify-member", // [MODULE-C]: Staff verification route
 
     // DELIVERY ROUTES

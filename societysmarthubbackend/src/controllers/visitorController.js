@@ -35,8 +35,6 @@ export const createVisitor = async (req, res) => {
     // Generate a unique 4-digit verification code
     const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
 
-    console.log(`Generating visitor for phone: ${visitorPhone}, Code: ${verificationCode}`);
-
     const newVisitor = await Visitor.create({
       society: req.user.society,
       visitorName,

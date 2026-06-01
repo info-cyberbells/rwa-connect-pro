@@ -127,6 +127,7 @@ export const uploadStaffDocuments = multer({
   fileFilter: fileFilter, // Images + PDFs allowed
   limits: { fileSize: 10 * MB },
 }).fields([
+  { name: "photo", maxCount: 1 },
   { name: "aadharCard", maxCount: 1 },
   { name: "policeVerification", maxCount: 1 },
 ]);

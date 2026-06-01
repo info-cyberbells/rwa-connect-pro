@@ -19,6 +19,10 @@ export const validationMiddleware = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
+    console.log("=== VALIDATION FAILED ===");
+    console.log("Incoming Body to Validation:", JSON.stringify(req.body, null, 2));
+    console.log("Validation Errors:", JSON.stringify(errors.array(), null, 2));
+
     return res.status(400).json({
       success: false,
       message: "Validation Error",

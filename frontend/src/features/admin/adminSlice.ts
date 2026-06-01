@@ -37,10 +37,10 @@ import {
   unblockStaffService,
   createStaffService,
   getStaffAttendanceHistoryService,
-  markStaffAttendanceByQRService, // [MODULE-A]: New service import
   verifyStaffService, // [MODULE-C]: New service import
   searchStaffService,
   getBlockedStaffService,
+  oneTimeStaffEntryService,
   createDeliveryService,
   markDeliveryExitService,
   getDeliveryLogsService,
@@ -65,15 +65,14 @@ export const verifyStaff = createAsyncThunk(
   }
 );
 
-// [MODULE-A]: MARK STAFF ATTENDANCE BY QR THUNK
-export const markStaffAttendanceByQR = createAsyncThunk(
-  "admin/markStaffAttendanceByQR",
-  async (payload: { uniqueId: string }, { rejectWithValue }) => {
+// ONE-TIME STAFF ENTRY THUNK
+export const oneTimeStaffEntry = createAsyncThunk(
+  "admin/oneTimeStaffEntry",
+  async (staffData: any, { rejectWithValue }) => {
     try {
-      const response = await markStaffAttendanceByQRService(payload);
-      return response;
+      return await oneTimeStaffEntryService(staffData);
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || "QR Scanning failed");
+      return rejectWithValue(err.response?.data?.message || "One-time entry failed");
     }
   }
 );
@@ -273,9 +272,9 @@ export const markDeliveryExit = createAsyncThunk(
 
 export const getStaffLogs = createAsyncThunk(
   "admin/getStaffLogs",
-  async (_, { rejectWithValue }) => {
+  async (type: string | undefined, { rejectWithValue }) => {
     try {
-      const res = await getStaffLogsService();
+      const res = await getStaffLogsService(type);
       return res.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch logs");
@@ -366,9 +365,7 @@ export const searchStaff = createAsyncThunk(
   "admin/searchStaff",
   async (query: string, { rejectWithValue }) => {
     try {
-      // Determine if query is phone or name
-      const params = /^\d+$/.test(query) ? { phone: query } : { name: query };
-      const res = await searchStaffService(params);
+      const res = await searchStaffService({ query });
       return res.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Search failed");
@@ -1111,6 +1108,21 @@ const adminSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
+      .addCase(oneTimeStaffEntry.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.isSuccess = false;
+      })
+      .addCase(oneTimeStaffEntry.fulfilled, (state, action: any) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        // Auto-add to staff data if it was a new creation or refresh needed
+        // The list will be refreshed by the component anyway
+      })
+      .addCase(oneTimeStaffEntry.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
       .addCase(getStaffHistory.pending, (state) => {
         state.historyLoading = true;
       })
@@ -1123,18 +1135,6 @@ const adminSlice = createSlice({
       })
       .addCase(searchStaff.fulfilled, (state, action: PayloadAction<any[]>) => {
         state.staffData = action.payload;
-      })
-      // [MODULE-A]: QR Attendance Reducer
-      .addCase(markStaffAttendanceByQR.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(markStaffAttendanceByQR.fulfilled, (state) => {
-        state.isLoading = false;
-        state.isSuccess = true;
-      })
-      .addCase(markStaffAttendanceByQR.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload as string;
       })
       // [MODULE-C]: Verify Staff Reducers
       .addCase(verifyStaff.pending, (state) => {

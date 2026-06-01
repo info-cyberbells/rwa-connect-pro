@@ -79,7 +79,7 @@ const visitorSchema = new mongoose.Schema(
     // CHANGED: System-generated verification code (Required)
     verificationCode: {
       type: String,
-      required: true,
+      required: true, 
     },
   },
   {

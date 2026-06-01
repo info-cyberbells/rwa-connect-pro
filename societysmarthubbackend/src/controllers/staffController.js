@@ -1,7 +1,7 @@
 import Staff from "../models/Staff.js";
 import StaffAttendance from "../models/StaffAttendance.js";
-import crypto from "crypto"; // For generating unique ID
 import mongoose from "mongoose";
+import { attachBaseUrl, attachBaseUrlToArray } from "../utils/addBaseUrl.js";
 
 export const createStaff = async (req, res) => {
   try {
@@ -24,13 +24,14 @@ export const createStaff = async (req, res) => {
       });
     }
 
-    // [MODULE-A]: Generate a Unique ID for Digital ID Card & QR Code
-    // Format: SSH-XXXX (where XXXX is a random hex string)
-    const uniqueId = `SSH-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
-
-    // [MODULE-C]: Handle document uploads
+    // [MODULE-C]: Handle document uploads and photo
     const documentArray = [];
+    let photoUrl = "";
+
     if (req.files) {
+      if (req.files.photo) {
+        photoUrl = `/uploads/staff/documents/${req.files.photo[0].filename}`;
+      }
       if (req.files.aadharCard) {
         documentArray.push({
           docType: "Aadhar Card",
@@ -52,20 +53,20 @@ export const createStaff = async (req, res) => {
       role,
       flatNumber,
       vehicleNumber,
-      photo,
+      photo: photoUrl || photo, // Use uploaded photo URL or provided photo string
       guardId,
-      uniqueId, // [MODULE-A]: Save the generated ID
       documents: documentArray, // [MODULE-C]: Save document paths
       isVerified: false, // [MODULE-C]: Default to unverified
+      staffType: "Daily", // Registered staff is always Daily
     });
 
     return res.status(201).json({
       success: true,
-      message: "Staff created successfully with Digital ID",
-      data: newStaff,
+      message: "Staff created successfully",
+      data: attachBaseUrl(req, newStaff, ["photo"]),
     });
   } catch (error) {
-    console.error("Create Staff Error:", error);
+    console.error("CRITICAL ERROR in createStaff:", error);
 
     return res.status(500).json({
       success: false,
@@ -75,26 +76,110 @@ export const createStaff = async (req, res) => {
   }
 };
 
+// ==============================
+// ONE-TIME STAFF ENTRY (GUARD)
+// ==============================
+export const oneTimeStaffEntry = async (req, res) => {
+  try {
+    const { staffName, mobileNumber } = req.body;
+
+    if (!staffName || !mobileNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Staff Name and Mobile Number are required",
+      });
+    }
+
+    // 1. Check if staff exists
+    let staff = await Staff.findOne({
+      mobileNumber,
+      society: req.user.society,
+      staffType: "One-time",
+    });
+
+    let photoUrl = "";
+    if (req.files && req.files.photo) {
+      photoUrl = `/uploads/staff/documents/${req.files.photo[0].filename}`;
+    }
+
+    if (!staff) {
+      // Create new One-time staff
+      staff = await Staff.create({
+        society: req.user.society,
+        staffName,
+        mobileNumber,
+        staffType: "One-time",
+        photo: photoUrl,
+        role: "One-time Visitor",
+        flatNumber: "N/A",
+      });
+    } else if (photoUrl) {
+      // Update photo if provided
+      staff.photo = photoUrl;
+      await staff.save();
+    }
+
+    // 2. Mark Attendance (Entry)
+    const today = new Date().toISOString().split("T")[0];
+
+    // Check if already checked in today (just in case)
+    const existingAttendance = await StaffAttendance.findOne({
+      staff: staff._id,
+      society: req.user.society,
+      date: today,
+      exitTime: null,
+    });
+
+    if (existingAttendance) {
+      return res.status(400).json({
+        success: false,
+        message: "This visitor is already inside the society",
+      });
+    }
+
+    const attendance = await StaffAttendance.create({
+      society: req.user.society,
+      staff: staff._id,
+      entryTime: new Date(),
+      date: today,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "One-time staff entry marked successfully",
+      staff: attachBaseUrl(req, staff, ["photo"]),
+      attendance,
+    });
+  } catch (error) {
+    console.error("One-time Staff Entry Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong during one-time entry",
+      error: error.message,
+    });
+  }
+};
+
 export const searchStaff = async (req, res) => {
   try {
-    const { phone, name } = req.query;
+    const { query } = req.query;
 
-    let query = {
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        message: "Search query is required",
+      });
+    }
+
+    let dbQuery = {
       society: req.user.society,
+      $or: [
+        { staffName: { $regex: query, $options: "i" } },
+        { mobileNumber: { $regex: query, $options: "i" } },
+      ],
     };
 
-    if (phone) {
-      query.mobileNumber = phone;
-    }
-
-    if (name) {
-      query.staffName = {
-        $regex: name,
-        $options: "i",
-      };
-    }
-
-    const staffList = await Staff.find(query).lean();
+    const staffList = await Staff.find(dbQuery).lean();
 
     const today = new Date().toISOString().split("T")[0];
 
@@ -114,18 +199,11 @@ export const searchStaff = async (req, res) => {
       };
     });
 
-    if (!updatedStaff.length) {
-      return res.status(404).json({
-        success: false,
-        message: "No staff found",
-      });
-    }
-
     return res.status(200).json({
       success: true,
-      message: "Staff fetched successfully",
+      message: "Staff searched successfully",
       totalStaff: updatedStaff.length,
-      data: updatedStaff,
+      data: attachBaseUrlToArray(req, updatedStaff, ["photo"]),
     });
   } catch (error) {
     console.error("Search Staff Error:", error);
@@ -278,12 +356,19 @@ export const staffExit = async (req, res) => {
 
 export const staffLogs = async (req, res) => {
   try {
+    const { type } = req.query; // Filter by staffType (Daily/One-time)
     const today = new Date().toISOString().split("T")[0];
 
-    // [MODULE-A]: Sort by createdAt: -1 to show newest staff at the top
-    const staffList = await Staff.find({
+    let query = {
       society: req.user.society,
-    }).sort({ createdAt: -1 }).lean();
+    };
+
+    if (type) {
+      query.staffType = type;
+    }
+
+    // Sort by createdAt: -1 to show newest staff at the top
+    const staffList = await Staff.find(query).sort({ createdAt: -1 }).lean();
 
     const attendanceList = await StaffAttendance.find({
       society: req.user.society,
@@ -305,7 +390,7 @@ export const staffLogs = async (req, res) => {
       success: true,
       message: "Staff logs fetched successfully",
       totalLogs: updatedLogs.length,
-      data: updatedLogs,
+      data: attachBaseUrlToArray(req, updatedLogs, ["photo"]),
     });
   } catch (error) {
     console.error("Staff Logs Error:", error);
@@ -337,11 +422,19 @@ export const getStaffAttendanceHistory = async (req, res) => {
         createdAt: -1,
       });
 
+    const updatedHistory = history.map(log => {
+      const logObj = log.toObject();
+      if (logObj.staff) {
+        logObj.staff = attachBaseUrl(req, logObj.staff, ["photo"]);
+      }
+      return logObj;
+    });
+
     return res.status(200).json({
       success: true,
       message: "Staff attendance history fetched successfully",
-      totalHistory: history.length,
-      data: history,
+      totalHistory: updatedHistory.length,
+      data: updatedHistory,
     });
   } catch (error) {
     console.error("Get Staff Attendance History Error:", error);
@@ -495,93 +588,6 @@ export const blockedStaffList = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Something went wrong while fetching blocked staff",
-      error: error.message,
-    });
-  }
-};
-
-// ==============================
-// [MODULE-A]: MARK ATTENDANCE VIA QR SCAN
-// ==============================
-export const markAttendanceByQR = async (req, res) => {
-  try {
-    const { uniqueId } = req.body; 
-
-    if (!uniqueId) {
-      return res.status(400).json({
-        success: false,
-        message: "Unique QR ID is required",
-      });
-    }
-
-    // 1. Find Staff by Unique ID (Case-insensitive)
-    const staff = await Staff.findOne({
-      uniqueId: { $regex: new RegExp(`^${uniqueId}$`, "i") },
-      society: req.user.society,
-    });
-
-    if (!staff) {
-      return res.status(404).json({
-        success: false,
-        message: "Invalid QR Code. Staff not found in your society.",
-      });
-    }
-
-    // 2. Check if Blocked
-    if (staff.status === "Blocked") {
-      return res.status(403).json({
-        success: false,
-        message: `Access Denied: ${staff.staffName} is blocked.`,
-      });
-    }
-
-    const today = new Date().toISOString().split("T")[0];
-
-    // 3. Find today's attendance log
-    let attendance = await StaffAttendance.findOne({
-      staff: staff._id,
-      society: req.user.society,
-      date: today,
-    });
-
-    let action = "";
-
-    if (!attendance) {
-      // Create Entry Log
-      attendance = await StaffAttendance.create({
-        society: req.user.society,
-        staff: staff._id,
-        entryTime: new Date(),
-        date: today,
-      });
-      action = "ENTRY";
-    } else if (!attendance.exitTime) {
-      // Mark Exit
-      attendance.exitTime = new Date();
-      await attendance.save();
-      action = "EXIT";
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Attendance already completed (Entry & Exit) for today.",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: `${action} marked successfully for ${staff.staffName}`,
-      data: {
-        staffName: staff.staffName,
-        role: staff.role,
-        action,
-        time: action === "ENTRY" ? attendance.entryTime : attendance.exitTime,
-      },
-    });
-  } catch (error) {
-    console.error("QR Attendance Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong during QR scanning",
       error: error.message,
     });
   }

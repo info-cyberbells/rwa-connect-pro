@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import { Download, ShieldCheck, MapPin, Phone } from 'lucide-react';
 
@@ -10,7 +9,6 @@ interface StaffIDCardProps {
     mobileNumber: string;
     flatNumber: string;
     photo?: string;
-    uniqueId: string;
     societyName?: string;
   };
 }
@@ -57,24 +55,8 @@ const StaffIDCard: React.FC<StaffIDCardProps> = ({ staff }) => {
           </div>
 
           <h2 className="text-xl font-black text-slate-800 text-center uppercase tracking-tight">{staff.staffName}</h2>
-          <div className="bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mt-1 mb-6">
+          <div className="bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mt-1 mb-10">
             {staff.role}
-          </div>
-
-          {/* [MODULE-A]: QR Code Section (Moved Up for better visibility) */}
-          <div className="flex flex-col items-center gap-3 mb-8">
-             <div className="p-3 bg-white rounded-3xl border-2 border-blue-50 shadow-sm shadow-blue-50">
-                <QRCodeSVG 
-                  value={staff.uniqueId} 
-                  size={140}
-                  level="H"
-                  includeMargin={false}
-                />
-             </div>
-             <div className="text-center">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[4px]">Entry Pass ID</p>
-                <p className="text-sm font-black text-blue-600 tracking-[3px]">{staff.uniqueId}</p>
-             </div>
           </div>
 
           {/* Contact Details */}

@@ -11,40 +11,46 @@ import {
   staffEntry,
   staffExit,
   staffLogs,
+  oneTimeStaffEntry,
   blockStaff,
   unblockStaff,
   blockedStaffList,
   getStaffAttendanceHistory,
-  markAttendanceByQR, // [MODULE-A]: Added QR controller
   verifyStaff, // [MODULE-C]: Added verification controller
-} from "../controllers/staffController.js";
+  } from "../controllers/staffController.js";
 
-import {
+  import {
   createStaffValidation,
   validationMiddleware,
-} from "../middleware/staffValidation.js";
+  } from "../middleware/staffValidation.js";
 
-import { uploadStaffDocuments } from "../middleware/upload.js"; // [MODULE-C]: Upload middleware
+  import { uploadStaffDocuments } from "../middleware/upload.js"; // [MODULE-C]: Handle document uploads
 
-// Test route to verify router is working
-router.get("/test", (req, res) => res.json({ message: "Staff routes are accessible" }));
+  // Test route to verify router is working
+  router.get("/test", (req, res) => res.json({ message: "Staff routes are accessible" }));
 
-// ==============================
-// COMMUNITY STAFF DIRECTORY (Residents can view)
-// ==============================
-// Moving this to the top to ensure priority
-router.get("/directory", auth, permit("user", "admin", "society_admin", "guard"), staffLogs);
+  // ==============================
+  // COMMUNITY STAFF DIRECTORY (Residents can view)
+  // ==============================
+  // Moving this to the top to ensure priority
+  router.get("/directory", auth, permit("user", "admin", "society_admin", "guard"), staffLogs);
 
-// [MODULE-A]: QR Based Attendance Route (For Guard)
-router.post("/mark-qr",auth,permit("guard", "admin", "society_admin"),
-markAttendanceByQR,
-);
+  // ==============================
+  // ONE-TIME STAFF ENTRY (GUARD)
+  // ==============================
+  router.post(
+  "/one-time-entry",
+  auth,
+  permit("guard", "admin", "society_admin"),
+  uploadStaffDocuments,
+  oneTimeStaffEntry,
+  );
 
-// ==============================
-// MEMBER CREATE STAFF
-// ==============================
+  // ==============================
+  // MEMBER CREATE STAFF
+  // ==============================
 
-router.post(
+  router.post(
   "/create",
   auth,
   permit("admin", "society_admin"),
@@ -52,7 +58,7 @@ router.post(
   createStaffValidation,
   validationMiddleware,
   createStaff,
-);
+  );
 
 // ==============================
 // [MODULE-C]: ADMIN VERIFY STAFF

@@ -16,14 +16,20 @@ const staffSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      required: true,
       trim: true,
+      default: "Other",
     },
 
     flatNumber: {
       type: String,
-      required: true,
       trim: true,
+      default: "N/A",
+    },
+
+    staffType: {
+      type: String,
+      enum: ["Daily", "One-time"],
+      default: "Daily",
     },
 
     vehicleNumber: {
@@ -35,13 +41,6 @@ const staffSchema = new mongoose.Schema(
     photo: {
       type: String,
       default: "",
-    },
-
-    // [MODULE-A]: Unique ID for QR code generation (e.g., ST-ABC123)
-    uniqueId: {
-      type: String,
-      unique: true,
-      sparse: true,
     },
 
     status: {

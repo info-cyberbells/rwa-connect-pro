@@ -418,8 +418,18 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
     return response.data;
     };
 
-    export const getStaffLogsService = async (): Promise<any> => {
-    const response = await axiosInstance.get(AUTHROUTES.STAFF_GET_LOGS);
+    export const getStaffLogsService = async (type?: string): Promise<any> => {
+    const response = await axiosInstance.get(AUTHROUTES.STAFF_GET_LOGS, {
+      params: { type }
+    });
+    return response.data;
+    };
+
+    export const oneTimeStaffEntryService = async (payload: any): Promise<any> => {
+    const isFormData = payload instanceof FormData;
+    const response = await axiosInstance.post(AUTHROUTES.STAFF_ONE_TIME_ENTRY, payload, {
+      headers: isFormData ? { "Content-Type": "multipart/form-data" } : { "Content-Type": "application/json" },
+    });
     return response.data;
     };
 
@@ -450,12 +460,6 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
 
     export const getStaffAttendanceHistoryService = async (staffId: string): Promise<any> => {
     const response = await axiosInstance.get(`${AUTHROUTES.STAFF_ATTENDANCE_HISTORY}/${staffId}`);
-    return response.data;
-    };
-
-    // [MODULE-A]: MARK ATTENDANCE BY QR SERVICE
-    export const markStaffAttendanceByQRService = async (payload: { uniqueId: string }): Promise<any> => {
-    const response = await axiosInstance.post(AUTHROUTES.STAFF_MARK_QR, payload);
     return response.data;
     };
 

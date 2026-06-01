@@ -1,10 +1,10 @@
- import { useState, useEffect, useRef } from 'react';
- import { 
+import { useState, useEffect, useRef } from 'react';
+import { 
   Users, Plus, Search, MapPin, Phone, Car, Clock, 
   ShieldAlert, CheckCircle2, XCircle, MoreVertical,
   Filter, Calendar, UserPlus, ArrowRightLeft, UserX,
   UserCheck, ShieldCheck, LogIn, LogOut, Ban, Info, Loader2,
-  ChevronDown, Check, X, Truck, History, QrCode
+  ChevronDown, Check, X, Truck, History
 } from 'lucide-react';
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
 import { useAppDispatch, useAppSelector } from "../../store/store";
@@ -19,6 +19,7 @@ import {
  getStaffHistory, 
  searchStaff,
  resetAdminState,
+ oneTimeStaffEntry,
  getDeliveryLogs,
  createDelivery,
  markDeliveryExit,
@@ -26,12 +27,9 @@ import {
  approveVisitor,
  rejectVisitor,
  markVisitorExit,
- markStaffAttendanceByQR, // [MODULE-A]: New thunk import
- verifyStaff // [MODULE-C]: New thunk import
+ verifyStaff 
 } from "../../features/admin/adminSlice";
 import { toast } from "sonner";
-import StaffIDCard from "../../components/SocietySmartHub/StaffIDCard"; // [MODULE-A]: ID Card Component
-import QRScanner from "../../components/SocietySmartHub/QRScanner"; // [MODULE-A]: QR Scanner Component
 
 const inputCls = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-400 focus:bg-white transition-colors placeholder:text-slate-400";
 
@@ -39,7 +37,7 @@ const DailyStaff = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   
-  // Persistent Role Check: Ensures UI doesn't break on refresh
+  // Persistent Role Check
   const userRole = user?.role || localStorage.getItem("role");
   const isAdmin = userRole === 'admin' || userRole === 'society_admin';
   const isGuard = userRole === 'guard'; 
@@ -48,7 +46,7 @@ const DailyStaff = () => {
     staffData, 
     blockedStaff, 
     staffLoading, 
-    isLoading, // [MODULE-A]: Global loading
+    isLoading, 
     staffHistory, 
     historyLoading, 
     isSuccess,  
@@ -57,7 +55,7 @@ const DailyStaff = () => {
     deliveryLoading,
     visitorData,
     visitorLoading,
-    society // [MODULE-A]: Society info for ID card
+    society 
   } = useAppSelector((state) => state.admin);
 
   const [mainTab, setMainTab] = useState<'staff' | 'delivery' | 'visitor'>('staff');
@@ -66,16 +64,18 @@ const DailyStaff = () => {
   const [visitorTab, setVisitorTab] = useState<'pending' | 'inside' | 'history'>('pending');
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showOneTimeModal, setShowOneTimeModal] = useState(false);
   const [showDeliveryModal, setShowDeliveryModal] = useState(false);
   const [showVerifyModal, setShowVerifyModal] = useState<any>(null);
   const [enteredCode, setEnteredCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [showBlockModal, setShowBlockModal] = useState<any>(null);
   const [showHistoryModal, setShowHistoryModal] = useState<any>(null);
-  const [showIDCardModal, setShowIDCardModal] = useState<any>(null); // [MODULE-A]: ID Card Modal state
-  const [showQRScanner, setShowQRScanner] = useState(false); // [MODULE-A]: QR Scanner state
   const [blockReason, setBlockReason] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [staffTypeFilter, setStaffTypeFilter] = useState<'Daily' | 'One-time' | 'All'>('All');
+  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
+  const typeDropdownRef = useRef<HTMLDivElement>(null);
 
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
@@ -91,6 +91,9 @@ const DailyStaff = () => {
       if (companyDropdownRef.current && !companyDropdownRef.current.contains(event.target as Node)) {
         setIsCompanyDropdownOpen(false);
       }
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(event.target as Node)) {
+        setIsTypeDropdownOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -102,7 +105,15 @@ const DailyStaff = () => {
     role: [],
     flatNumber: "",
     vehicleNumber: "",
-    photo: ""
+    photo: null,
+    aadharCard: null,
+    policeVerification: null
+  });
+
+  const [oneTimeStaff, setOneTimeStaff] = useState<any>({
+    staffName: "",
+    mobileNumber: "",
+    photo: null
   });
 
   const [newDelivery, setNewDelivery] = useState({
@@ -116,18 +127,16 @@ const DailyStaff = () => {
   const roleOptions = ["Maid", "Cook", "Driver", "Security", "Plumber", "Electrician"];
   const deliveryCompanies = ["Amazon", "Flipkart", "Zomato", "Swiggy", "Blinkit", "BigBasket", "Other"];
 
-  const isFirstMount = useRef(true);
-
   // 1. Initial Fetch
   useEffect(() => {
     if (mainTab === 'staff') {
-      dispatch(getStaffLogs());
+      dispatch(getStaffLogs(staffTypeFilter === 'All' ? undefined : staffTypeFilter));
     } else if (mainTab === 'delivery') {
       dispatch(getDeliveryLogs());
     } else {
       dispatch(getVisitorHistory('All'));
     }
-  }, [dispatch, mainTab]);
+  }, [dispatch, mainTab, staffTypeFilter]);
 
   // 2. Lazy Load Blocked List
   useEffect(() => {
@@ -141,7 +150,12 @@ const DailyStaff = () => {
     if (isSuccess) {
       if (showAddModal) {
         setShowAddModal(false);
-        setNewStaff({ staffName: "", mobileNumber: "", role: [], flatNumber: "", vehicleNumber: "", photo: "" });
+        setNewStaff({ staffName: "", mobileNumber: "", role: [], flatNumber: "", vehicleNumber: "", photo: null, aadharCard: null, policeVerification: null });
+      }
+      if (showOneTimeModal) {
+        setShowOneTimeModal(false);
+        setOneTimeStaff({ staffName: "", mobileNumber: "", photo: null });
+        dispatch(getStaffLogs(staffTypeFilter === 'All' ? undefined : staffTypeFilter));
       }
       if (showDeliveryModal) {
         setShowDeliveryModal(false);
@@ -160,7 +174,44 @@ const DailyStaff = () => {
       toast.error(error);
       dispatch(resetAdminState());
     }
-  }, [isSuccess, error, dispatch]);
+  }, [isSuccess, error, dispatch, staffTypeFilter]);
+
+  const handleCreateStaff = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newStaff.role.length === 0) return toast.error("Please select at least one role");
+    
+    const formData = new FormData();
+    formData.append("staffName", newStaff.staffName);
+    formData.append("mobileNumber", newStaff.mobileNumber);
+    formData.append("role", newStaff.role.join(", "));
+    formData.append("flatNumber", newStaff.flatNumber);
+    formData.append("vehicleNumber", newStaff.vehicleNumber);
+    if (newStaff.photo) formData.append("photo", newStaff.photo);
+    if (newStaff.aadharCard) formData.append("aadharCard", newStaff.aadharCard);
+    if (newStaff.policeVerification) formData.append("policeVerification", newStaff.policeVerification);
+
+    dispatch(createStaff(formData)).then((res: any) => {
+      if (res.payload?.success) {
+        toast.success("Staff registered successfully");
+        dispatch(getStaffLogs(staffTypeFilter === 'All' ? undefined : staffTypeFilter));
+      }
+    });
+  };
+
+  const handleOneTimeEntry = (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("staffName", oneTimeStaff.staffName);
+    formData.append("mobileNumber", oneTimeStaff.mobileNumber);
+    if (oneTimeStaff.photo) formData.append("photo", oneTimeStaff.photo);
+
+    dispatch(oneTimeStaffEntry(formData)).then((res: any) => {
+      if (res.payload?.success) {
+        toast.success("One-time entry marked successfully");
+        dispatch(getStaffLogs(staffTypeFilter === 'All' ? undefined : staffTypeFilter));
+      }
+    });
+  };
 
   const handleCreateDelivery = (e: React.FormEvent) => {
     e.preventDefault();
@@ -223,7 +274,7 @@ const DailyStaff = () => {
     dispatch(markStaffEntry(staffId)).then((res: any) => {
       if (res.payload?.success) {
         toast.success("Entry marked successfully");
-        dispatch(getStaffLogs()); // [MODULE-A]: Auto-refresh list to show time
+        dispatch(getStaffLogs(staffTypeFilter === 'All' ? undefined : staffTypeFilter));
       }
     });
   };
@@ -232,7 +283,7 @@ const DailyStaff = () => {
     dispatch(markStaffExit(staffId)).then((res: any) => {
       if (res.payload?.success) {
         toast.success("Exit marked successfully");
-        dispatch(getStaffLogs()); // [MODULE-A]: Auto-refresh list to show time
+        dispatch(getStaffLogs(staffTypeFilter === 'All' ? undefined : staffTypeFilter));
       }
     });
   };
@@ -250,52 +301,26 @@ const DailyStaff = () => {
     });
   };
 
-  // [MODULE-C]: HANDLE STAFF VERIFICATION
-  const handleVerifyStaff = (staffId: string) => {
-    dispatch(verifyStaff({ staffId })).then((res: any) => {
-      if (res.payload?.success) {
-        toast.success("Staff verified successfully");
-      }
-    });
-  };
-
-  // [MODULE-A]: HANDLE QR SCANNING LOGIC
-  const handleQRScan = (scannedUniqueId: string) => {
-    setShowQRScanner(false); // Close scanner immediately
-    toast.promise(
-      dispatch(markStaffAttendanceByQR({ uniqueId: scannedUniqueId })).unwrap(),
-      {
-        loading: 'Processing QR Code...',
-        success: (data) => {
-          dispatch(getStaffLogs()); // Refresh list
-          return `${data.message}`;
-        },
-        error: (err) => err || 'Invalid QR Code'
-      }
-    );
-  };
-
-  const handleCreateStaff = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newStaff.role.length === 0) return toast.error("Please select at least one role");
-    
-    // [MODULE-C]: Use FormData for document uploads
-    const formData = new FormData();
-    formData.append("staffName", newStaff.staffName);
-    formData.append("mobileNumber", newStaff.mobileNumber);
-    formData.append("role", newStaff.role.join(", "));
-    formData.append("flatNumber", newStaff.flatNumber);
-    formData.append("vehicleNumber", newStaff.vehicleNumber);
-    if (newStaff.photo) formData.append("photo", newStaff.photo);
-    if (newStaff.aadharCard) formData.append("aadharCard", newStaff.aadharCard);
-    if (newStaff.policeVerification) formData.append("policeVerification", newStaff.policeVerification);
-
-    dispatch(createStaff(formData));
-  };
-
   const openHistory = (staff: any) => {
     setShowHistoryModal(staff);
     dispatch(getStaffHistory(staff._id));
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.length > 2) {
+      dispatch(searchStaff(searchQuery));
+    } else if (searchQuery.length === 0) {
+      dispatch(getStaffLogs(staffTypeFilter === 'All' ? undefined : staffTypeFilter));
+    }
+  };
+
+  const handleVerifyStaff = (staffId: string) => {
+    dispatch(verifyStaff({ staffId })).then((res: any) => {
+       if (res.payload?.success) {
+         toast.success("Staff identity verified");
+       }
+    });
   };
 
   const StatsCard = ({ title, value, icon: Icon, color, onClick }: any) => (
@@ -417,7 +442,7 @@ const DailyStaff = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="relative flex-1 md:flex-none">
+                  <form onSubmit={handleSearch} className="relative flex-1 md:flex-none">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <input 
                       type="text" 
@@ -426,17 +451,53 @@ const DailyStaff = () => {
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 w-full md:w-64 transition-all"
                     />
-                  </div>
+                  </form>
 
-                  {/* [MODULE-A]: QR SCAN BUTTON FOR GUARDS */}
-                  {isGuard && (
-                    <button 
-                      onClick={() => setShowQRScanner(true)}
-                      className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-lg active:scale-95 animate-pulse"
-                    >
-                      <QrCode size={18} /> Scan QR Entry
-                    </button>
+                  {activeTab === 'logs' && (
+                    <div className="relative" ref={typeDropdownRef}>
+                      <div 
+                        onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
+                        className={`min-h-[38px] w-40 bg-white border ${isTypeDropdownOpen ? 'border-blue-400 ring-2 ring-blue-50' : 'border-slate-200'} rounded-xl px-3 py-2 flex items-center justify-between cursor-pointer transition-all hover:border-blue-300 group`}
+                      >
+                        <span className="text-xs font-bold text-slate-600">
+                          {staffTypeFilter === 'All' ? 'All Staff' : staffTypeFilter === 'Daily' ? 'Daily Staff' : 'One-time Visitors'}
+                        </span>
+                        <ChevronDown size={14} className={`text-slate-400 group-hover:text-blue-500 transition-transform duration-200 ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
+                      </div>
+
+                      {isTypeDropdownOpen && (
+                        <div className="absolute z-[100] w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                          <div className="p-1.5">
+                            {['All', 'Daily', 'One-time'].map((type) => {
+                              const isSelected = staffTypeFilter === type;
+                              return (
+                                <div
+                                  key={type}
+                                  onClick={() => {
+                                    setStaffTypeFilter(type as any);
+                                    setIsTypeDropdownOpen(false);
+                                  }}
+                                  className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-all ${
+                                    isSelected ? 'bg-blue-50 text-blue-700' : 'hover:bg-slate-50 text-slate-600'
+                                  }`}
+                                >
+                                  <span className="text-xs font-bold">{type === 'All' ? 'All Staff' : type === 'Daily' ? 'Daily Staff' : 'One-time Visitors'}</span>
+                                  {isSelected && <Check size={12} className="text-blue-600" strokeWidth={4} />}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
+
+                  <button 
+                    onClick={() => setShowOneTimeModal(true)}
+                    className={`flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold text-xs transition-all shadow-md shadow-emerald-100 active:scale-95 ${!isGuard ? 'hidden' : ''}`}
+                  >
+                    <UserPlus size={16} /> One-time Entry
+                  </button>
 
                   {isAdmin && (
                     <button 
@@ -457,23 +518,27 @@ const DailyStaff = () => {
                   </div>
                 ) : activeTab === 'directory' ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {staffData && staffData.length > 0 ? staffData.map((staff) => {
+                    {(staffData || []).length > 0 ? staffData.map((staff) => {
                       const status = getStatusInfo(staff);
+                      const isOneTime = staff.staffType === "One-time";
                       return (
-                        <div key={staff._id} className="group bg-white border border-slate-100 rounded-2xl p-5 hover:border-blue-200 hover:shadow-md transition-all">
+                        <div key={staff._id} className={`group bg-white border ${isOneTime ? 'border-emerald-100 hover:border-emerald-200' : 'border-slate-100 hover:border-blue-200'} rounded-2xl p-5 hover:shadow-md transition-all`}>
                           <div className="flex items-start justify-between mb-4">
-                            <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold overflow-hidden border border-indigo-100">
+                            <div className={`w-12 h-12 rounded-2xl ${isOneTime ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'} flex items-center justify-center font-bold overflow-hidden border ${isOneTime ? 'border-emerald-100' : 'border-indigo-100'}`}>
                               {staff.photo ? (
                                 <img src={staff.photo} alt={staff.staffName} className="w-full h-full object-cover" />
                               ) : (
                                 staff.staffName.charAt(0)
                               )}
                             </div>
-                            <div className="flex gap-1">
+                            <div className="flex gap-1 flex-col items-end">
                               <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${status.color}`}>
                                 <status.icon size={10} />
                                 {status.label}
                               </span>
+                              {isOneTime && (
+                                <span className="bg-emerald-100 text-emerald-700 text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md mt-1">Temporary</span>
+                              )}
                             </div>
                           </div>
 
@@ -487,7 +552,7 @@ const DailyStaff = () => {
                                   </div>
                                 )}
                               </div>
-                              <p className="text-[11px] font-bold text-blue-600 uppercase tracking-widest mt-0.5">{staff.role}</p>
+                              <p className={`text-[11px] font-bold ${isOneTime ? 'text-emerald-600' : 'text-blue-600'} uppercase tracking-widest mt-0.5`}>{staff.role}</p>
                             </div>
 
                             <div className="space-y-2 pt-1">
@@ -535,15 +600,6 @@ const DailyStaff = () => {
                                   <Calendar size={13} className="group-hover:scale-110 transition-transform" />
                                   <span className="text-[10px] font-black uppercase tracking-tighter">History</span>
                                 </button>
-                                
-                                <button 
-                                  onClick={() => setShowIDCardModal(staff)}
-                                  className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-slate-50 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-100 hover:border-indigo-200 transition-all group"
-                                  title="Digital ID"
-                                >
-                                  <QrCode size={13} className="group-hover:scale-110 transition-transform" />
-                                  <span className="text-[10px] font-black uppercase tracking-tighter">ID Card</span>
-                                </button>
 
                                 {isAdmin && (
                                   <>
@@ -565,7 +621,7 @@ const DailyStaff = () => {
 
                                     <button 
                                       onClick={() => setShowBlockModal(staff)}
-                                      className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600 border border-slate-100 hover:border-rose-200 transition-all group"
+                                      className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600 border border-slate-100 border-transparent hover:border-rose-200 transition-all group"
                                       title="Block Staff"
                                     >
                                       <UserX size={13} className="group-hover:scale-110 transition-transform" />
@@ -591,6 +647,7 @@ const DailyStaff = () => {
                       <thead>
                         <tr className="border-b border-slate-100">
                           <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Staff Member</th>
+                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Type</th>
                           <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Role</th>
                           <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Entry Time</th>
                           <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Exit Time</th>
@@ -602,14 +659,19 @@ const DailyStaff = () => {
                           <tr key={staff._id} className="hover:bg-slate-50/50 transition-colors group">
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs uppercase">
-                                  {staff.staffName.charAt(0)}
+                                <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs uppercase overflow-hidden">
+                                  {staff.photo ? <img src={staff.photo} alt="" className="w-full h-full object-cover" /> : staff.staffName.charAt(0)}
                                 </div>
                                 <div>
                                   <p className="text-sm font-bold text-slate-700">{staff.staffName}</p>
                                   <p className="text-[10px] text-slate-400 font-medium">Mob: {staff.mobileNumber}</p>
                                 </div>
                               </div>
+                            </td>
+                            <td className="py-4 px-4">
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${staff.staffType === 'One-time' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
+                                {staff.staffType}
+                              </span>
                             </td>
                             <td className="py-4 px-4">
                               <span className="text-xs font-bold text-slate-500 uppercase">{staff.role}</span>
@@ -636,7 +698,7 @@ const DailyStaff = () => {
                           </tr>
                         )) : (
                           <tr>
-                            <td colSpan={5} className="py-20 text-center text-slate-300 uppercase text-xs font-bold tracking-widest">No movement today</td>
+                            <td colSpan={6} className="py-20 text-center text-slate-300 uppercase text-xs font-bold tracking-widest">No movement today</td>
                           </tr>
                         )}
                       </tbody>
@@ -935,6 +997,80 @@ const DailyStaff = () => {
         )}
       </div>
 
+      {/* One-time Staff Entry Modal */}
+      {showOneTimeModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowOneTimeModal(false)} />
+          <div className="relative bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center border border-emerald-100">
+                  <UserPlus size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-800 leading-none">One-time Entry</h3>
+                  <p className="text-xs text-slate-500 mt-1">Register temporary worker entry</p>
+                </div>
+              </div>
+              <button onClick={() => setShowOneTimeModal(false)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 transition-colors">
+                <XCircle size={24} />
+              </button>
+            </div>
+
+            <form onSubmit={handleOneTimeEntry}>
+              <div className="p-6 space-y-5">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Staff Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="e.g. Rahul Plumber" 
+                    className={inputCls} 
+                    value={oneTimeStaff.staffName}
+                    onChange={(e) => setOneTimeStaff({...oneTimeStaff, staffName: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
+                  <input 
+                    type="tel" 
+                    required
+                    placeholder="e.g. 9876543210" 
+                    className={inputCls} 
+                    value={oneTimeStaff.mobileNumber}
+                    onChange={(e) => setOneTimeStaff({...oneTimeStaff, mobileNumber: e.target.value})}
+                  />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upload Photo (Optional)</label>
+                  <div className="flex items-center gap-4">
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      className="hidden"
+                      id="one-time-photo"
+                      onChange={(e) => setOneTimeStaff({...oneTimeStaff, photo: e.target.files ? e.target.files[0] : null})}
+                    />
+                    <label htmlFor="one-time-photo" className="flex-1 p-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-emerald-50 hover:border-emerald-200 transition-all group">
+                      <Plus size={20} className="text-slate-400 group-hover:text-emerald-500" />
+                      <span className="text-[10px] font-bold text-slate-500 group-hover:text-emerald-600 uppercase">
+                        {oneTimeStaff.photo ? oneTimeStaff.photo.name : "Click to Upload Photo"}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex items-center gap-3">
+                <button type="button" onClick={() => setShowOneTimeModal(false)} className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600">Cancel</button>
+                <button type="submit" className="flex-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-emerald-100 transition-all active:scale-95">Mark Entry</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Visitor Verification Confirmation Modal */}
       {showVerifyModal && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
@@ -1105,9 +1241,6 @@ const DailyStaff = () => {
           </div>
         </div>
       )}
-
-      {/* Rest of the modals (Add Staff, History, Block) - Keep them as they were but add isAdmin checks where needed */}
-
 
       {/* Attendance History Modal */}
       {showHistoryModal && (
@@ -1343,7 +1476,7 @@ const DailyStaff = () => {
                   />
                 </div>
 
-                {/* [MODULE-C]: Document Upload Fields */}
+                {/* Document Upload Fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Aadhar Card (PDF/Image)</label>
@@ -1365,13 +1498,27 @@ const DailyStaff = () => {
                   </div>
                 </div>
 
-                <div className="p-6 bg-slate-50 border border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-blue-50/50 hover:border-blue-200 transition-all group">
-                  <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:scale-110 transition-all border border-slate-100 group-hover:border-blue-100">
-                    <Plus size={24} />
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs font-bold text-slate-500 group-hover:text-blue-600 transition-colors">Upload Staff Photo</p>
-                    <p className="text-[10px] text-slate-400 font-medium">PNG, JPG or WEBP (Max 2MB)</p>
+                <div className="space-y-1.5">
+                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Staff Photo</label>
+                   <div className="flex items-center gap-4">
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      className="hidden"
+                      id="staff-photo-main"
+                      onChange={(e) => setNewStaff({...newStaff, photo: e.target.files ? e.target.files[0] : null})}
+                    />
+                    <label htmlFor="staff-photo-main" className="flex-1 p-6 bg-slate-50 border border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-blue-50/50 hover:border-blue-200 transition-all group">
+                      <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:scale-110 transition-all border border-slate-100 group-hover:border-blue-100">
+                        <Plus size={24} />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs font-bold text-slate-500 group-hover:text-blue-600 transition-colors">
+                          {newStaff.photo ? newStaff.photo.name : "Upload Staff Photo"}
+                        </p>
+                        <p className="text-[10px] text-slate-400 font-medium">PNG, JPG or WEBP (Max 2MB)</p>
+                      </div>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -1396,35 +1543,6 @@ const DailyStaff = () => {
         </div>
       )}
 
-      {/* [MODULE-A]: DIGITAL ID CARD MODAL */}
-      {showIDCardModal && (
-        <div className="fixed inset-0 z-[160] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onClick={() => setShowIDCardModal(null)} />
-          <div className="relative animate-in fade-in zoom-in duration-300">
-             <button 
-              onClick={() => setShowIDCardModal(null)}
-              className="absolute -top-12 right-0 text-white flex items-center gap-2 font-bold hover:text-blue-400 transition-colors"
-             >
-               <X size={20} /> Close
-             </button>
-             <StaffIDCard 
-                staff={{
-                  ...showIDCardModal,
-                  societyName: society?.societyName
-                }} 
-             />
-          </div>
-        </div>
-      )}
-
-      {/* [MODULE-A]: QR SCANNER MODAL */}
-      {showQRScanner && (
-        <QRScanner 
-          onScan={handleQRScan}
-          onClose={() => setShowQRScanner(false)}
-          isLoading={isLoading}
-        />
-      )}
     </DashboardLayout>
   );
 };
