@@ -35,8 +35,23 @@ const authService = {
     );
     return data;
   },
- 
-};  
+
+  forgotPassword: async (email: string): Promise<any> => {
+    const { data } = await axiosInstance.post(AUTHROUTES.FORGOT_PASSWORD, { email });
+    return data;
+  },
+
+  verifyOTP: async (email: string, otp: string): Promise<any> => {
+    const { data } = await axiosInstance.post(AUTHROUTES.VERIFY_OTP, { email, otp });
+    return data;
+  },
+
+  resetPassword: async (payload: any): Promise<any> => {
+    const { data } = await axiosInstance.post(AUTHROUTES.RESET_PASSWORD, payload);
+    return data;
+  },
+};
+  
  
 export default authService;
  
@@ -523,6 +538,36 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
     };
 
     export const getVisitorHistoryService = async (flatNumber: string): Promise<any> => {
-    const response = await axiosInstance.get(`${AUTHROUTES.VISITOR_HISTORY}/${flatNumber}`);
-    return response.data;
-    };
+  const response = await axiosInstance.get(`${AUTHROUTES.VISITOR_HISTORY}/${flatNumber}`);
+  return response.data;
+};
+
+// DOCUMENT SERVICES
+export const uploadDocumentService = async (formData: FormData): Promise<any> => {
+  const response = await axiosInstance.post(AUTHROUTES.ADMIN_CREATE_DOCUMENT, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+export const getAdminDocumentsService = async (): Promise<any> => {
+  const response = await axiosInstance.get(AUTHROUTES.ADMIN_GET_DOCUMENTS);
+  return response.data;
+};
+
+export const getPublicDocumentsService = async (params?: any): Promise<any> => {
+  const response = await axiosInstance.get(AUTHROUTES.USER_GET_DOCUMENTS, { params });
+  return response.data;
+};
+
+export const updateDocumentService = async (id: string, formData: FormData): Promise<any> => {
+  const response = await axiosInstance.patch(`${AUTHROUTES.ADMIN_UPDATE_DOCUMENT}/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+export const deleteDocumentService = async (id: string): Promise<any> => {
+  const response = await axiosInstance.delete(`${AUTHROUTES.ADMIN_DELETE_DOCUMENT}/${id}`);
+  return response.data;
+};

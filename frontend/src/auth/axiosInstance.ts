@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:4000/api",
+  baseURL: "https://www.societysmarthub.com/api",
+  // baseURL: "http://localhost:4000/api",
   headers: {
     "Content-Type": "application/json",
     "Cache-Control": "no-cache",

@@ -17,7 +17,8 @@ import {
   getVisitorHistoryService,
   addStaffRatingService,
   getStaffReviewsService,
-  getStaffDirectoryService
+  getStaffDirectoryService,
+  getPublicDocumentsService
 } from "@/auth/authServices";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -45,6 +46,9 @@ interface UserState {
   staffReviews: any[];
   ratingLoading: boolean;
   ratingSuccess: boolean;
+  // Document State
+  documents: any[];
+  documentsLoading: boolean;
 }
 
 const initialState: UserState = {
@@ -70,7 +74,25 @@ const initialState: UserState = {
   staffReviews: [],
   ratingLoading: false,
   ratingSuccess: false,
+  // Document Initial State
+  documents: [],
+  documentsLoading: false,
 };
+
+// GET PUBLIC DOCUMENTS THUNK
+export const getPublicDocuments = createAsyncThunk<any, any | undefined, { rejectValue: string }>(
+  "user/getPublicDocuments",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await getPublicDocumentsService(params);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch documents"
+      );
+    }
+  }
+);
 
 
 
@@ -608,6 +630,21 @@ const userSlice = createSlice({
         })
         .addCase(getStaffDirectory.rejected, (state, action) => {
           state.loading = false;
+          state.error = action.payload as string;
+        })
+
+        // GET PUBLIC DOCUMENTS
+        .addCase(getPublicDocuments.pending, (state) => {
+          state.documentsLoading = true;
+          state.error = null;
+        })
+        .addCase(getPublicDocuments.fulfilled, (state, action) => {
+          state.documentsLoading = false;
+          // Action payload might be the array or the full object { success, total, data }
+          state.documents = Array.isArray(action.payload) ? action.payload : (action.payload as any)?.data || [];
+        })
+        .addCase(getPublicDocuments.rejected, (state, action) => {
+          state.documentsLoading = false;
           state.error = action.payload as string;
         });
 

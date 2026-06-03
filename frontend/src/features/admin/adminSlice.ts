@@ -48,13 +48,17 @@ import {
   approveVisitorService,
   rejectVisitorService,
   markVisitorExitService,
-  getVisitorHistoryService
-} from "../../auth/authServices";
+  getVisitorHistoryService,
+  uploadDocumentService,
+  getAdminDocumentsService,
+  updateDocumentService,
+  deleteDocumentService
+  } from "../../auth/authServices";
 
-// ... existing interfaces
+  // ... existing code
 
-// [MODULE-C]: VERIFY STAFF THUNK
-export const verifyStaff = createAsyncThunk(
+  // [MODULE-C]: VERIFY STAFF THUNK
+  export const verifyStaff = createAsyncThunk(
   "admin/verifyStaff",
   async (args: { staffId: string; payload?: any }, { rejectWithValue }) => {
     try {
@@ -63,9 +67,56 @@ export const verifyStaff = createAsyncThunk(
       return rejectWithValue(err.response?.data?.message || "Verification failed");
     }
   }
-);
+  );
 
-// ONE-TIME STAFF ENTRY THUNK
+  // ─── Document Thunks ─────────────────────────────────────────────────────────────
+
+  export const uploadDocument = createAsyncThunk(
+  "admin/uploadDocument",
+  async (formData: FormData, { rejectWithValue }) => {
+    try {
+      return await uploadDocumentService(formData);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Upload failed");
+    }
+  }
+  );
+
+  export const getAdminDocuments = createAsyncThunk(
+  "admin/getAdminDocuments",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getAdminDocumentsService();
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch documents");
+    }
+  }
+  );
+
+  export const updateDocument = createAsyncThunk(
+  "admin/updateDocument",
+  async ({ id, formData }: { id: string; formData: FormData }, { rejectWithValue }) => {
+    try {
+      return await updateDocumentService(id, formData);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Update failed");
+    }
+  }
+  );
+
+  export const deleteDocument = createAsyncThunk(
+  "admin/deleteDocument",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      return await deleteDocumentService(id);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Delete failed");
+    }
+  }
+  );
+
+  // ONE-TIME STAFF ENTRY THUNK
 export const oneTimeStaffEntry = createAsyncThunk(
   "admin/oneTimeStaffEntry",
   async (staffData: any, { rejectWithValue }) => {
@@ -135,6 +186,10 @@ interface AdminState {
   visitorData: any[];
   visitorLoading: boolean;
   generatedCode: string | null;
+
+  // Document State
+  documents: any[];
+  documentsLoading: boolean;
 }
 
 const initialState: AdminState = {
@@ -172,6 +227,10 @@ const initialState: AdminState = {
   visitorData: [],
   visitorLoading: false,
   generatedCode: null,
+
+  // Document Initial State
+  documents: [],
+  documentsLoading: false,
 };
 
 // ─── Visitor Thunks ─────────────────────────────────────────────────────────────
@@ -1247,6 +1306,75 @@ const adminSlice = createSlice({
       })
       .addCase(getVisitorHistory.rejected, (state, action) => {
         state.visitorLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // Document Reducers
+      .addCase(getAdminDocuments.pending, (state) => {
+        state.documentsLoading = true;
+        state.error = null;
+      })
+      .addCase(getAdminDocuments.fulfilled, (state, action: any) => {
+        state.documentsLoading = false;
+        // The action.payload is now the array of documents returned from thunk
+        state.documents = Array.isArray(action.payload) ? action.payload : (action.payload?.data || []);
+      })
+      .addCase(getAdminDocuments.rejected, (state, action) => {
+        state.documentsLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(uploadDocument.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.error = null;
+      })
+      .addCase(uploadDocument.fulfilled, (state, action: any) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        // action.payload is the full response { success, message, data }
+        if (action.payload?.data) {
+          state.documents.unshift(action.payload.data);
+        }
+      })
+      .addCase(uploadDocument.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateDocument.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.error = null;
+      })
+      .addCase(updateDocument.fulfilled, (state, action: any) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        if (action.payload?.data) {
+          const updated = action.payload.data;
+          const index = state.documents.findIndex(d => d._id === updated._id);
+          if (index !== -1) {
+            state.documents[index] = updated;
+          }
+        }
+      })
+      .addCase(updateDocument.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        state.error = action.payload as string;
+      })
+      .addCase(deleteDocument.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(deleteDocument.fulfilled, (state, action: any) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const id = action.meta.arg;
+        state.documents = state.documents.filter(d => d._id !== id);
+      })
+      .addCase(deleteDocument.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
         state.error = action.payload as string;
       });
   },

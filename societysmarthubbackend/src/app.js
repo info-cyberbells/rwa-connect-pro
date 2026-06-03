@@ -16,6 +16,7 @@ import visitorRoutes from "./routes/visitorRoutes.js";
 import deliveryRoutes from "./routes/deliveryRoutes.js";
 import staffRoutes from "./routes/staffRoutes.js";
 import ratingsRouter from "./routes/ratings.js";
+import documentsRouter from "./routes/documents.js";
 
 const app = express();
 
@@ -56,8 +57,10 @@ app.use("/api/visitors", visitorRoutes);
 app.use("/api/delivery", deliveryRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/ratings", ratingsRouter);
+app.use("/api/documents", documentsRouter);
 
 // Error handler (must be last)
 app.use(errorHandler);
 
 export default app;
+

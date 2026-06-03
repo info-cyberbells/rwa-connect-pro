@@ -90,5 +90,17 @@ export const AUTHROUTES = {
     VISITOR_REJECT: "/visitors/reject",
     VISITOR_EXIT: "/visitors/exit",
     VISITOR_HISTORY: "/visitors/history",
+
+    // DOCUMENT ROUTES
+    ADMIN_GET_DOCUMENTS: "/documents",
+    ADMIN_CREATE_DOCUMENT: "/documents",
+    ADMIN_UPDATE_DOCUMENT: "/documents",
+    ADMIN_DELETE_DOCUMENT: "/documents",
+    USER_GET_DOCUMENTS: "/documents",
+
+    // PASSWORD RESET ROUTES
+    FORGOT_PASSWORD: "/auth/forgot-password",
+    VERIFY_OTP: "/auth/verify-otp",
+    RESET_PASSWORD: "/auth/reset-password",
 }
  

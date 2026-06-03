@@ -137,14 +137,14 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-primary cursor-pointer">
+              <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                {/* <Link
+                <Link
                   to="/forgot-password"
-                  className="text-sm text-primary hover:underline"
-                > */}
-                Forgot password?
-                {/* </Link> */}
+                  className="text-sm text-primary hover:underline font-medium"
+                >
+                  Forgot password?
+                </Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />

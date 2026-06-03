@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { login, refresh, logout } from "../controllers/authController.js";
+import {
+  login,
+  refresh,
+  logout,
+  forgotPassword,
+  verifyOTP,
+  resetPassword,
+} from "../controllers/authController.js";
 
 const router = Router();
 
@@ -11,5 +18,11 @@ router.post("/refresh", refresh);
 
 // POST /api/auth/logout - Logout and revoke refresh token
 router.post("/logout", logout);
+
+// Password Reset Routes
+router.post("/forgot-password", forgotPassword);
+router.post("/verify-otp", verifyOTP);
+router.post("/reset-password", resetPassword);
+
 
 export default router;

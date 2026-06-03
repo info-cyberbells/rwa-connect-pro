@@ -42,7 +42,7 @@ const navigationConfig = {
     { icon: AlertOctagon, label: "Fine", href: "/addPenaltyFine" },
     { icon: Wrench, label: "Maintenance", href: "/maintenance" },
     { icon: UserCheck, label: "Daily Staff", href: "/daily-staff" },
-    { icon: ClipboardList, label: "Registrations", href: "/society-admin/registrations" },
+    // { icon: ClipboardList, label: "Registrations", href: "/society-admin/registrations" },
     { icon: FileText, label: "Documents", href: "/society-admin/documents" },
     { icon: UserX, label: "Deactivations", href: "/deactivationrequests" },
     { icon: Settings, label: "Settings", href: "/adminSettings" },

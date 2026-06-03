@@ -131,3 +131,11 @@ export const uploadStaffDocuments = multer({
   { name: "aadharCard", maxCount: 1 },
   { name: "policeVerification", maxCount: 1 },
 ]);
+
+// Society Documents (Bylaws, Forms, Reports)
+export const uploadSocietyDocument = multer({
+  storage: createStorage("documents"),
+  fileFilter: fileFilter, // Images + PDFs allowed
+  limits: { fileSize: 20 * MB }, // Larger limit for documents
+}).single("documentFile");
+

@@ -16,6 +16,10 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import VerifyOTP from "./pages/VerifyOTP";
+import ResetPassword from "./pages/ResetPassword";
+
  
 // Dashboard Pages
 import SuperAdminDashboard from "./pages/dashboard/SuperAdminDashboard";
@@ -53,6 +57,7 @@ import Maintenance from "./pages/SocietyAdmin/Maintenance";
 import AddPenaltyFine from "./pages/SocietyAdmin/AddPenaltyFine";
 import DeactivationRequests from "./pages/SocietyAdmin/DeactivationRequests.tsx"
 import DailyStaff from "./pages/SocietyAdmin/DailyStaff";
+import AdminDocumentManagement from "./pages/SocietyAdmin/DocumentManagement";
  
 // import{DashboardLayout} from "./components/layout/DashboardLayout"
 import ResidentialDashboard from "./pages/ResidentialUser/ResidentialDashboard.tsx"
@@ -60,6 +65,7 @@ import ResidentialPayments from "./pages/ResidentialUser/ResidentialPayments.tsx
 import ResidentialsocietyNotices from "./pages/ResidentialUser/ResidentialSocietyNotices.tsx"
 import ResidentialSupport from "./pages/ResidentialUser/ResidentialSupport.tsx"
 import StaffDirectory from "./pages/ResidentialUser/StaffDirectory";
+import ResidentDocumentCenter from "./pages/ResidentialUser/DocumentCenter";
 import ProfileHub from "./pages/ResidentialUser/ProfileHub.tsx";
 import SocietySetupContainer from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietySetupContainer.tsx";
 import MySociety from "./pages/SocietyAdmin/MySociety.tsx";
@@ -86,6 +92,10 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-otp" element={<VerifyOTP />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+
  
           {/* Super Admin Routes */}
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
@@ -143,6 +153,7 @@ const App = () => (
          <Route path="/my-society/*" element={<MySociety/>} />
          <Route path="/deactivationrequests" element={<DeactivationRequests />} />
          <Route path="/daily-staff" element={<DailyStaff />} />
+         <Route path="/society-admin/documents" element={<AdminDocumentManagement />} />
 
 
           {/* All these paths will now render within the DashboardLayout alongside the Sidebar */}
@@ -150,6 +161,7 @@ const App = () => (
           <Route path="/member/payments" element={<ResidentialPayments />} />
           <Route path="/member/notices" element={<ResidentialsocietyNotices />} />  
           <Route path="/member/staff-directory" element={<StaffDirectory />} />
+          <Route path="/member/documents" element={<ResidentDocumentCenter />} />
           <Route path="/member/support" element={<ResidentialSupport/>} />  
           <Route path="/member/profile" element={<ProfileHub/>} />
        

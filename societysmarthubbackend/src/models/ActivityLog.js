@@ -22,6 +22,7 @@ const activityLogSchema = new mongoose.Schema(
         "deactivation_cancelled",
         "account_activated",
         "account_deactivated",
+        "password_reset",
       ],
       required: true,
     },
