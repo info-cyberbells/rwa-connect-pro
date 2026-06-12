@@ -8,12 +8,16 @@ import {
   requestDeactivation,
   getMyDeactivationRequest,
   cancelDeactivationRequest,
+  getDashboardSummary,
 } from "../controllers/profileController.js";
 
 const router = Router();
 
 // All routes require authentication (any role can access)
 router.use(auth);
+
+// GET /api/profile/dashboard-summary
+router.get("/dashboard-summary", getDashboardSummary);
 
 // GET /api/profile — get my profile
 router.get("/", getMyProfile);

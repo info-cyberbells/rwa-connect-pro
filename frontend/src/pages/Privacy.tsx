@@ -91,7 +91,7 @@ export default function Privacy() {
 
   return (
     <PublicLayout>
-      <div className="bg-gradient-to-b from-blue-50 via-white to-white min-h-screen">
+      <div className="bg-background min-h-screen">
 
         {/* Header */}
         <section className="py-20 text-center">
@@ -100,15 +100,15 @@ export default function Privacy() {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto px-6"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
               Privacy Policy
             </h1>
 
-            <p className="text-slate-500">
+            <p className="text-muted-foreground">
               Your privacy matters to us. Learn how Society Smart Hub protects your information.
             </p>
 
-            <p className="text-sm text-blue-600 mt-2">
+            <p className="text-sm text-blue-600 dark:text-blue-400 mt-2 font-medium">
               Last Updated • March 2026
             </p>
           </motion.div>
@@ -128,28 +128,28 @@ export default function Privacy() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white border border-slate-100 rounded-2xl p-7 shadow-sm hover:shadow-lg transition-all"
+                  className="bg-card border border-border rounded-2xl p-7 shadow-sm hover:shadow-md transition-all"
                 >
 
                   <div className="flex items-start gap-4">
 
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                      <Icon size={18} className="text-blue-600" />
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                      <Icon size={18} className="text-blue-600 dark:text-blue-400" />
                     </div>
 
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-800 mb-2">
+                      <h2 className="text-lg font-semibold text-foreground mb-2">
                         {index + 1}. {section.title}
                       </h2>
 
                       {section.content && (
-                        <p className="text-slate-600 text-sm leading-relaxed">
+                        <p className="text-muted-foreground text-sm leading-relaxed">
                           {section.content}
                         </p>
                       )}
 
                       {section.list && (
-                        <ul className="list-disc pl-5 mt-2 space-y-2 text-slate-600 text-sm">
+                        <ul className="list-disc pl-5 mt-2 space-y-2 text-muted-foreground text-sm">
                           {section.list.map((item, i) => (
                             <li key={i}>{item}</li>
                           ))}
@@ -167,7 +167,7 @@ export default function Privacy() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              className="mt-10 bg-blue-600 text-white rounded-2xl p-8 text-center shadow-lg"
+              className="mt-10 bg-blue-600 dark:bg-blue-700 text-white rounded-2xl p-8 text-center shadow-lg"
             >
 
               <Mail className="mx-auto mb-3" size={26} />
@@ -176,11 +176,11 @@ export default function Privacy() {
                 Have Questions?
               </h3>
 
-              <p className="text-blue-100 text-sm mb-4">
+              <p className="text-blue-50 text-sm mb-4">
                 If you have any questions regarding this privacy policy, feel free to contact our support team.
               </p>
 
-              <button className="bg-white text-blue-600 px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-50 transition">
+              <button className="bg-white dark:bg-blue-50 text-blue-600 px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-50 transition">
                 privacy@societysmarthub.com
               </button>
 

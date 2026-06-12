@@ -1,5 +1,8 @@
+import mongoose from "mongoose";
 import Visitor from "../models/Visitor.js";
 import User from "../models/user.js";
+import { createNotification } from "./notificationController.js"; 
+import { logActivity } from "../utils/logActivity.js"; 
 
 // ==============================
 // CREATE VISITOR
@@ -51,6 +54,51 @@ export const createVisitor = async (req, res) => {
     // Explicitly add verificationCode to the response data to ensure it's returned
     const responseData = newVisitor.toObject();
     responseData.verificationCode = verificationCode;
+
+    // [NEW] Trigger notification for the resident (Marked as Read so it shows in 'Sent' logs)
+    if (finalMemberId) {
+      await createNotification({
+        sender: finalMemberId, // Set as sender to appear in 'Sent' tab
+        recipient: finalMemberId,
+        society: req.user.society,
+        title: "Visitor Approval Generated", // Changed title to distinguish
+        message: `Visitor Code Generated for ${visitorName}`, 
+        category: "visitor",
+        targetAudience: "specific",
+        type: "success",
+        isRead: true, // Mark as Read
+        link: "/member/visitors",
+      }).catch(err => console.error("Notification Error:", err));
+
+      // [FINAL FAIL-SAFE] Trigger notification for GUARDS
+      const currentSociety = new mongoose.Types.ObjectId(req.user.society);
+      
+      const guards = await User.find({
+        society: currentSociety,
+        role: { $regex: /^guard$/i } // Case-insensitive check
+      });
+
+      for (const guard of guards) {
+        await createNotification({
+          recipient: guard._id,
+          society: req.user.society,
+          title: "Visitor Alert",
+          message: `Visitor ${visitorName} is arriving for flat ${finalFlatNumber}.`,
+          category: "visitor",
+          type: "info",
+        }).catch(err => console.error("Direct Notification Error:", err));
+      }
+
+      // [NEW] Log Activity
+      logActivity({
+        userId: req.user.id,
+        societyId: req.user.society,
+        action: "visitor_entry",
+        description: `New visitor pre-approved: ${visitorName} for flat ${finalFlatNumber}.`,
+        meta: { visitorId: newVisitor._id, flatNumber: finalFlatNumber }
+      });
+      }
+
 
     return res.status(201).json({
       success: true,
@@ -127,6 +175,26 @@ export const approveVisitor = async (req, res) => {
     visitor.entryTime = new Date();
 
     await visitor.save();
+
+    // [NEW] Auto-mark related visitor notifications as read for all guards
+    await Notification.updateMany(
+      { 
+        society: req.user.society, 
+        category: "visitor",
+        message: { $regex: new RegExp(visitor.visitorName, "i") },
+        isRead: false 
+      },
+      { isRead: true }
+    );
+
+    // [NEW] Log Activity
+    logActivity({
+      userId: req.user.id,
+      societyId: req.user.society,
+      action: "visitor_entry",
+      description: `Visitor ${visitor.visitorName} entered for flat ${visitor.flatNumber}.`,
+      meta: { visitorId: visitor._id, flatNumber: visitor.flatNumber }
+    });
 
     return res.status(200).json({
       success: true,
@@ -245,6 +313,15 @@ export const visitorExit = async (req, res) => {
     visitor.exitTime = new Date();
 
     await visitor.save();
+
+    // [NEW] Log Activity
+    logActivity({
+      userId: req.user.id,
+      societyId: req.user.society,
+      action: "visitor_exit",
+      description: `Visitor ${visitor.visitorName} exited from flat ${visitor.flatNumber}.`,
+      meta: { visitorId: visitor._id, flatNumber: visitor.flatNumber }
+    });
 
     return res.status(200).json({
       success: true,

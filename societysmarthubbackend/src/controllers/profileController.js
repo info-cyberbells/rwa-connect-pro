@@ -1,11 +1,94 @@
 import User from "../models/user.js";
 import DeactivationRequest from "../models/DeactivationRequest.js";
+import Notice from "../models/Notice.js";
+import Charge from "../models/Charge.js";
+import Payment from "../models/Payment.js";
 import bcrypt from "bcryptjs";
 import { attachBaseUrl } from "../utils/addBaseUrl.js";
 import { logActivity } from "../utils/logActivity.js";
 
 const SALT_ROUNDS = 12;
 const USER_IMG_FIELDS = { single: ["profilePicUrl", "kyc.governmentIdUrl", "kyc.addressProofUrl"], array: [] };
+
+// Member Dashboard Summary
+export async function getDashboardSummary(req, res, next) {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const societyId = user.society;
+    if (!societyId) return res.status(400).json({ message: "User not part of any society" });
+
+    // 1. Fetch Recent Notices (Last 3)
+    const recentNotices = await Notice.find({ 
+      society: societyId, 
+      isActive: true,
+      visibleFrom: { $lte: new Date() },
+      visibleUntil: { $gte: new Date() }
+    })
+    .sort({ isPinned: -1, createdAt: -1 })
+    .limit(3);
+
+    // 2. Fetch Pending Dues
+    // Find all active charges for this society that apply to this user
+    const charges = await Charge.find({
+      society: societyId,
+      isActive: true,
+      $or: [
+        { appliedTo: "all" },
+        { targetUsers: req.user.id }
+      ]
+    });
+
+    // Find all payments made by this user (including pending/approved)
+    const payments = await Payment.find({
+      user: req.user.id,
+      society: societyId
+    });
+
+    // logic: if a charge ID doesn't have an 'approved' payment, it's pending
+    const pendingPayments = [];
+    let totalPendingAmount = 0;
+
+    for (const charge of charges) {
+      const payment = payments.find(p => p.charge.toString() === charge._id.toString());
+      
+      if (!payment || payment.status === "rejected") {
+        pendingPayments.push({
+          id: charge._id,
+          title: charge.title,
+          amount: charge.amount,
+          dueDate: charge.dueDate,
+          status: "PENDING"
+        });
+        totalPendingAmount += charge.amount;
+      } else if (payment.status === "pending") {
+        pendingPayments.push({
+          id: charge._id,
+          title: charge.title,
+          amount: charge.amount,
+          dueDate: charge.dueDate,
+          status: "AWAITING_VERIFICATION"
+        });
+        totalPendingAmount += charge.amount;
+      } else if (payment.status === "approved") {
+        // Only add to list if we want to show paid ones too, or just skip
+        // For dashboard dues, we usually show unpaid.
+      }
+    }
+
+    res.json({
+      stats: {
+        pendingDues: totalPendingAmount,
+        newNoticesCount: recentNotices.length,
+      },
+      pendingPayments,
+      recentNotices
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 // Get my profile (any logged-in user)
 export async function getMyProfile(req, res, next) {

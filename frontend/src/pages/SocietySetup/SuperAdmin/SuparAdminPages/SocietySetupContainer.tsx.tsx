@@ -143,8 +143,8 @@ const handleFinalSubmit = async (settingsData: any) => {
                       isCompleted
                         ? "bg-blue-600 text-white"
                         : isActive
-                        ? "bg-white border-2 border-blue-600 text-blue-600 scale-110 shadow-md"
-                        : "bg-slate-100 text-slate-400"
+                        ? "bg-card border-2 border-blue-600 text-blue-600 scale-110 shadow-md"
+                        : "bg-slate-100 text-muted-foreground"
                     }`}
                 >
                   {isCompleted ? "✓" : stepNumber}
@@ -154,7 +154,7 @@ const handleFinalSubmit = async (settingsData: any) => {
                   className={`text-[10px] mt-2 font-bold uppercase tracking-wider ${
                     isActive || isCompleted
                       ? "text-blue-600"
-                      : "text-slate-400"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {label}

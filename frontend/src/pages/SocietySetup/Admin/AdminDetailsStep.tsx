@@ -151,11 +151,11 @@ const AdminDetailsStep = () => {
   // Helper for input styling
 const inputClass = (field) =>
   `w-full bg-[#F8FAFC] border rounded-2xl py-3.5 px-5 outline-none transition-all font-medium text-[#6B7280] placeholder:text-slate-300
-  ${errors[field] ? "border-red-500 focus:border-red-500 focus:ring-red-500/10" : "border-[#E2E8F0] focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5"}`;
+  ${errors[field] ? "border-red-500 focus:border-red-500 focus:ring-red-500/10" : "border-[#E2E8F0] focus:bg-card focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5"}`;
   return (
 
     <DashboardLayout role='super-admin'>
-    <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-[#F8FAFC] font-sans text-foreground relative overflow-hidden flex flex-col">
       
       {/* Background Decorative Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[120px] pointer-events-none" />
@@ -166,11 +166,11 @@ const inputClass = (field) =>
         {/* HEADER */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-[#0F172A] tracking-tight mb-3">Society Admin Details</h1>
-          <p className="text-slate-500 font-medium">Assign the super administrator who will oversee all society operations.</p>
+          <p className="text-muted-foreground font-medium">Assign the super administrator who will oversee all society operations.</p>
         </div>
 
         {/* MAIN FORM CARD */}
-        <div className="bg-white rounded-[2.5rem] p-10 md:p-14 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-50 space-y-12">
+        <div className="bg-card rounded-[2.5rem] p-10 md:p-14 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-slate-50 space-y-12">
           
           {/* SECTION 1: Personal Info */}
           <section>
@@ -212,7 +212,7 @@ const inputClass = (field) =>
                       <option>+91</option>
                       <option>+44</option>
                     </select>
-                    <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                   </div>
                   <input 
                     name="phone"
@@ -229,7 +229,7 @@ const inputClass = (field) =>
                 <div className="relative">
                   <select 
                     name="designation"
-                    className={`${inputClass("designation")} appearance-none pr-10 text-slate-400`}
+                    className={`${inputClass("designation")} appearance-none pr-10 text-muted-foreground`}
                     value={formData.designation}
                     onChange={handleChange}
                   >
@@ -238,7 +238,7 @@ const inputClass = (field) =>
                     <option>Secretary</option>
                     <option>Treasurer</option>
                   </select>
-                  <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                 </div>
               </div>
             </div>
@@ -277,7 +277,7 @@ const inputClass = (field) =>
                 <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                   <div className="h-full bg-emerald-500 w-[60%] rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>
                 </div>
-                <p className="text-[10px] text-slate-400 font-medium">Use 8+ characters with a mix of letters, numbers & symbols.</p>
+                <p className="text-[10px] text-muted-foreground font-medium">Use 8+ characters with a mix of letters, numbers & symbols.</p>
               </div>
             </div>
           </section>
@@ -363,7 +363,7 @@ const inputClass = (field) =>
                   ? "border-2 border-red-500"
                   : formData.govIdFile
                   ? "bg-[#F4F9F7] border border-emerald-100 shadow-sm"
-                  : "border-2 border-dashed border-slate-100 hover:border-blue-200"
+                  : "border-2 border-dashed border-border hover:border-blue-200"
               }`}
             >
               <input
@@ -392,14 +392,14 @@ const inputClass = (field) =>
                   <button
                     type="button"
                     onClick={() => document.getElementById("govIdUpload").click()}
-                    className="text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-slate-600 transition-colors"
+                    className="text-muted-foreground text-[10px] font-black uppercase tracking-widest hover:text-slate-600 transition-colors"
                   >
                     Change
                   </button>
                 </>
               ) : (
                 <>
-                  <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 group-hover:text-blue-500 transition-colors">
+                  <div className="w-12 h-12 bg-muted/50 rounded-xl flex items-center justify-center text-slate-300 group-hover:text-blue-500 transition-colors">
                     <FileText size={24} />
                   </div>
 
@@ -407,7 +407,7 @@ const inputClass = (field) =>
                     <h4 className="text-sm font-bold text-slate-700">
                       Government ID
                     </h4>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Passport or Driver's License
                     </p>
                   </div>
@@ -430,7 +430,7 @@ const inputClass = (field) =>
                   ? "border-2 border-red-500"
                   : formData.addressFile
                   ? "bg-[#F4F9F7] border border-emerald-100 shadow-sm"
-                  : "border-2 border-dashed border-slate-100 hover:border-blue-200"
+                  : "border-2 border-dashed border-border hover:border-blue-200"
               }`}
             >
               <input
@@ -459,14 +459,14 @@ const inputClass = (field) =>
                   <button
                     type="button"
                     onClick={() => document.getElementById("addressUpload").click()}
-                    className="text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-slate-600 transition-colors"
+                    className="text-muted-foreground text-[10px] font-black uppercase tracking-widest hover:text-slate-600 transition-colors"
                   >
                     Change
                   </button>
                 </>
               ) : (
                 <>
-                  <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300">
+                  <div className="w-12 h-12 bg-muted/50 rounded-xl flex items-center justify-center text-slate-300">
                     <FileText size={24} />
                   </div>
 
@@ -474,7 +474,7 @@ const inputClass = (field) =>
                     <h4 className="text-sm font-bold text-slate-700">
                       Address Proof
                     </h4>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Utility bill or bank statement
                     </p>
                   </div>
@@ -497,14 +497,14 @@ const inputClass = (field) =>
       </main>
 
       {/* FIXED FOOTER */}
-      <footer className="sticky bottom-0 bg-white border-t border-slate-100 px-10 py-6 flex justify-between items-center z-30">
+      <footer className="sticky bottom-0 bg-card border-t border-border px-10 py-6 flex justify-between items-center z-30">
         <div className="flex flex-col">
           <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Final Step</span>
-          <span className="text-sm font-bold text-slate-800">5 of 5: Setup Admin</span>
+          <span className="text-sm font-bold text-foreground">5 of 5: Setup Admin</span>
         </div>
         
         <div className="flex items-center gap-6">
-          <button className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors">
+          <button className="text-sm font-bold text-muted-foreground hover:text-slate-600 transition-colors">
             Cancel
           </button>
           <button 

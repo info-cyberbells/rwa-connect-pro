@@ -38,7 +38,7 @@ router.post(
 router.post(
   "/approve",
   auth,
-  permit("guard", "admin", "society_admin"),
+  permit("guard", "society_admin"),
   approveVisitor,
 );
 
@@ -49,7 +49,7 @@ router.post(
 router.post(
   "/reject",
   auth,
-  permit("guard", "admin", "society_admin"),
+  permit("guard", "society_admin"),
   rejectVisitor,
 );
 
@@ -60,7 +60,7 @@ router.post(
 router.post(
   "/exit",
   auth,
-  permit("guard", "admin", "society_admin"),
+  permit("guard", "society_admin"),
   visitorExit,
 );
 
@@ -71,7 +71,7 @@ router.post(
 router.get(
   "/history/:flatNumber",
   auth,
-  permit("user", "society_admin", "admin", "guard"),
+  permit("user", "society_admin", "guard"),
   visitorHistory,
 );
 

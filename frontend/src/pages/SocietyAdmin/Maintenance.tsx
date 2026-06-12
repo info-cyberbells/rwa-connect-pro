@@ -7,6 +7,8 @@ import { createCharge, getResidents ,getChargeById } from "../../features/admin/
 import { toast } from "sonner";
 
 const Maintenance = () => {
+  const { user } = useAppSelector((state) => state.auth);
+  const role = user?.role || localStorage.getItem("role") || "guard";
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -177,28 +179,28 @@ useEffect(() => {
   };
 
   return (
-    <DashboardLayout role="society-admin">
+    <DashboardLayout role={role as any}>
       <div className="max-w-4xl mx-auto">
 
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-white rounded-full border hover:border-slate-200"
+            className="p-2 hover:bg-card rounded-full border hover:border-border"
           >
-            <ArrowLeft className="w-5 h-5 text-slate-500" />
+            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">
+            <h1 className="text-2xl font-bold text-foreground">
               {id ? "Edit Maintenance Charge" : "Create Maintenance Charge"}
             </h1>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               Manage your society maintenance billing
             </p>
           </div>
         </div>
 
-        <main className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+        <main className="bg-card rounded-3xl shadow-sm border border-border p-8">
 
           {error && (
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-6">
@@ -262,7 +264,7 @@ useEffect(() => {
 
           {/* ✅ Applied To — All Units ya Specific Users */}
           <div className="mb-6">
-            <label className="block text-[13px] font-bold mb-3 text-slate-500 uppercase tracking-wider">
+            <label className="block text-[13px] font-bold mb-3 text-muted-foreground uppercase tracking-wider">
               Apply To
             </label>
             <div className="flex gap-3">
@@ -280,7 +282,7 @@ useEffect(() => {
                   className={`flex-1 py-3 rounded-xl font-bold text-sm border transition-all ${
                     formData.appliedTo === opt.value
                       ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-slate-600 border-slate-200 hover:bg-blue-50"
+                      : "bg-card text-slate-600 border-border hover:bg-blue-50"
                   }`}
                 >
                   {opt.label}
@@ -291,26 +293,26 @@ useEffect(() => {
 
           {/* ✅ Specific Users Section */}
           {formData.appliedTo === "specific" && (
-            <div className="mb-6 border border-slate-200 rounded-2xl p-4 bg-slate-50/30">
+            <div className="mb-6 border border-border rounded-2xl p-4 bg-muted/50/30">
 
-              <label className="block text-[13px] font-bold mb-3 text-slate-500 uppercase tracking-wider">
+              <label className="block text-[13px] font-bold mb-3 text-muted-foreground uppercase tracking-wider">
                 Select Residents
               </label>
 
               {/* Search Input */}
               <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search by name or unit..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-100 text-sm"
+                  className="w-full pl-10 pr-4 py-2.5 border border-border rounded-xl bg-card outline-none focus:ring-2 focus:ring-blue-100 text-sm"
                 />
               </div>
 
               {/* Residents List */}
-              <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-100 bg-white">
+              <div className="max-h-48 overflow-y-auto rounded-xl border border-border bg-card">
                 {filteredResidents.length > 0 ? (
                   filteredResidents.map((r) => {
                     const isSelected = formData.targetUsers.includes(r._id);
@@ -319,14 +321,14 @@ useEffect(() => {
                         key={r._id}
                         onClick={() => toggleResident(r._id)}
                         className={`flex justify-between items-center px-4 py-3 cursor-pointer border-b border-slate-50 last:border-0 transition-colors ${
-                          isSelected ? "bg-blue-50" : "hover:bg-slate-50"
+                          isSelected ? "bg-blue-50" : "hover:bg-muted/50"
                         }`}
                       >
                         <div>
                           <p className={`text-sm font-bold ${isSelected ? "text-blue-700" : "text-slate-700"}`}>
                             {r.name}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-muted-foreground">
                             Unit: {r.unitNumber || r.flatNumber || "—"}
                           </p>
                         </div>
@@ -342,7 +344,7 @@ useEffect(() => {
                     );
                   })
                 ) : (
-                  <p className="text-center text-slate-400 text-sm py-6">
+                  <p className="text-center text-muted-foreground text-sm py-6">
                     No residents found
                   </p>
                 )}
@@ -374,7 +376,7 @@ useEffect(() => {
               )}
 
               {/* Counter */}
-              <p className="text-xs text-slate-400 mt-2 font-medium">
+              <p className="text-xs text-muted-foreground mt-2 font-medium">
                 {formData.targetUsers.length} resident(s) selected
               </p>
             </div>
@@ -382,11 +384,11 @@ useEffect(() => {
 
           {/* Due Date */}
           <div className="mb-6">
-            <label className="block text-[13px] font-bold mb-2 text-slate-500 uppercase tracking-wider">
+            <label className="block text-[13px] font-bold mb-2 text-muted-foreground uppercase tracking-wider">
               Due Date
             </label>
 
-            <div className="border border-slate-200 rounded-2xl p-6 bg-slate-50/30">
+            <div className="border border-border rounded-2xl p-6 bg-muted/50/30">
               {/* Month & Year */}
               <div className="flex gap-4 mb-4">
                 <div className="relative flex-1">
@@ -403,13 +405,13 @@ useEffect(() => {
                         ),
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl appearance-none outline-none"
+                    className="w-full px-4 py-2.5 bg-card border border-border rounded-xl appearance-none outline-none"
                   >
                     {MONTHS.map((m, i) => (
                       <option key={i} value={i}>{m}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 </div>
 
                 <div className="relative w-32">
@@ -422,20 +424,20 @@ useEffect(() => {
                         dueYear: Number(e.target.value),
                       }))
                     }
-                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl appearance-none outline-none"
+                    className="w-full px-4 py-2.5 bg-card border border-border rounded-xl appearance-none outline-none"
                   >
                     {[2025, 2026, 2027].map((y) => (
                       <option key={y} value={y}>{y}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 </div>
               </div>
 
               {/* Days Calendar */}
               <div className="grid grid-cols-7 text-center gap-y-2">
                 {["S","M","T","W","T","F","S"].map((d, i) => (
-                  <div key={i} className="text-[10px] font-black text-slate-400 pb-2">
+                  <div key={i} className="text-[10px] font-black text-muted-foreground pb-2">
                     {d}
                   </div>
                 ))}
@@ -455,24 +457,24 @@ useEffect(() => {
                 ))}
               </div>
 
-              <p className="mt-4 text-xs text-slate-400 text-center font-medium">
+              <p className="mt-4 text-xs text-muted-foreground text-center font-medium">
                 Due: {MONTHS[formData.dueMonth]} {formData.dueDay}, {formData.dueYear}
               </p>
             </div>
           </div>
 
           {/* Upload Proof */}
-          <label className={`flex items-center gap-3 w-full px-4 py-3 border border-dashed rounded-xl cursor-pointer mb-6 hover:bg-slate-50 transition-colors ${
+          <label className={`flex items-center gap-3 w-full px-4 py-3 border border-dashed rounded-xl cursor-pointer mb-6 hover:bg-muted/50 transition-colors ${
             (formData.category === "fine" || formData.category === "penalty") && !proofFile
               ? "border-red-300 bg-red-50/30"
-              : "border-slate-200"
+              : "border-border"
           }`}>
             <Upload className={`w-5 h-5 ${
               (formData.category === "fine" || formData.category === "penalty") && !proofFile
                 ? "text-red-400"
-                : "text-slate-400"
+                : "text-muted-foreground"
             }`} />
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-muted-foreground">
               {proofFile
                 ? proofFile.name
                 : (formData.category === "fine" || formData.category === "penalty")
@@ -502,7 +504,7 @@ useEffect(() => {
             </button>
             <button
               onClick={() => navigate(-1)}
-              className="flex-1 border py-3 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+              className="flex-1 border py-3 rounded-xl font-semibold hover:bg-muted/50 transition-colors"
             >
               Cancel
             </button>

@@ -1,24 +1,46 @@
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Building, Users, CreditCard, TrendingUp, ArrowUpRight, Plus } from "lucide-react";
+import { Building, Users, CreditCard, TrendingUp, ArrowUpRight, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-
-const stats = [
-  { label: "Total Societies", value: "156", change: "+12%", icon: Building, color: "bg-primary" },
-  { label: "Active Members", value: "12,450", change: "+8%", icon: Users, color: "bg-success" },
-  { label: "Monthly Revenue", value: "₹1.2L", change: "+15%", icon: CreditCard, color: "bg-info" },
-  { label: "Growth Rate", value: "23%", change: "+5%", icon: TrendingUp, color: "bg-warning" },
-];
-
-const recentSocieties = [
-  { name: "Green Valley Apartments", members: 120, status: "Active", plan: "Premium" },
-  { name: "Sunrise Heights", members: 85, status: "Active", plan: "Standard" },
-  { name: "Palm Gardens", members: 200, status: "Active", plan: "Premium" },
-  { name: "Lake View Society", members: 45, status: "Pending", plan: "Basic" },
-  { name: "Metro Residency", members: 150, status: "Active", plan: "Standard" },
-];
+import axiosInstance from "@/auth/axiosInstance";
+import { toast } from "sonner";
 
 export default function SuperAdminDashboard() {
+  const [stats, setStats] = useState({
+    totalSocieties: 0,
+    activeMembers: 0,
+    monthlyRevenue: 0,
+    growthRate: "0%"
+  });
+  const [recentSocieties, setRecentSocieties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get("/superadmin/dashboard-stats");
+        setStats(response.data.stats);
+        setRecentSocieties(response.data.recentSocieties);
+      } catch (error) {
+        console.error("Failed to fetch superadmin stats", error);
+        toast.error("Error loading dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const statConfig = [
+    { label: "Total Societies", value: stats.totalSocieties, change: "+12%", icon: Building, color: "bg-primary" },
+    { label: "Active Members", value: stats.activeMembers, change: "+8%", icon: Users, color: "bg-success" },
+    { label: "Monthly Revenue", value: `₹${stats.monthlyRevenue.toLocaleString()}`, change: stats.growthRate, icon: CreditCard, color: "bg-info" },
+    { label: "Growth Rate", value: stats.growthRate, change: "+5%", icon: TrendingUp, color: "bg-warning" },
+  ];
+
   return (
     <DashboardLayout role="super-admin">
       <div className="space-y-8">
@@ -28,15 +50,15 @@ export default function SuperAdminDashboard() {
             <h1 className="text-3xl font-heading font-bold">Super Admin Dashboard</h1>
             <p className="text-muted-foreground">Manage all societies and platform operations</p>
           </div>
-          <Button>
-            <Plus className="w-4 h-4" />
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Plus className="w-4 h-4 mr-2" />
             Onboard Society
           </Button>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
+          {statConfig.map((stat, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -48,12 +70,18 @@ export default function SuperAdminDashboard() {
                 <div className={`p-3 rounded-xl ${stat.color}`}>
                   <stat.icon className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <span className="flex items-center gap-1 text-sm text-success font-medium">
-                  {stat.change}
-                  <ArrowUpRight className="w-4 h-4" />
-                </span>
+                {!loading && (
+                  <span className="flex items-center gap-1 text-sm text-success font-medium">
+                    {stat.change}
+                    <ArrowUpRight className="w-4 h-4" />
+                  </span>
+                )}
               </div>
-              <p className="text-3xl font-heading font-bold">{stat.value}</p>
+              {loading ? (
+                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+              ) : (
+                <p className="text-3xl font-heading font-bold">{stat.value}</p>
+              )}
               <p className="text-muted-foreground text-sm">{stat.label}</p>
             </motion.div>
           ))}
@@ -69,36 +97,52 @@ export default function SuperAdminDashboard() {
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Society Name</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Members</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Members/Units</th>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Plan</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Created At</th>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {recentSocieties.map((society, index) => (
-                  <tr key={index} className="border-b border-border last:border-0 hover:bg-muted/50">
-                    <td className="p-4 font-medium">{society.name}</td>
-                    <td className="p-4 text-muted-foreground">{society.members}</td>
-                    <td className="p-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          society.status === "Active"
-                            ? "bg-success/10 text-success"
-                            : "bg-warning/10 text-warning"
-                        }`}
-                      >
-                        {society.status}
-                      </span>
-                    </td>
-                    <td className="p-4 text-muted-foreground">{society.plan}</td>
-                    <td className="p-4">
-                      <Button variant="ghost" size="sm">
-                        View
-                      </Button>
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="p-10 text-center">
+                      <Loader2 className="w-10 h-10 animate-spin mx-auto text-primary" />
                     </td>
                   </tr>
-                ))}
+                ) : recentSocieties.length > 0 ? (
+                  recentSocieties.map((society, index) => (
+                    <tr key={index} className="border-b border-border last:border-0 hover:bg-muted/50">
+                      <td className="p-4 font-medium">{society.name}</td>
+                      <td className="p-4 text-muted-foreground">{society.totalUnits} Units</td>
+                      <td className="p-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            society.isActive
+                              ? "bg-success/10 text-success"
+                              : "bg-warning/10 text-warning"
+                          }`}
+                        >
+                          {society.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td className="p-4 text-muted-foreground">
+                        {new Date(society.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="p-4">
+                        <Button variant="ghost" size="sm">
+                          View
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="p-10 text-center text-muted-foreground font-medium">
+                      No societies found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

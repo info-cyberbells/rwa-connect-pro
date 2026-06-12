@@ -38,15 +38,15 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8 bg-slate-50">
+    <div className="min-h-screen flex items-center justify-center p-8 bg-muted/50">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-white rounded-3xl p-8 shadow-xl border border-slate-100"
+        className="w-full max-w-md bg-card rounded-3xl p-8 shadow-xl border border-border"
       >
         <Link 
           to="/login" 
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-primary transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-8"
         >
           <ArrowLeft size={16} /> Back to Login
         </Link>

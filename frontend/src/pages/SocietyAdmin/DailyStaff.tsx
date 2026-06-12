@@ -31,16 +31,16 @@ import {
 } from "../../features/admin/adminSlice";
 import { toast } from "sonner";
 
-const inputCls = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-400 focus:bg-white transition-colors placeholder:text-slate-400";
+const inputCls = "w-full bg-muted/50 border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-blue-400 focus:bg-card transition-colors placeholder:text-muted-foreground";
 
 const DailyStaff = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   
   // Persistent Role Check
-  const userRole = user?.role || localStorage.getItem("role");
-  const isAdmin = userRole === 'admin' || userRole === 'society_admin';
-  const isGuard = userRole === 'guard'; 
+  const userRole = user?.role || localStorage.getItem('role') || 'guard';
+  const isAdmin = userRole === 'society_admin';
+  const isGuard = userRole === 'guard';
 
   const { 
     staffData, 
@@ -326,11 +326,11 @@ const DailyStaff = () => {
   const StatsCard = ({ title, value, icon: Icon, color, onClick }: any) => (
     <div 
       onClick={onClick}
-      className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md hover:border-blue-200 hover:scale-[1.02] transition-all active:scale-95 group"
+      className="bg-card p-5 rounded-2xl border border-border shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md hover:border-blue-200 hover:scale-[1.02] transition-all active:scale-95 group"
     >
       <div>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 group-hover:text-blue-500 transition-colors">{title}</p>
-        <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 group-hover:text-blue-500 transition-colors">{title}</p>
+        <h3 className="text-2xl font-bold text-foreground">{value}</h3>
       </div>
       <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
         <Icon size={24} />
@@ -339,44 +339,44 @@ const DailyStaff = () => {
   );
 
   const getStatusInfo = (staff: any) => {
-    if (staff.status === 'Blocked') return { label: 'Blocked', color: 'bg-rose-50 text-rose-600', icon: Ban };
-    if (!staff.todayLog) return { label: 'Not In', color: 'bg-slate-50 text-slate-500', icon: Clock };
-    if (staff.todayLog.exitTime) return { label: 'Left Today', color: 'bg-blue-50 text-blue-600', icon: LogOut };
-    return { label: 'Inside', color: 'bg-emerald-50 text-emerald-600', icon: LogIn };
+    if (staff.status === 'Blocked') return { label: 'Blocked', color: 'bg-destructive/10 text-destructive', icon: Ban };
+    if (!staff.todayLog) return { label: 'Not In', color: 'bg-muted text-muted-foreground', icon: Clock };
+    if (staff.todayLog.exitTime) return { label: 'Left Today', color: 'bg-primary/10 text-primary', icon: LogOut };
+    return { label: 'Inside', color: 'bg-success/10 text-success', icon: LogIn };
   };
 
   return (
-    <DashboardLayout role="society-admin">
+    <DashboardLayout role={userRole === 'guard' ? 'guard' : 'society-admin'}>
       <div className="max-w-[1600px] mx-auto space-y-6">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-2.5 rounded-2xl shadow-lg shadow-blue-100">
-               <ShieldCheck className="text-white" size={28} />
+            <div className="bg-primary p-2.5 rounded-2xl shadow-lg shadow-primary/10">
+               <ShieldCheck className="text-primary-foreground" size={28} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Security & Movement</h1>
-              <p className="text-sm text-slate-500 font-medium">Real-time tracking of staff and deliveries</p>
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">Security & Movement</h1>
+              <p className="text-sm text-muted-foreground font-medium">Real-time tracking of staff and deliveries</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl border border-slate-200">
+          <div className="flex items-center gap-2 bg-muted p-1 rounded-2xl border border-border">
             <button 
               onClick={() => setMainTab('staff')}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${mainTab === 'staff' ? 'bg-white text-blue-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${mainTab === 'staff' ? 'bg-card text-primary shadow-sm border border-border' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <Users size={18} /> Daily Staff
             </button>
             <button 
               onClick={() => setMainTab('delivery')}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${mainTab === 'delivery' ? 'bg-white text-blue-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${mainTab === 'delivery' ? 'bg-card text-primary shadow-sm border border-border' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <Truck size={18} /> Deliveries
             </button>
             <button 
               onClick={() => setMainTab('visitor')}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${mainTab === 'visitor' ? 'bg-white text-blue-600 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${mainTab === 'visitor' ? 'bg-card text-primary shadow-sm border border-border' : 'text-muted-foreground hover:text-foreground'}`}
             >
               <UserPlus size={18} /> Visitors
             </button>
@@ -391,35 +391,35 @@ const DailyStaff = () => {
                 title="Total Registered" 
                 value={(staffData?.length || 0) + (blockedStaff?.length || 0)} 
                 icon={Users} 
-                color="bg-blue-50 text-blue-600"
+                color="bg-primary/10 text-primary"
                 onClick={() => setActiveTab('directory')}
               />
               <StatsCard 
                 title="Currently In" 
                 value={(staffData || []).filter(s => s.todayLog && !s.todayLog.exitTime).length} 
                 icon={UserCheck} 
-                color="bg-emerald-50 text-emerald-600"
+                color="bg-success/10 text-success"
                 onClick={() => setActiveTab('logs')}
               />
               <StatsCard 
                 title="Left Today" 
                 value={(staffData || []).filter(s => s.todayLog?.exitTime).length} 
                 icon={LogOut} 
-                color="bg-amber-50 text-amber-600"
+                color="bg-warning/10 text-warning"
                 onClick={() => setActiveTab('logs')}
               />
               <StatsCard 
                 title="Blocked Staff" 
                 value={blockedStaff?.length || 0} 
                 icon={UserX} 
-                color="bg-rose-50 text-rose-600"
+                color="bg-destructive/10 text-destructive"
                 onClick={() => setActiveTab('blocked')}
               />
             </div>
 
             {/* Staff Content */}
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden min-h-[600px]">
-              <div className="border-b border-slate-100 p-2 flex flex-col md:flex-row md:items-center justify-between bg-slate-50/50 gap-4">
+            <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden min-h-[600px]">
+              <div className="border-b border-border p-2 flex flex-col md:flex-row md:items-center justify-between bg-muted/30 gap-4">
                 <div className="flex gap-1 overflow-x-auto">
                   {[
                     { id: 'directory', label: 'Directory', icon: Users },
@@ -431,8 +431,8 @@ const DailyStaff = () => {
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                         activeTab === tab.id 
-                        ? "bg-white text-blue-600 shadow-sm border border-slate-100" 
-                        : "text-slate-500 hover:text-slate-700"
+                        ? "bg-card text-primary shadow-sm border border-border" 
+                        : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       <tab.icon size={14} />
@@ -443,13 +443,13 @@ const DailyStaff = () => {
 
                 <div className="flex items-center gap-3">
                   <form onSubmit={handleSearch} className="relative flex-1 md:flex-none">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                     <input 
                       type="text" 
                       placeholder="Search name/phone..." 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 w-full md:w-64 transition-all"
+                      className="pl-10 pr-4 py-2 bg-card border border-border rounded-xl text-sm outline-none focus:border-primary w-full md:w-64 transition-all text-foreground"
                     />
                   </form>
 
@@ -457,16 +457,16 @@ const DailyStaff = () => {
                     <div className="relative" ref={typeDropdownRef}>
                       <div 
                         onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                        className={`min-h-[38px] w-40 bg-white border ${isTypeDropdownOpen ? 'border-blue-400 ring-2 ring-blue-50' : 'border-slate-200'} rounded-xl px-3 py-2 flex items-center justify-between cursor-pointer transition-all hover:border-blue-300 group`}
+                        className={`min-h-[38px] w-40 bg-card border ${isTypeDropdownOpen ? 'border-primary ring-2 ring-primary/10' : 'border-border'} rounded-xl px-3 py-2 flex items-center justify-between cursor-pointer transition-all hover:border-primary/50 group`}
                       >
-                        <span className="text-xs font-bold text-slate-600">
+                        <span className="text-xs font-bold text-foreground">
                           {staffTypeFilter === 'All' ? 'All Staff' : staffTypeFilter === 'Daily' ? 'Daily Staff' : 'One-time Visitors'}
                         </span>
-                        <ChevronDown size={14} className={`text-slate-400 group-hover:text-blue-500 transition-transform duration-200 ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
+                        <ChevronDown size={14} className={`text-muted-foreground group-hover:text-primary transition-transform duration-200 ${isTypeDropdownOpen ? 'rotate-180' : ''}`} />
                       </div>
 
                       {isTypeDropdownOpen && (
-                        <div className="absolute z-[100] w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="absolute z-[100] w-full mt-2 bg-card border border-border rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                           <div className="p-1.5">
                             {['All', 'Daily', 'One-time'].map((type) => {
                               const isSelected = staffTypeFilter === type;
@@ -478,11 +478,11 @@ const DailyStaff = () => {
                                     setIsTypeDropdownOpen(false);
                                   }}
                                   className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-all ${
-                                    isSelected ? 'bg-blue-50 text-blue-700' : 'hover:bg-slate-50 text-slate-600'
+                                    isSelected ? 'bg-primary/10 text-primary' : 'hover:bg-muted text-muted-foreground'
                                   }`}
                                 >
                                   <span className="text-xs font-bold">{type === 'All' ? 'All Staff' : type === 'Daily' ? 'Daily Staff' : 'One-time Visitors'}</span>
-                                  {isSelected && <Check size={12} className="text-blue-600" strokeWidth={4} />}
+                                  {isSelected && <Check size={12} className="text-primary" strokeWidth={4} />}
                                 </div>
                               );
                             })}
@@ -494,7 +494,7 @@ const DailyStaff = () => {
 
                   <button 
                     onClick={() => setShowOneTimeModal(true)}
-                    className={`flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold text-xs transition-all shadow-md shadow-emerald-100 active:scale-95 ${!isGuard ? 'hidden' : ''}`}
+                    className={`flex items-center justify-center gap-2 bg-success hover:bg-success/90 text-success-foreground px-4 py-2 rounded-xl font-bold text-xs transition-all shadow-md active:scale-95 ${!isGuard ? 'hidden' : ''}`}
                   >
                     <UserPlus size={16} /> One-time Entry
                   </button>
@@ -502,7 +502,7 @@ const DailyStaff = () => {
                   {isAdmin && (
                     <button 
                       onClick={() => setShowAddModal(true)}
-                      className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-xs transition-all shadow-md shadow-blue-100 active:scale-95"
+                      className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl font-bold text-xs transition-all shadow-md active:scale-95"
                     >
                       <Plus size={16} /> Register
                     </button>
@@ -513,8 +513,8 @@ const DailyStaff = () => {
               <div className="p-6">
                 {staffLoading ? (
                   <div className="flex flex-col items-center justify-center py-24 gap-4">
-                    <Loader2 size={40} className="text-blue-600 animate-spin" />
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Loading Staff Data...</p>
+                    <Loader2 size={40} className="text-primary animate-spin" />
+                    <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Loading Staff Data...</p>
                   </div>
                 ) : activeTab === 'directory' ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -522,9 +522,9 @@ const DailyStaff = () => {
                       const status = getStatusInfo(staff);
                       const isOneTime = staff.staffType === "One-time";
                       return (
-                        <div key={staff._id} className={`group bg-white border ${isOneTime ? 'border-emerald-100 hover:border-emerald-200' : 'border-slate-100 hover:border-blue-200'} rounded-2xl p-5 hover:shadow-md transition-all`}>
+                        <div key={staff._id} className={`group bg-card border ${isOneTime ? 'border-success/20 hover:border-success/40' : 'border-border hover:border-primary/40'} rounded-2xl p-5 hover:shadow-md transition-all`}>
                           <div className="flex items-start justify-between mb-4">
-                            <div className={`w-12 h-12 rounded-2xl ${isOneTime ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'} flex items-center justify-center font-bold overflow-hidden border ${isOneTime ? 'border-emerald-100' : 'border-indigo-100'}`}>
+                            <div className={`w-12 h-12 rounded-2xl ${isOneTime ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'} flex items-center justify-center font-bold overflow-hidden border border-border`}>
                               {staff.photo ? (
                                 <img src={staff.photo} alt={staff.staffName} className="w-full h-full object-cover" />
                               ) : (
@@ -537,7 +537,7 @@ const DailyStaff = () => {
                                 {status.label}
                               </span>
                               {isOneTime && (
-                                <span className="bg-emerald-100 text-emerald-700 text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md mt-1">Temporary</span>
+                                <span className="bg-success/10 text-success text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md mt-1">Temporary</span>
                               )}
                             </div>
                           </div>
@@ -545,46 +545,46 @@ const DailyStaff = () => {
                           <div className="space-y-3">
                             <div>
                               <div className="flex items-center gap-1.5 leading-tight">
-                                <h4 className="font-bold text-slate-800">{staff.staffName}</h4>
+                                <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{staff.staffName}</h4>
                                 {staff.isVerified && (
-                                  <div className="bg-blue-600 rounded-full p-0.5" title="Verified Staff">
-                                    <Check className="text-white" size={8} strokeWidth={5} />
+                                  <div className="bg-primary rounded-full p-0.5" title="Verified Staff">
+                                    <Check className="text-primary-foreground" size={8} strokeWidth={5} />
                                   </div>
                                 )}
                               </div>
-                              <p className={`text-[11px] font-bold ${isOneTime ? 'text-emerald-600' : 'text-blue-600'} uppercase tracking-widest mt-0.5`}>{staff.role}</p>
+                              <p className={`text-[11px] font-bold ${isOneTime ? 'text-success' : 'text-primary'} uppercase tracking-widest mt-0.5`}>{staff.role}</p>
                             </div>
 
                             <div className="space-y-2 pt-1">
-                              <div className="flex items-center gap-2.5 text-slate-500">
-                                <Phone size={14} className="text-slate-400" />
+                              <div className="flex items-center gap-2.5 text-muted-foreground">
+                                <Phone size={14} />
                                 <span className="text-xs font-semibold">{staff.mobileNumber}</span>
                               </div>
-                              <div className="flex items-center gap-2.5 text-slate-500">
-                                <MapPin size={14} className="text-slate-400" />
+                              <div className="flex items-center gap-2.5 text-muted-foreground">
+                                <MapPin size={14} />
                                 <span className="text-xs font-semibold">Flat: {staff.flatNumber}</span>
                               </div>
                             </div>
 
-                            <div className="pt-4 border-t border-slate-50 space-y-3">
+                            <div className="pt-4 border-t border-border space-y-3">
                               {/* Primary Movement Action */}
                               <div className="h-10">
                                 {!staff.todayLog ? (
                                   <button 
                                     onClick={() => handleEntry(staff._id)}
-                                    className="w-full h-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-50 active:scale-95"
+                                    className="w-full h-full bg-success hover:bg-success/90 text-success-foreground rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95"
                                   >
                                     <LogIn size={14} strokeWidth={3} /> Mark Entry
                                   </button>
                                 ) : !staff.todayLog.exitTime ? (
                                   <button 
                                     onClick={() => handleExit(staff._id)}
-                                    className="w-full h-full bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md shadow-rose-50 active:scale-95"
+                                    className="w-full h-full bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95"
                                   >
                                     <LogOut size={14} strokeWidth={3} /> Mark Exit
                                   </button>
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center bg-slate-50 rounded-xl text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-100">
+                                  <div className="w-full h-full flex items-center justify-center bg-muted rounded-xl text-[10px] font-bold text-muted-foreground uppercase tracking-widest border border-border">
                                     Shift Done: {new Date(staff.todayLog.exitTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </div>
                                 )}
@@ -594,7 +594,7 @@ const DailyStaff = () => {
                               <div className="grid grid-cols-2 gap-2">
                                 <button 
                                   onClick={() => openHistory(staff)}
-                                  className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-slate-50 text-slate-500 hover:bg-blue-50 hover:text-blue-600 border border-slate-100 hover:border-blue-200 transition-all group"
+                                  className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border transition-all group"
                                   title="View History"
                                 >
                                   <Calendar size={13} className="group-hover:scale-110 transition-transform" />
@@ -608,8 +608,8 @@ const DailyStaff = () => {
                                       disabled={staff.isVerified}
                                       className={`flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl transition-all group ${
                                         staff.isVerified 
-                                        ? "bg-emerald-50 text-emerald-600 border border-emerald-100 cursor-default" 
-                                        : "bg-slate-50 text-slate-500 hover:bg-emerald-50 hover:text-emerald-600 border border-slate-100 hover:border-emerald-200"
+                                        ? "bg-success/10 text-success border border-success/20 cursor-default" 
+                                        : "bg-muted text-muted-foreground hover:bg-success/10 hover:text-success border border-border"
                                       }`}
                                       title={staff.isVerified ? "Verified" : "Verify Staff"}
                                     >
@@ -621,7 +621,7 @@ const DailyStaff = () => {
 
                                     <button 
                                       onClick={() => setShowBlockModal(staff)}
-                                      className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600 border border-slate-100 border-transparent hover:border-rose-200 transition-all group"
+                                      className="flex items-center justify-center gap-1.5 py-2 px-1 rounded-xl bg-muted text-muted-foreground hover:bg-destructive/10 hover:text-destructive border border-border transition-all group"
                                       title="Block Staff"
                                     >
                                       <UserX size={13} className="group-hover:scale-110 transition-transform" />
@@ -635,7 +635,7 @@ const DailyStaff = () => {
                         </div>
                       );
                     }) : (
-                      <div className="col-span-full py-20 flex flex-col items-center justify-center text-slate-400">
+                      <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground">
                         <Users size={48} className="opacity-20 mb-4" />
                         <p className="text-sm font-bold uppercase tracking-widest">No staff found</p>
                       </div>
@@ -645,60 +645,60 @@ const DailyStaff = () => {
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="border-b border-slate-100">
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Staff Member</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Type</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Role</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Entry Time</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Exit Time</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Status</th>
+                        <tr className="border-b border-border bg-muted/20">
+                          <th className="py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Staff Member</th>
+                          <th className="py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Type</th>
+                          <th className="py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Role</th>
+                          <th className="py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Entry Time</th>
+                          <th className="py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Exit Time</th>
+                          <th className="py-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Status</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-50">
+                      <tbody className="divide-y divide-border">
                         {staffData && staffData.filter(s => s.todayLog).length > 0 ? staffData.filter(s => s.todayLog).map((staff) => (
-                          <tr key={staff._id} className="hover:bg-slate-50/50 transition-colors group">
+                          <tr key={staff._id} className="hover:bg-muted/50 transition-colors group">
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs uppercase overflow-hidden">
+                                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase overflow-hidden border border-border">
                                   {staff.photo ? <img src={staff.photo} alt="" className="w-full h-full object-cover" /> : staff.staffName.charAt(0)}
                                 </div>
                                 <div>
-                                  <p className="text-sm font-bold text-slate-700">{staff.staffName}</p>
-                                  <p className="text-[10px] text-slate-400 font-medium">Mob: {staff.mobileNumber}</p>
+                                  <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{staff.staffName}</p>
+                                  <p className="text-[10px] text-muted-foreground font-medium">Mob: {staff.mobileNumber}</p>
                                 </div>
                               </div>
                             </td>
                             <td className="py-4 px-4">
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${staff.staffType === 'One-time' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${staff.staffType === 'One-time' ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'}`}>
                                 {staff.staffType}
                               </span>
                             </td>
                             <td className="py-4 px-4">
-                              <span className="text-xs font-bold text-slate-500 uppercase">{staff.role}</span>
+                              <span className="text-xs font-bold text-muted-foreground uppercase">{staff.role}</span>
                             </td>
                             <td className="py-4 px-4">
-                                <span className="text-xs font-bold text-slate-600">
+                                <span className="text-xs font-bold text-foreground/80">
                                   {new Date(staff.todayLog!.entryTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                             </td>
                             <td className="py-4 px-4">
                               {staff.todayLog!.exitTime ? (
-                                <span className="text-xs font-bold text-slate-600">
+                                <span className="text-xs font-bold text-foreground/80">
                                   {new Date(staff.todayLog!.exitTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                               ) : (
-                                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase">Inside</span>
+                                <span className="text-[10px] font-bold text-success bg-success/10 px-2 py-0.5 rounded-full uppercase">Inside</span>
                               )}
                             </td>
                             <td className="py-4 px-4">
-                               <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${staff.todayLog!.exitTime ? 'bg-slate-100 text-slate-400' : 'bg-emerald-50 text-emerald-600'}`}>
+                               <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg ${staff.todayLog!.exitTime ? 'bg-muted text-muted-foreground' : 'bg-success/10 text-success'}`}>
                                  {staff.todayLog!.exitTime ? 'Completed' : 'Working'}
                                </span>
                             </td>
                           </tr>
                         )) : (
                           <tr>
-                            <td colSpan={6} className="py-20 text-center text-slate-300 uppercase text-xs font-bold tracking-widest">No movement today</td>
+                            <td colSpan={6} className="py-20 text-center text-muted-foreground/30 uppercase text-xs font-bold tracking-widest">No movement today</td>
                           </tr>
                         )}
                       </tbody>
@@ -707,25 +707,25 @@ const DailyStaff = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {blockedStaff && blockedStaff.length > 0 ? blockedStaff.map((staff) => (
-                      <div key={staff._id} className="bg-rose-50/30 border border-rose-100 rounded-2xl p-5 relative overflow-hidden group">
+                      <div key={staff._id} className="bg-destructive/5 border border-destructive/10 rounded-2xl p-5 relative overflow-hidden group">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold">
+                          <div className="w-10 h-10 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center font-bold border border-destructive/20">
                             {staff.staffName.charAt(0)}
                           </div>
                           <div>
-                            <h4 className="font-bold text-slate-800 leading-tight">{staff.staffName}</h4>
-                            <p className="text-[11px] font-bold text-rose-600 uppercase tracking-widest">{staff.role}</p>
+                            <h4 className="font-bold text-foreground leading-tight">{staff.staffName}</h4>
+                            <p className="text-[11px] font-bold text-destructive uppercase tracking-widest">{staff.role}</p>
                           </div>
                         </div>
                         <div className="space-y-3">
-                          <div className="p-3 bg-white/80 rounded-xl border border-rose-100">
-                            <p className="text-[10px] font-black uppercase text-rose-400 mb-1">Reason</p>
-                            <p className="text-xs font-medium text-slate-700 italic">"{staff.blockedReason}"</p>
+                          <div className="p-3 bg-muted/50 rounded-xl border border-destructive/10">
+                            <p className="text-[10px] font-black uppercase text-destructive/60 mb-1">Reason</p>
+                            <p className="text-xs font-medium text-foreground/70 italic">"{staff.blockedReason}"</p>
                           </div>
                           {isAdmin && (
                             <button 
                               onClick={() => handleUnblock(staff._id)}
-                              className="w-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-600 px-4 py-2.5 rounded-xl text-xs font-bold border border-emerald-200 transition-all shadow-sm active:scale-95"
+                              className="w-full bg-card hover:bg-success hover:text-success-foreground text-success px-4 py-2.5 rounded-xl text-xs font-bold border border-success/20 transition-all shadow-sm active:scale-95"
                             >
                               Unblock Staff
                             </button>
@@ -733,7 +733,7 @@ const DailyStaff = () => {
                         </div>
                       </div>
                     )) : (
-                      <div className="col-span-full py-20 flex flex-col items-center justify-center text-slate-400">
+                      <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground">
                         <ShieldCheck size={48} className="opacity-20 mb-4" />
                         <p className="text-sm font-bold uppercase tracking-widest">No blocked records</p>
                       </div>
@@ -761,17 +761,17 @@ const DailyStaff = () => {
                 color="bg-emerald-50 text-emerald-600"
                 onClick={() => setDeliveryTab('history')}
               />
-              <div 
+              <div
                 onClick={() => setShowDeliveryModal(true)}
-                className="bg-blue-600 p-5 rounded-2xl shadow-lg shadow-blue-100 flex items-center justify-center gap-3 cursor-pointer hover:bg-blue-700 transition-all active:scale-95"
+                className="bg-blue-600 p-5 rounded-2xl shadow-none flex items-center justify-center gap-3 cursor-pointer hover:bg-blue-700 transition-all active:scale-95"
               >
                 <Plus className="text-white" size={24} />
                 <span className="text-white font-bold">New Delivery Entry</span>
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden min-h-[600px]">
-              <div className="border-b border-slate-100 p-2 flex items-center justify-between bg-slate-50/50">
+            <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden min-h-[600px]">
+              <div className="border-b border-border p-2 flex items-center justify-between bg-muted/50/50">
                 <div className="flex gap-1">
                   {[
                     { id: 'active', label: 'In Society', icon: Clock },
@@ -782,8 +782,8 @@ const DailyStaff = () => {
                       onClick={() => setDeliveryTab(tab.id as any)}
                       className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                         deliveryTab === tab.id 
-                        ? "bg-white text-blue-600 shadow-sm border border-slate-100" 
-                        : "text-slate-500 hover:text-slate-700"
+                        ? "bg-card text-blue-600 shadow-sm border border-border" 
+                        : "text-muted-foreground hover:text-slate-700"
                       }`}
                     >
                       <tab.icon size={14} />
@@ -797,19 +797,19 @@ const DailyStaff = () => {
                 {deliveryLoading ? (
                   <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 size={40} className="text-blue-600 animate-spin" />
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Loading Deliveries...</p>
+                    <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Loading Deliveries...</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="border-b border-slate-100">
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Delivery Boy</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Company</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Flat</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Entry</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Exit</th>
-                          <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 text-right">Action</th>
+                        <tr className="border-b border-border">
+                          <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Delivery Boy</th>
+                          <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Company</th>
+                          <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Flat</th>
+                          <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Entry</th>
+                          <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Exit</th>
+                          <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4 text-right">Action</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-50">
@@ -817,11 +817,11 @@ const DailyStaff = () => {
                           ? (deliveryData || []).filter(d => !d.exitTime)
                           : (deliveryData || [])
                         ).map((del) => (
-                          <tr key={del._id} className="hover:bg-slate-50/50 transition-colors">
+                          <tr key={del._id} className="hover:bg-muted/50/50 transition-colors">
                             <td className="py-4 px-4">
                               <div className="flex flex-col">
                                 <span className="text-sm font-bold text-slate-700">{del.deliveryBoyName}</span>
-                                <span className="text-[10px] text-slate-400">Mob: {del.mobileNumber}</span>
+                                <span className="text-[10px] text-muted-foreground">Mob: {del.mobileNumber}</span>
                               </div>
                             </td>
                             <td className="py-4 px-4">
@@ -831,11 +831,11 @@ const DailyStaff = () => {
                               <span className="text-xs font-bold text-slate-600">{del.flatNumber}</span>
                             </td>
                             <td className="py-4 px-4">
-                              <span className="text-xs font-bold text-slate-500">{new Date(del.entryTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              <span className="text-xs font-bold text-muted-foreground">{new Date(del.entryTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             </td>
                             <td className="py-4 px-4">
                               {del.exitTime ? (
-                                <span className="text-xs font-bold text-slate-500">{new Date(del.exitTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                <span className="text-xs font-bold text-muted-foreground">{new Date(del.exitTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                               ) : (
                                 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase">Inside</span>
                               )}
@@ -886,8 +886,8 @@ const DailyStaff = () => {
               />
             </div>
 
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden min-h-[600px]">
-              <div className="border-b border-slate-100 p-2 flex items-center justify-between bg-slate-50/50">
+            <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden min-h-[600px]">
+              <div className="border-b border-border p-2 flex items-center justify-between bg-muted/50/50">
                 <div className="flex gap-1">
                   {[
                     { id: 'pending', label: 'Pending Request', icon: ShieldAlert },
@@ -899,8 +899,8 @@ const DailyStaff = () => {
                       onClick={() => setVisitorTab(tab.id as any)}
                       className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                         visitorTab === tab.id 
-                        ? "bg-white text-blue-600 shadow-sm border border-slate-100" 
-                        : "text-slate-500 hover:text-slate-700"
+                        ? "bg-card text-blue-600 shadow-sm border border-border" 
+                        : "text-muted-foreground hover:text-slate-700"
                       }`}
                     >
                       <tab.icon size={14} />
@@ -914,13 +914,13 @@ const DailyStaff = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="border-b border-slate-100">
-                        <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Visitor</th>
-                        <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Purpose</th>
-                        <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Flat</th>
-                        <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 text-center">Verification Code</th>
-                        <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">Status</th>
-                        <th className="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-4 text-right">Action</th>
+                      <tr className="border-b border-border">
+                        <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Visitor</th>
+                        <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Purpose</th>
+                        <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Flat</th>
+                        <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4 text-center">Verification Code</th>
+                        <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">Status</th>
+                        <th className="pb-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4 text-right">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
@@ -930,22 +930,22 @@ const DailyStaff = () => {
                         ? (visitorData || []).filter((v: any) => v.status?.toLowerCase() === 'approved' && !v.exitTime)
                         : (visitorData || [])
                       ).map((v: any) => (
-                        <tr key={v._id} className="hover:bg-slate-50/50 transition-colors">
+                        <tr key={v._id} className="hover:bg-muted/50/50 transition-colors">
                           <td className="py-4 px-4">
                             <div className="flex flex-col">
                               <span className="text-sm font-bold text-slate-700">{v.visitorName}</span>
-                              <span className="text-[10px] text-slate-400">Mob: {v.visitorPhone}</span>
+                              <span className="text-[10px] text-muted-foreground">Mob: {v.visitorPhone}</span>
                             </div>
                           </td>
                           <td className="py-4 px-4">
-                            <span className="text-xs font-bold text-slate-500">{v.purpose}</span>
+                            <span className="text-xs font-bold text-muted-foreground">{v.purpose}</span>
                           </td>
                           <td className="py-4 px-4">
                             <span className="text-xs font-bold text-slate-600">{v.flatNumber}</span>
                           </td>
                           <td className="py-4 px-4 text-center">
                             {v.status?.toLowerCase() === 'pending' ? (
-                               <span className="bg-slate-50 text-slate-400 px-3 py-1 rounded-lg font-black text-sm tracking-widest border border-slate-100 shadow-sm">
+                               <span className="bg-muted/50 text-muted-foreground px-3 py-1 rounded-lg font-black text-sm tracking-widest border border-border shadow-sm">
                                  {v.verificationCode || '####'}
                                </span>
                             ) : (
@@ -983,7 +983,7 @@ const DailyStaff = () => {
                                 Mark Exit
                               </button>
                             ) : (
-                              <span className="text-[10px] font-bold text-slate-400 uppercase">Completed</span>
+                              <span className="text-[10px] font-bold text-muted-foreground uppercase">Completed</span>
                             )}
                           </td>
                         </tr>
@@ -1001,18 +1001,18 @@ const DailyStaff = () => {
       {showOneTimeModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowOneTimeModal(false)} />
-          <div className="relative bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <div className="relative bg-card rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center border border-emerald-100">
                   <UserPlus size={20} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 leading-none">One-time Entry</h3>
-                  <p className="text-xs text-slate-500 mt-1">Register temporary worker entry</p>
+                  <h3 className="font-bold text-foreground leading-none">One-time Entry</h3>
+                  <p className="text-xs text-muted-foreground mt-1">Register temporary worker entry</p>
                 </div>
               </div>
-              <button onClick={() => setShowOneTimeModal(false)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 transition-colors">
+              <button onClick={() => setShowOneTimeModal(false)} className="p-2 hover:bg-muted/50 rounded-xl text-muted-foreground transition-colors">
                 <XCircle size={24} />
               </button>
             </div>
@@ -1020,7 +1020,7 @@ const DailyStaff = () => {
             <form onSubmit={handleOneTimeEntry}>
               <div className="p-6 space-y-5">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Staff Name</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Staff Name</label>
                   <input 
                     type="text" 
                     required
@@ -1031,7 +1031,7 @@ const DailyStaff = () => {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Mobile Number</label>
                   <input 
                     type="tel" 
                     required
@@ -1043,7 +1043,7 @@ const DailyStaff = () => {
                 </div>
                 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upload Photo (Optional)</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Upload Photo (Optional)</label>
                   <div className="flex items-center gap-4">
                     <input 
                       type="file" 
@@ -1052,9 +1052,9 @@ const DailyStaff = () => {
                       id="one-time-photo"
                       onChange={(e) => setOneTimeStaff({...oneTimeStaff, photo: e.target.files ? e.target.files[0] : null})}
                     />
-                    <label htmlFor="one-time-photo" className="flex-1 p-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-emerald-50 hover:border-emerald-200 transition-all group">
-                      <Plus size={20} className="text-slate-400 group-hover:text-emerald-500" />
-                      <span className="text-[10px] font-bold text-slate-500 group-hover:text-emerald-600 uppercase">
+                    <label htmlFor="one-time-photo" className="flex-1 p-4 bg-muted/50 border border-dashed border-border rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-emerald-50 hover:border-emerald-200 transition-all group">
+                      <Plus size={20} className="text-muted-foreground group-hover:text-emerald-500" />
+                      <span className="text-[10px] font-bold text-muted-foreground group-hover:text-emerald-600 uppercase">
                         {oneTimeStaff.photo ? oneTimeStaff.photo.name : "Click to Upload Photo"}
                       </span>
                     </label>
@@ -1062,7 +1062,7 @@ const DailyStaff = () => {
                 </div>
               </div>
 
-              <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex items-center gap-3">
+              <div className="p-6 bg-muted/50/80 border-t border-border flex items-center gap-3">
                 <button type="button" onClick={() => setShowOneTimeModal(false)} className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600">Cancel</button>
                 <button type="submit" className="flex-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-emerald-100 transition-all active:scale-95">Mark Entry</button>
               </div>
@@ -1075,17 +1075,17 @@ const DailyStaff = () => {
       {showVerifyModal && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowVerifyModal(null)} />
-          <div className="relative bg-white rounded-3xl w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden">
+          <div className="relative bg-card rounded-3xl w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden">
             <div className="p-8 text-center">
               <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
                 <ShieldCheck size={40} />
               </div>
-              <h3 className="text-xl font-bold text-slate-800">Verify Visitor Code</h3>
-              <p className="text-sm text-slate-500 mt-2">Does the visitor's code match?</p>
+              <h3 className="text-xl font-bold text-foreground">Verify Visitor Code</h3>
+              <p className="text-sm text-muted-foreground mt-2">Does the visitor's code match?</p>
               
               <div className="mt-8 space-y-6">
                 <div className="space-y-1.5 text-left">
-                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Enter Visitor's 4-Digit Code</label>
+                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Enter Visitor's 4-Digit Code</label>
                    <input 
                     type="text"
                     maxLength={4}
@@ -1113,7 +1113,7 @@ const DailyStaff = () => {
                       setShowVerifyModal(null);
                       setEnteredCode("");
                     }}
-                    className="text-slate-400 font-bold text-xs hover:text-slate-600 transition-colors"
+                    className="text-muted-foreground font-bold text-xs hover:text-slate-600 transition-colors"
                   >
                     Cancel
                   </button>
@@ -1128,18 +1128,18 @@ const DailyStaff = () => {
       {showDeliveryModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowDeliveryModal(false)} />
-          <div className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <div className="relative bg-card rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
                   <Truck size={20} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 leading-none">New Delivery Entry</h3>
-                  <p className="text-xs text-slate-500 mt-1">Record incoming package/delivery</p>
+                  <h3 className="font-bold text-foreground leading-none">New Delivery Entry</h3>
+                  <p className="text-xs text-muted-foreground mt-1">Record incoming package/delivery</p>
                 </div>
               </div>
-              <button onClick={() => setShowDeliveryModal(false)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 transition-colors">
+              <button onClick={() => setShowDeliveryModal(false)} className="p-2 hover:bg-muted/50 rounded-xl text-muted-foreground transition-colors">
                 <XCircle size={24} />
               </button>
             </div>
@@ -1148,7 +1148,7 @@ const DailyStaff = () => {
               <div className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Delivery Boy Name</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Delivery Boy Name</label>
                     <input 
                       type="text" required
                       className={inputCls} 
@@ -1157,20 +1157,20 @@ const DailyStaff = () => {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Company</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Company</label>
                     <div className="relative" ref={companyDropdownRef}>
                       <div 
                         onClick={() => setIsCompanyDropdownOpen(!isCompanyDropdownOpen)}
-                        className={`min-h-[42px] w-full bg-slate-50 border ${isCompanyDropdownOpen ? 'border-blue-400 ring-2 ring-blue-50 bg-white' : 'border-slate-200'} rounded-xl px-3 py-2 flex items-center justify-between cursor-pointer transition-all hover:bg-white hover:border-blue-300 group`}
+                        className={`min-h-[42px] w-full bg-muted/50 border ${isCompanyDropdownOpen ? 'border-blue-400 ring-2 ring-blue-50 bg-card' : 'border-border'} rounded-xl px-3 py-2 flex items-center justify-between cursor-pointer transition-all hover:bg-card hover:border-blue-300 group`}
                       >
-                        <span className={`text-sm ${newDelivery.companyName ? 'text-slate-800 font-bold' : 'text-slate-400'}`}>
+                        <span className={`text-sm ${newDelivery.companyName ? 'text-foreground font-bold' : 'text-muted-foreground'}`}>
                           {newDelivery.companyName || "Select Company"}
                         </span>
-                        <ChevronDown size={16} className={`text-slate-400 group-hover:text-blue-500 transition-transform duration-200 ${isCompanyDropdownOpen ? 'rotate-180' : ''}`} />
+                        <ChevronDown size={16} className={`text-muted-foreground group-hover:text-blue-500 transition-transform duration-200 ${isCompanyDropdownOpen ? 'rotate-180' : ''}`} />
                       </div>
 
                       {isCompanyDropdownOpen && (
-                        <div className="absolute z-[150] w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="absolute z-[150] w-full mt-2 bg-card border border-border rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                           <div className="max-h-60 overflow-y-auto p-1.5">
                             {deliveryCompanies.map((company) => {
                               const isSelected = newDelivery.companyName === company;
@@ -1182,7 +1182,7 @@ const DailyStaff = () => {
                                     setIsCompanyDropdownOpen(false);
                                   }}
                                   className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
-                                    isSelected ? 'bg-blue-50 text-blue-700' : 'hover:bg-slate-50 text-slate-600'
+                                    isSelected ? 'bg-blue-50 text-blue-700' : 'hover:bg-muted/50 text-slate-600'
                                   }`}
                                 >
                                   <span className={`text-sm ${isSelected ? 'font-bold' : 'font-medium'}`}>{company}</span>
@@ -1203,7 +1203,7 @@ const DailyStaff = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Mobile Number</label>
                     <input 
                       type="tel" required
                       className={inputCls} 
@@ -1212,7 +1212,7 @@ const DailyStaff = () => {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Flat Number</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Flat Number</label>
                     <input 
                       type="text" required
                       className={inputCls} 
@@ -1223,7 +1223,7 @@ const DailyStaff = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Vehicle Number (Optional)</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Vehicle Number (Optional)</label>
                   <input 
                     type="text"
                     className={inputCls} 
@@ -1233,7 +1233,7 @@ const DailyStaff = () => {
                 </div>
               </div>
 
-              <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex items-center gap-3">
+              <div className="p-6 bg-muted/50/80 border-t border-border flex items-center gap-3">
                 <button type="button" onClick={() => setShowDeliveryModal(false)} className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600">Cancel</button>
                 <button type="submit" className="flex-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-100 transition-all active:scale-95">Save Entry</button>
               </div>
@@ -1246,18 +1246,18 @@ const DailyStaff = () => {
       {showHistoryModal && (
         <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowHistoryModal(null)} />
-          <div className="relative bg-white rounded-3xl w-full max-w-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 overflow-hidden">
-            <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+          <div className="relative bg-card rounded-3xl w-full max-w-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-300 overflow-hidden">
+            <div className="p-6 border-b border-border bg-muted/50/50 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-100">
                   {showHistoryModal.staffName.charAt(0)}
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 text-lg">{showHistoryModal.staffName}</h3>
-                  <p className="text-xs text-slate-500 font-medium uppercase tracking-widest">{showHistoryModal.role} • {showHistoryModal.flatNumber}</p>
+                  <h3 className="font-bold text-foreground text-lg">{showHistoryModal.staffName}</h3>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">{showHistoryModal.role} • {showHistoryModal.flatNumber}</p>
                 </div>
               </div>
-              <button onClick={() => setShowHistoryModal(null)} className="p-2 hover:bg-white rounded-xl text-slate-400 transition-colors border border-transparent hover:border-slate-100">
+              <button onClick={() => setShowHistoryModal(null)} className="p-2 hover:bg-card rounded-xl text-muted-foreground transition-colors border border-transparent hover:border-border">
                 <XCircle size={24} />
               </button>
             </div>
@@ -1266,17 +1266,17 @@ const DailyStaff = () => {
               {historyLoading ? (
                 <div className="flex flex-col items-center justify-center h-full gap-3">
                   <Loader2 size={32} className="text-blue-500 animate-spin" />
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fetching Logs...</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Fetching Logs...</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Recent Attendance History</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Recent Attendance History</p>
                   {staffHistory && staffHistory.length > 0 ? staffHistory.map((log) => (
-                    <div key={log._id} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-blue-200 hover:bg-blue-50/30 transition-all">
+                    <div key={log._id} className="flex items-center justify-between p-4 rounded-2xl bg-muted/50 border border-border group hover:border-blue-200 hover:bg-blue-50/30 transition-all">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-white flex flex-col items-center justify-center border border-slate-100 shadow-sm group-hover:border-blue-100 transition-all">
+                        <div className="w-10 h-10 rounded-xl bg-card flex flex-col items-center justify-center border border-border shadow-sm group-hover:border-blue-100 transition-all">
                           <span className="text-[10px] font-bold text-blue-600 leading-none">{new Date(log.date).toLocaleString('default', { month: 'short' })}</span>
-                          <span className="text-lg font-black text-slate-800 leading-none mt-0.5">{new Date(log.date).getDate()}</span>
+                          <span className="text-lg font-black text-foreground leading-none mt-0.5">{new Date(log.date).getDate()}</span>
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
@@ -1290,8 +1290,8 @@ const DailyStaff = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Date</span>
-                        <span className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 group-hover:border-blue-100 shadow-sm">
+                        <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Date</span>
+                        <span className="px-3 py-1 bg-card border border-border rounded-lg text-[10px] font-bold text-slate-600 group-hover:border-blue-100 shadow-sm">
                           {log.date}
                         </span>
                       </div>
@@ -1303,7 +1303,7 @@ const DailyStaff = () => {
                     </div>
                   )}
                   
-                  <div className="py-8 flex flex-col items-center justify-center text-slate-400 opacity-40">
+                  <div className="py-8 flex flex-col items-center justify-center text-muted-foreground opacity-40">
                     <div className="w-px h-8 bg-slate-200 mb-2" />
                     <p className="text-[10px] font-bold uppercase tracking-widest">End of History</p>
                   </div>
@@ -1311,7 +1311,7 @@ const DailyStaff = () => {
               )}
             </div>
 
-            <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+            <div className="p-6 border-t border-border bg-muted/50/50 flex justify-end">
               <button 
                 className="flex items-center gap-2 text-blue-600 font-bold text-sm hover:underline"
               >
@@ -1326,10 +1326,10 @@ const DailyStaff = () => {
       {showBlockModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowBlockModal(null)} />
-          <div className="relative bg-white rounded-3xl w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200">
-            <div className="p-6 border-b border-slate-100">
-              <h3 className="font-bold text-slate-800 text-lg">Block Staff Member</h3>
-              <p className="text-xs text-slate-500 mt-1">Provide a reason to restrict entry for {showBlockModal.staffName}</p>
+          <div className="relative bg-card rounded-3xl w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-border">
+              <h3 className="font-bold text-foreground text-lg">Block Staff Member</h3>
+              <p className="text-xs text-muted-foreground mt-1">Provide a reason to restrict entry for {showBlockModal.staffName}</p>
             </div>
             <div className="p-6">
               <textarea 
@@ -1339,8 +1339,8 @@ const DailyStaff = () => {
                 onChange={(e) => setBlockReason(e.target.value)}
               />
             </div>
-            <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex gap-3 rounded-b-3xl">
-              <button onClick={() => setShowBlockModal(null)} className="flex-1 py-2.5 font-bold text-slate-600 hover:bg-white rounded-xl transition-colors">Cancel</button>
+            <div className="p-6 bg-muted/50/80 border-t border-border flex gap-3 rounded-b-3xl">
+              <button onClick={() => setShowBlockModal(null)} className="flex-1 py-2.5 font-bold text-slate-600 hover:bg-card rounded-xl transition-colors">Cancel</button>
               <button onClick={handleBlock} className="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl font-bold shadow-lg shadow-rose-100 transition-all active:scale-95">Confirm Block</button>
             </div>
           </div>
@@ -1351,18 +1351,18 @@ const DailyStaff = () => {
       {showAddModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
-          <div className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <div className="relative bg-card rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center border border-blue-100">
                   <UserPlus size={20} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 leading-none">Register New Staff</h3>
-                  <p className="text-xs text-slate-500 mt-1">Add a new daily help or staff member</p>
+                  <h3 className="font-bold text-foreground leading-none">Register New Staff</h3>
+                  <p className="text-xs text-muted-foreground mt-1">Add a new daily help or staff member</p>
                 </div>
               </div>
-              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 transition-colors">
+              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-muted/50 rounded-xl text-muted-foreground transition-colors">
                 <XCircle size={24} />
               </button>
             </div>
@@ -1371,7 +1371,7 @@ const DailyStaff = () => {
               <div className="p-6 space-y-4 max-h-[65vh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Full Name</label>
                     <input 
                       type="text" 
                       required
@@ -1382,7 +1382,7 @@ const DailyStaff = () => {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Mobile Number</label>
                     <input 
                       type="tel" 
                       required
@@ -1396,14 +1396,14 @@ const DailyStaff = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Role / Category</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Role / Category</label>
                     <div className="relative" ref={roleDropdownRef}>
                       <div 
                         onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-                        className={`min-h-[42px] w-full bg-slate-50 border ${isRoleDropdownOpen ? 'border-blue-400 ring-2 ring-blue-50 bg-white' : 'border-slate-200'} rounded-xl px-2 py-1.5 flex flex-wrap gap-1.5 items-center cursor-pointer transition-all hover:bg-white hover:border-blue-300 group`}
+                        className={`min-h-[42px] w-full bg-muted/50 border ${isRoleDropdownOpen ? 'border-blue-400 ring-2 ring-blue-50 bg-card' : 'border-border'} rounded-xl px-2 py-1.5 flex flex-wrap gap-1.5 items-center cursor-pointer transition-all hover:bg-card hover:border-blue-300 group`}
                       >
                         {newStaff.role.length === 0 ? (
-                          <span className="text-sm text-slate-400 ml-2">Select Roles</span>
+                          <span className="text-sm text-muted-foreground ml-2">Select Roles</span>
                         ) : (
                           newStaff.role.map((r: string) => (
                             <div key={r} className="bg-blue-100 text-blue-700 text-[11px] font-bold py-1 px-2 rounded-lg flex items-center gap-1 animate-in zoom-in-95 duration-150">
@@ -1420,13 +1420,13 @@ const DailyStaff = () => {
                             </div>
                           ))
                         )}
-                        <div className="ml-auto pr-1 text-slate-400 group-hover:text-blue-500 transition-colors">
+                        <div className="ml-auto pr-1 text-muted-foreground group-hover:text-blue-500 transition-colors">
                           <ChevronDown size={16} className={`transition-transform duration-200 ${isRoleDropdownOpen ? 'rotate-180' : ''}`} />
                         </div>
                       </div>
 
                       {isRoleDropdownOpen && (
-                        <div className="absolute z-[150] w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="absolute z-[150] w-full mt-2 bg-card border border-border rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                           <div className="max-h-60 overflow-y-auto p-1.5">
                             {roleOptions.map((option) => {
                               const isSelected = newStaff.role.includes(option);
@@ -1435,12 +1435,12 @@ const DailyStaff = () => {
                                   key={option}
                                   onClick={() => toggleRole(option)}
                                   className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
-                                    isSelected ? 'bg-blue-50 text-blue-700' : 'hover:bg-slate-50 text-slate-600'
+                                    isSelected ? 'bg-blue-50 text-blue-700' : 'hover:bg-muted/50 text-slate-600'
                                   }`}
                                 >
                                   <span className={`text-sm ${isSelected ? 'font-bold' : 'font-medium'}`}>{option}</span>
                                   <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
-                                    isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300 bg-white'
+                                    isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300 bg-card'
                                   }`}>
                                     {isSelected && <Check size={12} className="text-white" strokeWidth={4} />}
                                   </div>
@@ -1453,7 +1453,7 @@ const DailyStaff = () => {
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Flat Number</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Flat Number</label>
                     <input 
                       type="text" 
                       required
@@ -1466,7 +1466,7 @@ const DailyStaff = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Vehicle Number (Optional)</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Vehicle Number (Optional)</label>
                   <input 
                     type="text" 
                     placeholder="e.g. DL3CAB1122" 
@@ -1479,7 +1479,7 @@ const DailyStaff = () => {
                 {/* Document Upload Fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Aadhar Card (PDF/Image)</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Aadhar Card (PDF/Image)</label>
                     <input 
                       type="file" 
                       accept=".pdf,image/*"
@@ -1488,7 +1488,7 @@ const DailyStaff = () => {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Police Verification</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Police Verification</label>
                     <input 
                       type="file" 
                       accept=".pdf,image/*"
@@ -1499,7 +1499,7 @@ const DailyStaff = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Staff Photo</label>
+                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Staff Photo</label>
                    <div className="flex items-center gap-4">
                     <input 
                       type="file" 
@@ -1508,32 +1508,32 @@ const DailyStaff = () => {
                       id="staff-photo-main"
                       onChange={(e) => setNewStaff({...newStaff, photo: e.target.files ? e.target.files[0] : null})}
                     />
-                    <label htmlFor="staff-photo-main" className="flex-1 p-6 bg-slate-50 border border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-blue-50/50 hover:border-blue-200 transition-all group">
-                      <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:scale-110 transition-all border border-slate-100 group-hover:border-blue-100">
+                    <label htmlFor="staff-photo-main" className="flex-1 p-6 bg-muted/50 border border-dashed border-border rounded-3xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-blue-50/50 hover:border-blue-200 transition-all group">
+                      <div className="w-12 h-12 bg-card rounded-2xl shadow-sm flex items-center justify-center text-muted-foreground group-hover:text-blue-500 group-hover:scale-110 transition-all border border-border group-hover:border-blue-100">
                         <Plus size={24} />
                       </div>
                       <div className="text-center">
-                        <p className="text-xs font-bold text-slate-500 group-hover:text-blue-600 transition-colors">
+                        <p className="text-xs font-bold text-muted-foreground group-hover:text-blue-600 transition-colors">
                           {newStaff.photo ? newStaff.photo.name : "Upload Staff Photo"}
                         </p>
-                        <p className="text-[10px] text-slate-400 font-medium">PNG, JPG or WEBP (Max 2MB)</p>
+                        <p className="text-[10px] text-muted-foreground font-medium">PNG, JPG or WEBP (Max 2MB)</p>
                       </div>
                     </label>
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex items-center gap-3">
+              <div className="p-6 bg-muted/50/80 border-t border-border flex items-center gap-3">
                 <button 
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-white border border-transparent hover:border-slate-200 transition-all"
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-card border border-transparent hover:border-border transition-all"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit"
-                  className="flex-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-100 active:scale-95"
+                  className="flex-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl font-bold text-sm transition-all shadow-none active:scale-95"
                 >
                   Register Staff Member
                 </button>

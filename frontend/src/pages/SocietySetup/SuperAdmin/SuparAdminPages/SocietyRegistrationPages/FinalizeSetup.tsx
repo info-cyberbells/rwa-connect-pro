@@ -67,23 +67,23 @@ const FinalizeSetup = ({ prevStep, submitForm, defaultValues, fullFormData, load
         <div className="w-full mb-12">
           <p className="text-blue-500 text-[11px] font-black uppercase tracking-[0.2em] mb-3">Step 4 of 4</p>
           <div className="flex justify-between items-end mb-4">
-            <h1 className="text-4xl font-[800] text-slate-900 tracking-tighter ">Finalize Setup</h1>
-            {/* <span className="text-slate-400 font-bold text-lg italic">100%</span> */}
+            <h1 className="text-4xl font-[800] text-foreground tracking-tighter ">Finalize Setup</h1>
+            {/* <span className="text-muted-foreground font-bold text-lg italic">100%</span> */}
           </div>
           {/* <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
             <div className="w-full h-full bg-blue-600 rounded-full" />
           </div> */}
-          <p className="mt-3 text-slate-400 font-medium">
+          <p className="mt-3 text-muted-foreground font-medium">
             Ready to launch your society management dashboard.
           </p>
         </div>
 
         {/* --- 4. MAIN CONFIGURATION CARD --- */}
-        <div className="w-full bg-white rounded-[3.5rem] p-16 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.04)] border border-slate-50 mb-16">
-          <h2 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">
+        <div className="w-full bg-card rounded-[3.5rem] p-16 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.04)] border border-slate-50 mb-16">
+          <h2 className="text-2xl font-black text-foreground mb-2 tracking-tight">
             Regional & Billing Settings
           </h2>
-          <p className="text-slate-400 text-sm font-medium mb-12">
+          <p className="text-muted-foreground text-sm font-medium mb-12">
             Configure how maintenance and local timings are handled.
           </p>
 
@@ -100,7 +100,7 @@ const FinalizeSetup = ({ prevStep, submitForm, defaultValues, fullFormData, load
                   onChange={(e) =>
                     setSettings({ ...settings, maintenanceDue: e.target.value })
                   }
-                  className="w-full bg-slate-50/50 border border-slate-100 rounded-[1.5rem] py-5 px-8 focus:bg-white focus:border-blue-400 transition-all outline-none text-slate-700 font-bold appearance-none"
+                  className="w-full bg-muted/50 border border-border rounded-[1.5rem] py-5 px-8 focus:bg-card focus:border-blue-400 transition-all outline-none text-slate-700 font-bold appearance-none"
                 >
                    <option value="5">5th of every month</option>
                    <option value="10">10th of every month</option>
@@ -124,7 +124,7 @@ const FinalizeSetup = ({ prevStep, submitForm, defaultValues, fullFormData, load
                   onChange={(e) =>
                     setSettings({ ...settings, currency: e.target.value })
                   }
-                  className="w-full bg-slate-50/50 border border-slate-100 rounded-[1.5rem] py-5 px-8 focus:bg-white focus:border-blue-400 transition-all outline-none text-slate-700 font-bold appearance-none"
+                  className="w-full bg-muted/50 border border-border rounded-[1.5rem] py-5 px-8 focus:bg-card focus:border-blue-400 transition-all outline-none text-slate-700 font-bold appearance-none"
                 >
                    <option value="INR">INR (₹) - Indian Rupee</option>
                    <option value="USD">USD ($) - US Dollar</option>
@@ -148,7 +148,7 @@ const FinalizeSetup = ({ prevStep, submitForm, defaultValues, fullFormData, load
                   onChange={(e) =>
                     setSettings({ ...settings, timezone: e.target.value })
                   }
-                  className="w-full bg-slate-50/50 border border-slate-100 rounded-[1.5rem] py-5 px-8 focus:bg-white focus:border-blue-400 transition-all outline-none text-slate-700 font-bold appearance-none"
+                  className="w-full bg-muted/50 border border-border rounded-[1.5rem] py-5 px-8 focus:bg-card focus:border-blue-400 transition-all outline-none text-slate-700 font-bold appearance-none"
                 >
                   <option>Asia/Kolkata (GMT +5:30)</option>
                   <option>UTC (GMT +0)</option>
@@ -166,7 +166,7 @@ const FinalizeSetup = ({ prevStep, submitForm, defaultValues, fullFormData, load
           <div className="mt-16 flex items-center justify-center gap-8">
             <button
               onClick={prevStep}
-              className="flex items-center gap-2 text-slate-400 font-bold text-sm hover:text-slate-700 transition-all"
+              className="flex items-center gap-2 text-muted-foreground font-bold text-sm hover:text-slate-700 transition-all"
             >
               <ChevronLeft size={18} /> Previous Step
             </button>
@@ -190,12 +190,12 @@ const FinalizeSetup = ({ prevStep, submitForm, defaultValues, fullFormData, load
             { icon: <Zap className="text-blue-500" />, title: "Fast Processing", desc: "Your dashboard will be ready in under 30 seconds after completion." }
           ].map((item, i) => (
             <div key={i} className="flex gap-4">
-              <div className="bg-white p-3 h-fit rounded-xl shadow-sm border border-slate-50">
+              <div className="bg-card p-3 h-fit rounded-xl shadow-sm border border-slate-50">
                 {item.icon}
               </div>
               <div className="space-y-1">
-                <h4 className="font-black text-slate-800 text-sm tracking-tight">{item.title}</h4>
-                <p className="text-xs text-slate-400 leading-relaxed font-medium">{item.desc}</p>
+                <h4 className="font-black text-foreground text-sm tracking-tight">{item.title}</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed font-medium">{item.desc}</p>
               </div>
             </div>
           ))}

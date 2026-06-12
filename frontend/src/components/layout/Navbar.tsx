@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ModeToggle } from "../mode-toggle";
 import navbarLogo from "@/assets/navbar.webp"
 
 const navLinks = [
@@ -50,6 +51,7 @@ export function Navbar() {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <ModeToggle />
             <Button variant="ghost" asChild className="text-base">
               <Link to="/login">Login</Link>
             </Button>

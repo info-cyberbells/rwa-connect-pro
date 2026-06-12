@@ -1,5 +1,6 @@
 import Notice from "../models/Notice.js";
 import { attachBaseUrl, attachBaseUrlToArray } from "../utils/addBaseUrl.js";
+import { createNotification } from "./notificationController.js"; // [NEW] Import notification utility
 
 const NOTICE_FIELDS = { single: [], array: ["imageUrls", "attachmentUrls"] };
 
@@ -56,6 +57,19 @@ export async function createNotice(req, res, next) {
     });
 
     const result = attachBaseUrl(req, notice, NOTICE_FIELDS.single, NOTICE_FIELDS.array);
+
+    // [NEW] Trigger broadcast notification for the target audience
+    await createNotification({
+      sender: req.user.id,
+      society: req.user.society,
+      title: "New Notice: " + title,
+      message: description.length > 100 ? description.substring(0, 100) + "..." : description,
+      category: "notice",
+      type: "info",
+      targetAudience: targetAudience || "all",
+      link: "/member/notices",
+    }).catch(err => console.error("Notification Error:", err));
+
     res.status(201).json({
       message: "Notice created successfully",
       notice: result,

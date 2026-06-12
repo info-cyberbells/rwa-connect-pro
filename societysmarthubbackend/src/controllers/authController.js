@@ -31,7 +31,7 @@ export async function login(req, res, next) {
 
   const payload = {
     userId: user._id.toString(),
-    role: user.role,
+    role: user.role === 'admin' ? 'society_admin' : user.role,
     society: user.society ? user.society.toString() : null,
   };
   const accessToken = signAccessToken({
@@ -80,7 +80,7 @@ export async function login(req, res, next) {
       id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: user.role === 'admin' ? 'society_admin' : user.role,
       society: user.society,
     },
   });

@@ -13,7 +13,7 @@ const Delete = ({ isOpen, onClose, onConfirm }) => {
       />
       
       {/* Modal Content */}
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200">
+      <div className="relative bg-card rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200">
         <div className="p-8">
           {/* Icon Header */}
           <div className="flex justify-center mb-6">
@@ -23,8 +23,8 @@ const Delete = ({ isOpen, onClose, onConfirm }) => {
           </div>
 
           <div className="text-center mb-8">
-            <h3 className="text-xl font-bold tracking-wide text-slate-900 mb-2">Confirm Deletion</h3>
-            <p className="text-slate-500 leading-relaxed px-4">
+            <h3 className="text-xl font-bold tracking-wide text-foreground mb-2">Confirm Deletion</h3>
+            <p className="text-muted-foreground leading-relaxed px-4">
               Are you sure you want to delete the record. This action cannot be undone.
             </p>
           </div>
@@ -48,7 +48,7 @@ const Delete = ({ isOpen, onClose, onConfirm }) => {
         {/* Subtle close button in corner */}
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+          className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
         >
           <X size={20} />
         </button>

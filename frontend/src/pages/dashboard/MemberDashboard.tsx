@@ -1,30 +1,18 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
-  CreditCard, Bell, FileText, MessageSquare, Upload, 
-  CheckCircle, Clock, AlertCircle, UserPlus, ShieldCheck, 
-  XCircle, Loader2, Phone, MapPin, Info, Car, Users 
+  CreditCard, Bell, MessageSquare, Upload, 
+  CheckCircle, Clock, UserPlus, ShieldCheck, 
+  XCircle, Loader2, Phone, MapPin, Info, Users 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { createVisitor, getVisitorHistory, clearUserError, getMyProfile } from "../../features/User/userSlice";
+import { createVisitor, getVisitorHistory, clearUserError, getMyProfile, getDashboardSummary } from "../../features/User/userSlice";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-const inputCls = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-400 focus:bg-white transition-colors placeholder:text-slate-400";
-
-const paymentDues = [
-  { type: "Maintenance", amount: "₹5,500", dueDate: "Dec 10, 2024", status: "pending" },
-  { type: "Club Membership", amount: "₹2,000", dueDate: "Dec 15, 2024", status: "pending" },
-  { type: "Parking Fee", amount: "₹500", dueDate: "Dec 10, 2024", status: "paid" },
-];
-
-const recentNotices = [
-  { title: "Annual General Meeting", date: "Jan 15, 2025", type: "Meeting" },
-  { title: "Water Supply Maintenance", date: "Dec 8, 2024", type: "Maintenance" },
-  { title: "New Year Celebration", date: "Dec 31, 2024", type: "Event" },
-];
+const inputCls = "w-full bg-muted border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:bg-background transition-colors placeholder:text-muted-foreground";
 
 const paymentHistory = [
   { type: "Maintenance", amount: "₹5,500", date: "Nov 5, 2024", status: "approved" },
@@ -36,7 +24,16 @@ export default function MemberDashboard() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
-  const { profileData, visitorData, visitorLoading, createVisitorSuccess, generatedCode, error } = useAppSelector((state) => state.user);
+  const { 
+    profileData, 
+    dashboardStats, 
+    dashboardLoading,
+    visitorData, 
+    visitorLoading, 
+    createVisitorSuccess, 
+    generatedCode, 
+    error 
+  } = useAppSelector((state) => state.user);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -44,6 +41,9 @@ export default function MemberDashboard() {
   // Use profileData if available, otherwise fallback to auth user
   const currentUser = profileData || user;
   const userFlat = currentUser?.unit?.flatNumber || "";
+
+  const pendingPaymentsList = dashboardStats?.pendingPayments || [];
+  const recentNoticesList = dashboardStats?.recentNotices || [];
 
   const [newVisitor, setNewVisitor] = useState({
     visitorName: "",
@@ -55,9 +55,10 @@ export default function MemberDashboard() {
     flatNumber: "",
   });
 
-  // 1. Fetch Profile and Initial Visitors
+  // 1. Fetch Profile and Dashboard Summary
   useEffect(() => {
     dispatch(getMyProfile());
+    dispatch(getDashboardSummary());
   }, [dispatch]);
 
   useEffect(() => {
@@ -107,11 +108,7 @@ export default function MemberDashboard() {
       memberId: finalMemberId
     };
 
-    dispatch(createVisitor(payload)).then((res: any) => {
-       if (res.error) {
-         // Handle failure if needed, toast is already handled by useEffect
-       }
-    });
+    dispatch(createVisitor(payload));
   };
 
   return (
@@ -120,8 +117,8 @@ export default function MemberDashboard() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-heading font-bold">Welcome, {user?.name || 'Resident'}!</h1>
-            <p className="text-muted-foreground">{user?.unit?.flatNumber ? `Flat ${user.unit.flatNumber}` : 'Green Valley Apartments'}</p>
+            <h1 className="text-3xl font-heading font-bold">Welcome, {currentUser?.name || 'Resident'}!</h1>
+            <p className="text-muted-foreground">{currentUser?.unit?.flatNumber ? `Flat ${currentUser.unit.flatNumber}` : 'Green Valley Apartments'}</p>
           </div>
           <div className="flex gap-3">
             <Button 
@@ -147,7 +144,9 @@ export default function MemberDashboard() {
                 <CreditCard className="w-6 h-6 text-primary-foreground" />
               </div>
             </div>
-            <p className="text-3xl font-heading font-bold">₹7,500</p>
+            {dashboardLoading ? <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /> : (
+              <p className="text-3xl font-heading font-bold">₹{dashboardStats?.stats?.pendingDues?.toLocaleString() || 0}</p>
+            )}
             <p className="text-muted-foreground text-sm">Pending Dues</p>
           </motion.div>
 
@@ -163,7 +162,9 @@ export default function MemberDashboard() {
                 <Bell className="w-6 h-6 text-primary-foreground" />
               </div>
             </div>
-            <p className="text-3xl font-heading font-bold">3</p>
+            {dashboardLoading ? <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /> : (
+              <p className="text-3xl font-heading font-bold">{dashboardStats?.stats?.newNoticesCount || 0}</p>
+            )}
             <p className="text-muted-foreground text-sm">New Notices</p>
           </motion.div>
 
@@ -280,41 +281,53 @@ export default function MemberDashboard() {
         <div className="bg-card rounded-2xl card-shadow">
           <div className="p-6 border-b border-border flex items-center justify-between">
             <h2 className="text-xl font-heading font-semibold">Payment Dues</h2>
-            <Button>
+            <Button onClick={() => navigate('/member/payments')}>
               <Upload className="w-4 h-4" />
               Upload Payment Proof
             </Button>
           </div>
           <div className="p-4 space-y-4">
-            {paymentDues.map((payment, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    payment.status === "paid" ? "bg-success/20" : "bg-warning/20"
-                  }`}>
-                    {payment.status === "paid" ? (
-                      <CheckCircle className="w-5 h-5 text-success" />
-                    ) : (
-                      <Clock className="w-5 h-5 text-warning" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium">{payment.type}</p>
-                    <p className="text-sm text-muted-foreground">Due: {payment.dueDate}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">{payment.amount}</p>
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    payment.status === "paid" 
-                      ? "bg-success/10 text-success" 
-                      : "bg-warning/10 text-warning"
-                  }`}>
-                    {payment.status === "paid" ? "Paid" : "Pending"}
-                  </span>
-                </div>
+            {dashboardLoading ? (
+              <div className="py-10 flex justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
-            ))}
+            ) : pendingPaymentsList.length > 0 ? (
+              pendingPaymentsList.map((payment: any) => (
+                <div key={payment.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      payment.status === "PAID" ? "bg-success/20" : "bg-warning/20"
+                    }`}>
+                      {payment.status === "PAID" ? (
+                        <CheckCircle className="w-5 h-5 text-success" />
+                      ) : (
+                        <Clock className="w-5 h-5 text-warning" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">{payment.title}</p>
+                      <p className="text-sm text-muted-foreground">Due: {payment.dueDate ? new Date(payment.dueDate).toLocaleDateString() : 'N/A'}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">₹{payment.amount.toLocaleString()}</p>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      payment.status === "PAID" 
+                        ? "bg-success/10 text-success" 
+                        : payment.status === 'AWAITING_VERIFICATION'
+                        ? "bg-blue-500/10 text-blue-500"
+                        : "bg-warning/10 text-warning"
+                    }`}>
+                      {payment.status.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="py-10 text-center text-muted-foreground text-sm italic">
+                No pending dues. You're all caught up! ✨
+              </div>
+            )}
           </div>
         </div>
 
@@ -324,23 +337,33 @@ export default function MemberDashboard() {
           <div className="bg-card rounded-2xl card-shadow">
             <div className="p-6 border-b border-border flex items-center justify-between">
               <h2 className="text-xl font-heading font-semibold">Recent Notices</h2>
-              <Button variant="ghost" size="sm">View All</Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/member/notices')}>View All</Button>
             </div>
             <div className="p-4 space-y-4">
-              {recentNotices.map((notice, index) => (
-                <div key={index} className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl">
-                  <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
-                    <Bell className="w-5 h-5 text-accent-foreground" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{notice.title}</p>
-                    <p className="text-sm text-muted-foreground">{notice.date}</p>
-                  </div>
-                  <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-                    {notice.type}
-                  </span>
+              {dashboardLoading ? (
+                <div className="py-10 flex justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
-              ))}
+              ) : recentNoticesList.length > 0 ? (
+                recentNoticesList.map((notice: any) => (
+                  <div key={notice._id} className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl">
+                    <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center">
+                      <Bell className="w-5 h-5 text-accent-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{notice.title}</p>
+                      <p className="text-sm text-muted-foreground">{new Date(notice.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary uppercase">
+                      {notice.category}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="py-10 text-center text-muted-foreground text-sm italic">
+                  No recent notices.
+                </div>
+              )}
             </div>
           </div>
 
@@ -376,19 +399,19 @@ export default function MemberDashboard() {
       {/* Add Visitor Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
-          <div className="relative bg-white rounded-[32px] w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
+          <div className="relative bg-card rounded-[32px] w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 border border-border">
+            <div className="p-8 border-b border-border flex items-center justify-between bg-muted/30">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-100">
+                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
                   <UserPlus size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-800">Pre-Approve Visitor</h3>
-                  <p className="text-sm text-slate-500 font-medium">Generate a secure entry code</p>
+                  <h3 className="text-xl font-bold text-foreground">Pre-Approve Visitor</h3>
+                  <p className="text-sm text-muted-foreground font-medium">Generate a secure entry code</p>
                 </div>
               </div>
-              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-white rounded-xl text-slate-400 transition-colors border border-transparent hover:border-slate-100">
+              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-muted rounded-xl text-muted-foreground transition-colors border border-transparent hover:border-border">
                 <XCircle size={24} />
               </button>
             </div>
@@ -397,7 +420,7 @@ export default function MemberDashboard() {
               <div className="p-8 space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5 text-left">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Visitor Name</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Visitor Name</label>
                     <input 
                       type="text" required
                       placeholder="e.g. Shivam"
@@ -407,7 +430,7 @@ export default function MemberDashboard() {
                     />
                   </div>
                   <div className="space-y-1.5 text-left">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Phone Number</label>
                     <input 
                       type="tel" required
                       placeholder="e.g. 9759477504"
@@ -420,7 +443,7 @@ export default function MemberDashboard() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5 text-left">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Purpose of Visit</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Purpose of Visit</label>
                     <select 
                       className={inputCls}
                       value={newVisitor.purpose}
@@ -433,7 +456,7 @@ export default function MemberDashboard() {
                     </select>
                   </div>
                   <div className="space-y-1.5 text-left">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Vehicle Number</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Vehicle Number</label>
                     <input 
                       type="text"
                       placeholder="e.g. UP32AB1234"
@@ -446,7 +469,7 @@ export default function MemberDashboard() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5 text-left">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Visit Date</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Visit Date</label>
                     <input 
                       type="date" required
                       className={inputCls} 
@@ -455,7 +478,7 @@ export default function MemberDashboard() {
                     />
                   </div>
                   <div className="space-y-1.5 text-left">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Visit Time</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Visit Time</label>
                     <input 
                       type="text" required
                       placeholder="e.g. 10:30 AM"
@@ -466,20 +489,20 @@ export default function MemberDashboard() {
                   </div>
                 </div>
                 
-                <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex gap-3 text-left">
-                  <Info className="text-blue-600 shrink-0" size={20} />
-                  <p className="text-[11px] font-medium text-blue-700 leading-relaxed">
+                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex gap-3 text-left">
+                  <Info className="text-primary shrink-0" size={20} />
+                  <p className="text-[11px] font-medium text-primary leading-relaxed">
                     Once created, you will receive a 4-digit code. Share this with your visitor to allow them entry at the gate.
                   </p>
                 </div>
               </div>
 
-              <div className="p-8 bg-slate-50/80 border-t border-slate-100 flex items-center gap-3">
-                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-white transition-all">Cancel</button>
+              <div className="p-8 bg-muted/50 border-t border-border flex items-center gap-3">
+                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-3 rounded-2xl text-sm font-bold text-muted-foreground hover:bg-card transition-all">Cancel</button>
                 <button 
                   type="submit" 
                   disabled={visitorLoading}
-                  className="flex-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50"
+                  className="flex-2 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50"
                 >
                   {visitorLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : "Create & Get Code"}
                 </button>
@@ -492,40 +515,40 @@ export default function MemberDashboard() {
       {/* Success Modal (Showing Verification Code) */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowSuccessModal(false)} />
-          <div className="relative bg-white rounded-[40px] w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-300 overflow-hidden">
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={() => setShowSuccessModal(false)} />
+          <div className="relative bg-card rounded-[40px] w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-300 overflow-hidden border border-border">
             <div className="p-10 text-center">
-              <div className="w-24 h-24 bg-emerald-50 text-emerald-600 rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-inner">
+              <div className="w-24 h-24 bg-success/10 text-success rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-inner">
                 <ShieldCheck size={48} />
               </div>
-              <h3 className="text-2xl font-bold text-slate-800">Visitor Approved!</h3>
-              <p className="text-sm text-slate-500 mt-2 font-medium">Please share this entry code with your visitor</p>
+              <h3 className="text-2xl font-bold text-foreground">Visitor Approved!</h3>
+              <p className="text-sm text-muted-foreground mt-2 font-medium">Please share this entry code with your visitor</p>
               
-              <div className="mt-10 mb-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-[32px] relative group overflow-hidden">
-                <div className="absolute inset-0 bg-blue-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-[0.02]" />
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Verification Code</p>
-                <p className="text-6xl font-black text-blue-600 tracking-[8px]">{generatedCode || '####'}</p>
+              <div className="mt-10 mb-10 py-8 bg-muted border-2 border-border rounded-[32px] relative group overflow-hidden">
+                <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-[0.02]" />
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">Verification Code</p>
+                <p className="text-6xl font-black text-primary tracking-[8px]">{generatedCode || '####'}</p>
               </div>
 
               <div className="space-y-4">
-                <div className="p-5 bg-blue-50/30 rounded-3xl border border-blue-50 text-left space-y-3">
+                <div className="p-5 bg-primary/5 rounded-3xl border border-primary/10 text-left space-y-3">
                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <MapPin size={16} className="text-blue-500" />
+                      <div className="w-8 h-8 bg-card rounded-xl flex items-center justify-center shadow-sm">
+                        <MapPin size={16} className="text-primary" />
                       </div>
-                      <p className="text-xs font-bold text-slate-700">Flat {user?.unit?.flatNumber}</p>
+                      <p className="text-xs font-bold text-foreground">Flat {user?.unit?.flatNumber}</p>
                    </div>
                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <Phone size={16} className="text-blue-500" />
+                      <div className="w-8 h-8 bg-card rounded-xl flex items-center justify-center shadow-sm">
+                        <Phone size={16} className="text-primary" />
                       </div>
-                      <p className="text-xs font-bold text-slate-700">{newVisitor.visitorPhone || 'Visitor Mobile'}</p>
+                      <p className="text-xs font-bold text-foreground">{newVisitor.visitorPhone || 'Visitor Mobile'}</p>
                    </div>
                 </div>
 
                 <button 
                   onClick={() => setShowSuccessModal(false)}
-                  className="w-full py-4 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
+                  className="w-full py-4 rounded-2xl font-bold text-sm bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all"
                 >
                   Done
                 </button>
@@ -534,7 +557,7 @@ export default function MemberDashboard() {
                      const text = `Hi, I have pre-approved your visit. Your entry code is: ${generatedCode}. Please show this to the guard at the gate.`;
                      window.open(`https://wa.me/${newVisitor.visitorPhone}?text=${encodeURIComponent(text)}`, '_blank');
                    }}
-                   className="w-full py-4 rounded-2xl font-bold text-sm bg-white text-emerald-600 border border-emerald-100 hover:bg-emerald-50 transition-all flex items-center justify-center gap-2"
+                   className="w-full py-4 rounded-2xl font-bold text-sm bg-card text-success border border-success/20 hover:bg-success/5 transition-all flex items-center justify-center gap-2"
                 >
                   Share via WhatsApp
                 </button>

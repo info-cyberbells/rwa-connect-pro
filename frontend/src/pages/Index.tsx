@@ -291,8 +291,8 @@ export default function Index() {
       <section className="pt-16 pb-12">
         <div className="container mx-auto container-padding">
           <div className="relative overflow-hidden rounded-3xl hero-gradient p-8 md:p-16">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-card/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-card/10 rounded-full blur-3xl" />
 
             <div className="relative text-center">
               <h2 className="text-3xl md:text-4xl font-heading font-bold text-primary-foreground mb-4">
@@ -309,7 +309,7 @@ export default function Index() {
                     <ArrowRight className="w-5 h-5" />
                   </Link>
                 </Button>
-                <Button size="xl" variant="ghost" className="text-primary-foreground hover:bg-white/10" asChild>
+                <Button size="xl" variant="ghost" className="text-primary-foreground hover:bg-card/10" asChild>
                   <Link to="/contact">Contact Sales</Link>
                 </Button>
               </div>

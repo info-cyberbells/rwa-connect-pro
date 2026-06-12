@@ -41,14 +41,14 @@ const Sidebar: React.FC = () => {
     },
     {
       name: "Notifications",
-      path: "/notificationsHub",
+      path: "/notificationHub",
       icon: <Bell className="w-5 h-5" />,
     },
-    {
+    /* {
       name: "Documents",
       path: "/documentCenter",
       icon: <FileText className="w-5 h-5" />,
-    },
+    }, */
     
     {
       name: "Super Admin Settings",
@@ -70,7 +70,7 @@ const Sidebar: React.FC = () => {
   return (
     <>
       {/* 🔹 Mobile Top Bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b z-40 flex items-center px-4">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-card border-b z-40 flex items-center px-4">
         <button onClick={() => setOpen(true)}>
           <Menu className="w-6 h-6 text-gray-700" />
         </button>
@@ -93,7 +93,7 @@ const Sidebar: React.FC = () => {
       {/* 🔹 Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-screen w-64 bg-white border-r shadow-lg z-50
+          fixed top-0 left-0 h-screen w-64 bg-card border-r shadow-lg z-50
           transform transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
@@ -106,7 +106,7 @@ const Sidebar: React.FC = () => {
               <Building2 className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold">
-              <span className="text-slate-900">Society</span>
+              <span className="text-foreground">Society</span>
               <span className="text-blue-600">Hub</span>
             </span>
           </div>

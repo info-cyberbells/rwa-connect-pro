@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { DashboardLayout } from "../../components/layout/DashboardLayout"; 
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store/store';
+import { AppDispatch, RootState, useAppSelector } from '../../store/store';
 import { 
   getAdminDocuments,
   uploadDocument,
@@ -75,6 +75,8 @@ interface Document {
 const CATEGORIES = ['Legal', 'Society Rules', 'Forms', 'Financial Reports', 'NOC Templates', 'Others'];
 
 const DocumentManagement = () => {
+  const { user } = useAppSelector((state) => state.auth);
+  const role = user?.role || localStorage.getItem("role") || "guard";
   const dispatch = useDispatch<AppDispatch>();
   const { documents, documentsLoading, isLoading, isSuccess, error } = useSelector(
     (state: RootState) => state.admin
@@ -197,12 +199,12 @@ const DocumentManagement = () => {
   };
 
   return (
-    <DashboardLayout role="society-admin">
+    <DashboardLayout role={role as any}>
       <div className="p-6 space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Document Management</h1>
-            <p className="text-slate-500">Create, Update, and Delete society documents</p>
+            <h1 className="text-2xl font-bold text-foreground">Document Management</h1>
+            <p className="text-muted-foreground">Create, Update, and Delete society documents</p>
           </div>
           <Button onClick={() => { resetForm(); setShowModal(true); }} className="bg-indigo-600 hover:bg-indigo-700">
             <Plus className="w-4 h-4 mr-2" />
@@ -211,9 +213,9 @@ const DocumentManagement = () => {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-card p-4 rounded-xl shadow-sm border border-border">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
               placeholder="Search by title..." 
               className="pl-10"
@@ -233,22 +235,22 @@ const DocumentManagement = () => {
             </SelectContent>
           </Select>
           <div className="flex items-center justify-end">
-            <Badge variant="outline" className="text-slate-500 font-normal py-1.5 px-3">
+            <Badge variant="outline" className="text-muted-foreground font-normal py-1.5 px-3">
               Total Documents: {filteredDocuments.length}
             </Badge>
           </div>
         </div>
 
         {/* Documents Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           {documentsLoading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-              <p className="text-slate-500 font-medium">Loading documents...</p>
+              <p className="text-muted-foreground font-medium">Loading documents...</p>
             </div>
           ) : filteredDocuments.length > 0 ? (
             <Table>
-              <TableHeader className="bg-slate-50/50">
+              <TableHeader className="bg-muted/50/50">
                 <TableRow>
                   <TableHead className="font-semibold text-slate-700">Document</TableHead>
                   <TableHead className="font-semibold text-slate-700">Category</TableHead>
@@ -259,20 +261,20 @@ const DocumentManagement = () => {
               </TableHeader>
               <TableBody>
                 {filteredDocuments.map((doc) => (
-                  <TableRow key={doc._id} className="hover:bg-slate-50/50 transition-colors">
+                  <TableRow key={doc._id} className="hover:bg-muted/50/50 transition-colors">
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
                           <FileIcon className="w-5 h-5" />
                         </div>
                         <div className="max-w-[200px]">
-                          <p className="font-medium text-slate-800 truncate">{doc.title}</p>
-                          <p className="text-xs text-slate-500 line-clamp-1">{doc.description}</p>
+                          <p className="font-medium text-foreground truncate">{doc.title}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-1">{doc.description}</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="bg-slate-50 font-normal">{doc.category}</Badge>
+                      <Badge variant="outline" className="bg-muted/50 font-normal">{doc.category}</Badge>
                     </TableCell>
                     <TableCell>
                       {doc.visibility === 'Public' ? (
@@ -288,22 +290,22 @@ const DocumentManagement = () => {
                     <TableCell>
                       <div className="text-sm">
                         <p className="text-slate-700 font-medium">{doc.uploadedBy?.name || 'Admin'}</p>
-                        <p className="text-slate-400 text-xs">
+                        <p className="text-muted-foreground text-xs">
                           {new Date(doc.createdAt).toLocaleDateString()} • {formatFileSize(doc.fileSize)}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-indigo-600" asChild title="View/Download">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-indigo-600" asChild title="View/Download">
                           <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="w-4 h-4" />
                           </a>
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-amber-600" onClick={() => handleEdit(doc)} title="Edit Document">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-amber-600" onClick={() => handleEdit(doc)} title="Edit Document">
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-red-600" onClick={() => handleDelete(doc._id)} title="Delete Document">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-red-600" onClick={() => handleDelete(doc._id)} title="Delete Document">
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -314,11 +316,11 @@ const DocumentManagement = () => {
             </Table>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-              <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mb-4">
+              <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mb-4">
                 <FolderOpen className="w-10 h-10 text-slate-300" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-1">No documents found</h3>
-              <p className="text-slate-500 max-w-sm">
+              <h3 className="text-lg font-semibold text-foreground mb-1">No documents found</h3>
+              <p className="text-muted-foreground max-w-sm">
                 {searchTerm || selectedCategory !== 'All' 
                   ? "No documents match your current filters."
                   : "Start by uploading your first society document."}
@@ -331,7 +333,7 @@ const DocumentManagement = () => {
         <Dialog open={showModal} onOpenChange={setShowModal}>
           <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden">
             <DialogHeader className="p-6 pb-2">
-              <DialogTitle className="text-xl font-bold text-slate-800">
+              <DialogTitle className="text-xl font-bold text-foreground">
                 {isEditing ? "Edit Document" : "Create New Document"}
               </DialogTitle>
             </DialogHeader>
@@ -346,7 +348,7 @@ const DocumentManagement = () => {
                     value={formData.title}
                     onChange={handleInputChange}
                     required
-                    className="h-10 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
+                    className="h-10 border-border focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
                 <div className="space-y-2">
@@ -357,7 +359,7 @@ const DocumentManagement = () => {
                     placeholder="Short description of the document" 
                     value={formData.description}
                     onChange={handleInputChange}
-                    className="h-10 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
+                    className="h-10 border-border focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
                 <div className="grid grid-cols-1 gap-4">
@@ -367,7 +369,7 @@ const DocumentManagement = () => {
                       value={formData.category} 
                       onValueChange={(val) => setFormData(prev => ({ ...prev, category: val }))}
                     >
-                      <SelectTrigger className="h-10 border-slate-200">
+                      <SelectTrigger className="h-10 border-border">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -383,7 +385,7 @@ const DocumentManagement = () => {
                       value={formData.visibility} 
                       onValueChange={(val: 'Public' | 'Private') => setFormData(prev => ({ ...prev, visibility: val }))}
                     >
-                      <SelectTrigger className="h-10 border-slate-200">
+                      <SelectTrigger className="h-10 border-border">
                         <SelectValue placeholder="Set visibility" />
                       </SelectTrigger>
                       <SelectContent>
@@ -395,7 +397,7 @@ const DocumentManagement = () => {
                 </div>
                 <div className="space-y-2 pt-2">
                   <Label htmlFor="file" className="text-sm font-semibold text-slate-700">File Attachment</Label>
-                  <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center gap-3 hover:border-indigo-400 transition-all bg-slate-50/50 cursor-pointer relative group">
+                  <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center gap-3 hover:border-indigo-400 transition-all bg-muted/50/50 cursor-pointer relative group">
                     <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-100 transition-colors">
                       <UploadCloud className="w-6 h-6" />
                     </div>
@@ -403,7 +405,7 @@ const DocumentManagement = () => {
                       <p className="text-sm font-semibold text-slate-700 truncate max-w-[250px]">
                         {formData.file ? formData.file.name : (isEditing ? "Click to replace file" : "Click to browse")}
                       </p>
-                      <p className="text-xs text-slate-400 mt-1">PDF, PNG, JPG (Max 20MB)</p>
+                      <p className="text-xs text-muted-foreground mt-1">PDF, PNG, JPG (Max 20MB)</p>
                     </div>
                     <input 
                       type="file" 
@@ -419,8 +421,8 @@ const DocumentManagement = () => {
                   )}
                 </div>
               </div>
-              <DialogFooter className="p-6 bg-slate-50 border-t border-slate-100 flex items-center gap-3">
-                <Button type="button" variant="ghost" onClick={() => setShowModal(false)} disabled={isLoading} className="text-slate-500 hover:bg-slate-200">
+              <DialogFooter className="p-6 bg-muted/50 border-t border-border flex items-center gap-3">
+                <Button type="button" variant="ghost" onClick={() => setShowModal(false)} disabled={isLoading} className="text-muted-foreground hover:bg-slate-200">
                   Cancel
                 </Button>
                 <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 min-w-[140px] shadow-indigo-200 shadow-lg" disabled={isLoading}>

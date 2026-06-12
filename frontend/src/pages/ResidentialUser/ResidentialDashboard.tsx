@@ -1,18 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet, Bell, Megaphone, Wrench, CheckCircle, Clock, Upload, UserPlus, ShieldCheck, XCircle, Loader2, Phone, Car, Info, MapPin } from 'lucide-react';
+import { Wallet, Bell, Megaphone, Wrench, CheckCircle, Clock, Upload, UserPlus, ShieldCheck, XCircle, Loader2, Phone, Car, Info, MapPin, MessageSquare, Users, AlertTriangle, Calendar, CreditCard } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { createVisitor, getVisitorHistory, clearUserError } from "../../features/User/userSlice";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from "@/auth/axiosInstance";
 
-const inputCls = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-400 focus:bg-white transition-colors placeholder:text-slate-400";
+const inputCls = "w-full bg-muted border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:bg-background transition-colors placeholder:text-muted-foreground";
 
 const ResidentialDashboard: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
-  const { visitorData, visitorLoading, createVisitorSuccess, generatedCode, error } = useAppSelector((state) => state.user);
+  const { profileData, visitorData, visitorLoading, createVisitorSuccess, generatedCode, error } = useAppSelector((state) => state.user);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  
+  const [dashboardStats, setDashboardStats] = useState({
+    pendingDues: 0,
+    newNoticesCount: 0
+  });
+  const [pendingPayments, setPendingPayments] = useState<any[]>([]);
+  const [recentNotices, setRecentNotices] = useState<any[]>([]);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
+
+  // Use profileData if available, otherwise fallback to auth user
+  const currentUser = profileData || user;
+  const userFlat = currentUser?.unit?.flatNumber || "";
+
   const [newVisitor, setNewVisitor] = useState({
     visitorName: "",
     visitorPhone: "",
@@ -20,19 +39,35 @@ const ResidentialDashboard: React.FC = () => {
     purpose: "Guest",
     visitDate: new Date().toISOString().split('T')[0],
     visitTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }),
-    flatNumber: user?.unit?.flatNumber || "", // Assuming this structure
+    flatNumber: userFlat, 
   });
 
   useEffect(() => {
-    // Initial fetch for visitors
-    dispatch(getVisitorHistory(user?.unit?.flatNumber || 'All'));
-  }, [dispatch, user]);
+    dispatch(getVisitorHistory(userFlat || 'All'));
+  }, [dispatch, userFlat]);
+
+  useEffect(() => {
+    const fetchDashboardSummary = async () => {
+      try {
+        setDashboardLoading(true);
+        const response = await axiosInstance.get("/profile/dashboard-summary");
+        setDashboardStats(response.data.stats);
+        setPendingPayments(response.data.pendingPayments);
+        setRecentNotices(response.data.recentNotices);
+      } catch (err) {
+        console.error("Failed to fetch dashboard summary", err);
+      } finally {
+        setDashboardLoading(false);
+      }
+    };
+
+    fetchDashboardSummary();
+  }, []);
 
   useEffect(() => {
     if (createVisitorSuccess) {
       setShowAddModal(false);
       setShowSuccessModal(true);
-      // Reset form
       setNewVisitor({
         visitorName: "",
         visitorPhone: "",
@@ -58,131 +93,167 @@ const ResidentialDashboard: React.FC = () => {
     }));
   };
 
-  const payments = [
-    { id: 1, title: 'Maintenance', amount: 5500, dueDate: 'Dec 10, 2024', status: 'PENDING' },
-    { id: 2, title: 'Club Membership', amount: 2000, dueDate: 'Dec 15, 2024', status: 'PENDING' },
-    { id: 3, title: 'Parking Fee', amount: 500, dueDate: 'Dec 10, 2024', status: 'PAID' },
-  ];
+  const getNoticeIcon = (category: string) => {
+    switch (category) {
+      case 'maintenance': return <Wrench className="w-5 h-5 text-purple-500" />;
+      case 'urgent': return <AlertTriangle className="w-5 h-5 text-destructive" />;
+      case 'event': return <Calendar className="w-5 h-5 text-success" />;
+      default: return <Megaphone className="w-5 h-5 text-primary" />;
+    }
+  };
 
-  const notices = [
-    {
-      id: 1,
-      title: 'Annual General Meeting',
-      tag: 'Meeting',
-      description: 'Scheduled for Jan 15, 2025 at the Clubhouse.',
-      icon: <Megaphone className="w-5 h-5 text-blue-500" />,
-      tagColor: 'bg-blue-50 text-blue-600',
-    },
-    {
-      id: 2,
-      title: 'Water Supply Maintenance',
-      tag: 'Maintenance',
-      description: 'Scheduled for Dec 20, 10 AM - 4 PM.',
-      icon: <Wrench className="w-5 h-5 text-purple-500" />,
-      tagColor: 'bg-purple-50 text-purple-600',
-    },
-  ];
+  const getNoticeTagColor = (category: string) => {
+    switch (category) {
+      case 'maintenance': return 'bg-purple-500/10 text-purple-500';
+      case 'urgent': return 'bg-destructive/10 text-destructive';
+      case 'event': return 'bg-success/10 text-success';
+      default: return 'bg-primary/10 text-primary';
+    }
+  };
 
   return (
-    <div className="space-y-8 font-sans text-slate-800">
-      <div className="flex justify-between items-end">
+    <DashboardLayout role="member">
+    <div className="space-y-8 font-sans text-foreground">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Welcome back, {user?.name || 'Resident'}!</h1>
-          <p className="text-slate-500 text-sm">{user?.unit?.flatNumber ? `Flat ${user.unit.flatNumber}` : 'Greenwood Heights'}</p>
+          <h1 className="text-3xl font-heading font-bold">Welcome, {currentUser?.name || 'Resident'}!</h1>
+          <p className="text-muted-foreground">{currentUser?.unit?.flatNumber ? `Flat ${currentUser.unit.flatNumber}` : 'Green Valley Apartments'}</p>
         </div>
-        <button 
-          onClick={() => setShowAddModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-2 shadow-lg shadow-blue-100 transition-all active:scale-95"
-        >
-          <UserPlus size={18} /> Pre-Approve Visitor
-        </button>
-      </div>
+        <div className="flex gap-3">
+            <Button 
+              onClick={() => setShowAddModal(true)}
+              className="rounded-2xl h-12 px-6 font-bold bg-primary text-primary-foreground border-none hover:bg-primary/90 transition-all"
+            >
+              <UserPlus className="w-5 h-5 mr-2" />
+              Pre-Approve Visitor
+            </Button>
+          </div>
+        </div>
 
-      {/* Top Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 transition-transform hover:scale-[1.01]">
-          <div className="p-4 bg-orange-50 rounded-xl">
-            <Wallet className="text-orange-500" size={28} />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900">₹7,500</h2>
-            <p className="text-slate-500 font-medium text-sm uppercase tracking-wide">Pending Dues</p>
-          </div>
+      {/* Quick Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-card rounded-3xl p-6 border border-border cursor-pointer hover:bg-muted/30 transition-all shadow-none"
+            onClick={() => navigate('/member/payments')}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-warning/10">
+                <CreditCard className="w-6 h-6 text-warning" />
+              </div>
+            </div>
+            {dashboardLoading ? <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /> : (
+              <p className="text-3xl font-bold text-foreground">₹{dashboardStats.pendingDues.toLocaleString()}</p>
+            )}
+            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mt-1">Pending Dues</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-card rounded-3xl p-6 border border-border cursor-pointer hover:bg-muted/30 transition-all shadow-none"
+            onClick={() => navigate('/member/notices')}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-primary/10">
+                <Bell className="w-6 h-6 text-primary" />
+              </div>
+            </div>
+            {dashboardLoading ? <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /> : (
+              <p className="text-3xl font-bold text-foreground">{dashboardStats.newNoticesCount}</p>
+            )}
+            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mt-1">New Notices</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-card rounded-3xl p-6 border border-border cursor-pointer hover:bg-muted/30 transition-all shadow-none"
+            onClick={() => navigate('/member/staff-directory')}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-success/10">
+                <Users className="w-6 h-6 text-success" />
+              </div>
+            </div>
+            <p className="text-3xl font-bold text-foreground">Explore</p>
+            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mt-1">Staff Directory</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-card rounded-3xl p-6 border border-border cursor-pointer hover:bg-muted/30 transition-all shadow-none"
+            onClick={() => navigate('/member/support')}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-destructive/10">
+                <MessageSquare className="w-6 h-6 text-destructive" />
+              </div>
+            </div>
+            <p className="text-3xl font-bold text-foreground">Support</p>
+            <p className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mt-1">Help Desk</p>
+          </motion.div>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 transition-transform hover:scale-[1.01]">
-          <div className="p-4 bg-blue-50 rounded-xl">
-            <Bell className="text-blue-500" size={28} />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900">3</h2>
-            <p className="text-slate-500 font-medium text-sm uppercase tracking-wide">New Notices</p>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-5 transition-transform hover:scale-[1.01]">
-          <div className="p-4 bg-emerald-50 rounded-xl">
-            <ShieldCheck className="text-emerald-500" size={28} />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900">{(visitorData || []).filter((v: any) => v.status === 'Pending').length}</h2>
-            <p className="text-slate-500 font-medium text-sm uppercase tracking-wide">Expected Visitors</p>
-          </div>
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Visitor Management Section */}
         <div className="lg:col-span-2 space-y-8">
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Scheduled Visitors</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Ongoing & Upcoming</p>
+              <h3 className="text-xl font-bold text-foreground">Scheduled Visitors</h3>
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Ongoing & Upcoming</p>
             </div>
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden">
               {visitorLoading && visitorData.length === 0 ? (
                 <div className="py-20 flex flex-col items-center justify-center gap-3">
-                  <Loader2 className="text-blue-600 animate-spin" size={32} />
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Fetching Visitors...</p>
+                  <Loader2 className="text-primary animate-spin" size={32} />
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Fetching Visitors...</p>
                 </div>
               ) : visitorData.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="bg-slate-50/50 border-b border-slate-100">
-                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Visitor Info</th>
-                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Purpose</th>
-                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Entry Code</th>
-                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                      <tr className="bg-muted/30 border-b border-border">
+                        <th className="py-4 px-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Visitor Info</th>
+                        <th className="py-4 px-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Purpose</th>
+                        <th className="py-4 px-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Entry Code</th>
+                        <th className="py-4 px-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50">
+                    <tbody className="divide-y divide-border">
                       {visitorData.map((v: any) => (
-                        <tr key={v._id} className="hover:bg-slate-50/50 transition-colors">
+                        <tr key={v._id} className="hover:bg-muted/30 transition-colors">
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
                                 {v.visitorName.charAt(0)}
                               </div>
                               <div>
-                                <p className="text-sm font-bold text-slate-700">{v.visitorName}</p>
-                                <p className="text-[10px] text-slate-400 font-medium">{v.visitDate} • {v.visitTime}</p>
+                                <p className="text-sm font-bold text-foreground">{v.visitorName}</p>
+                                <p className="text-[10px] text-muted-foreground font-medium">{v.visitDate} • {v.visitTime}</p>
                               </div>
                             </div>
                           </td>
                           <td className="py-4 px-6">
-                            <span className="text-xs font-bold text-slate-500">{v.purpose}</span>
+                            <span className="text-xs font-bold text-muted-foreground">{v.purpose}</span>
                           </td>
                           <td className="py-4 px-6">
                             {v.status === 'Pending' ? (
-                              <span className="bg-blue-600 text-white px-3 py-1 rounded-lg font-black text-xs tracking-widest shadow-sm">
+                              <span className="bg-primary text-primary-foreground px-3 py-1 rounded-lg font-black text-xs tracking-widest">
                                 {v.verificationCode}
                               </span>
                             ) : (
-                              <span className="text-slate-300 text-xs font-bold italic">Used</span>
+                              <span className="text-muted-foreground/30 text-xs font-bold italic">Used</span>
                             )}
                           </td>
                           <td className="py-4 px-6">
                             <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase ${
-                              v.status === 'Pending' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
+                              v.status === 'Pending' ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success'
                             }`}>
                               {v.status}
                             </span>
@@ -193,12 +264,12 @@ const ResidentialDashboard: React.FC = () => {
                   </table>
                 </div>
               ) : (
-                <div className="py-20 flex flex-col items-center justify-center text-slate-300 gap-4">
+                <div className="py-20 flex flex-col items-center justify-center text-muted-foreground/40 gap-4">
                   <UserPlus size={48} className="opacity-20" />
                   <p className="text-sm font-bold uppercase tracking-widest">No visitors scheduled</p>
                   <button 
                     onClick={() => setShowAddModal(true)}
-                    className="text-blue-600 text-xs font-bold hover:underline"
+                    className="text-primary text-xs font-bold hover:underline"
                   >
                     + Add your first visitor
                   </button>
@@ -209,36 +280,48 @@ const ResidentialDashboard: React.FC = () => {
 
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Payment Dues</h3>
-              <button className="text-blue-600 text-sm font-semibold flex items-center gap-1 hover:underline">
+              <h3 className="text-xl font-bold text-foreground">Payment Dues</h3>
+              <button className="text-primary text-sm font-semibold flex items-center gap-1 hover:underline">
                 <Upload size={16} /> Upload Proof
               </button>
             </div>
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-50">
-              {payments.map((item) => (
-                <div key={item.id} className="p-5 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-full ${item.status === 'PAID' ? 'bg-emerald-50' : 'bg-orange-50'}`}>
-                      {item.status === 'PAID' ? 
-                        <CheckCircle size={20} className="text-emerald-500" /> : 
-                        <Clock size={20} className="text-orange-400" />
-                      }
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-800">{item.title}</p>
-                      <p className="text-xs text-slate-400">Due Date: {item.dueDate}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-slate-900 text-lg">₹{item.amount.toLocaleString()}</p>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-                      item.status === 'PAID' ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-orange-600'
-                    }`}>
-                      {item.status}
-                    </span>
-                  </div>
+            <div className="bg-card rounded-3xl border border-border overflow-hidden divide-y divide-border min-h-[100px]">
+              {dashboardLoading ? (
+                <div className="py-10 flex justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
-              ))}
+              ) : pendingPayments.length > 0 ? (
+                pendingPayments.map((item) => (
+                  <div key={item.id} className="p-5 flex items-center justify-between hover:bg-muted/30 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-2 rounded-full ${item.status === 'PAID' ? 'bg-success/10' : 'bg-warning/10'}`}>
+                        {item.status === 'PAID' ? 
+                          <CheckCircle size={20} className="text-success" /> : 
+                          <Clock size={20} className="text-warning" />
+                        }
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground">{item.title}</p>
+                        <p className="text-xs text-muted-foreground">Due Date: {item.dueDate ? new Date(item.dueDate).toLocaleDateString() : 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-foreground text-lg">₹{item.amount.toLocaleString()}</p>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+                        item.status === 'PAID' ? 'bg-success/10 text-success' : 
+                        item.status === 'AWAITING_VERIFICATION' ? 'bg-blue-500/10 text-blue-500' : 
+                        'bg-warning/10 text-warning'
+                      }`}>
+                        {item.status.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-10 text-center text-muted-foreground text-sm font-medium italic">
+                  No pending dues. You're all caught up! ✨
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -246,24 +329,42 @@ const ResidentialDashboard: React.FC = () => {
         {/* Notices Section */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold">Recent Notices</h3>
-            <button className="text-blue-600 text-sm font-semibold hover:underline">View All</button>
+            <h3 className="text-xl font-bold text-foreground">Recent Notices</h3>
+            <button 
+              onClick={() => navigate('/member/notices')}
+              className="text-primary text-sm font-semibold hover:underline"
+            >
+              View All
+            </button>
           </div>
           <div className="space-y-4">
-            {notices.map((notice) => (
-              <div key={notice.id} className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 border-l-4 border-l-blue-500">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="p-2 bg-slate-50 rounded-lg">
-                    {notice.icon}
-                  </div>
-                  <span className={`text-[10px] font-bold px-2 py-1 rounded-md ${notice.tagColor}`}>
-                    {notice.tag}
-                  </span>
-                </div>
-                <h4 className="font-bold text-slate-800 mb-1">{notice.title}</h4>
-                <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">{notice.description}</p>
+            {dashboardLoading ? (
+              <div className="py-10 flex justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
-            ))}
+            ) : recentNotices.length > 0 ? (
+              recentNotices.map((notice) => (
+                <div key={notice._id} className="bg-card p-5 rounded-3xl border border-border border-l-4 border-l-primary hover:bg-muted/20 transition-all cursor-pointer">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="p-2 bg-muted rounded-lg">
+                      {getNoticeIcon(notice.category)}
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase ${getNoticeTagColor(notice.category)}`}>
+                      {notice.category}
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-foreground mb-1">{notice.title}</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{notice.description}</p>
+                  <p className="text-[10px] text-muted-foreground mt-3 font-bold uppercase tracking-widest">
+                    {new Date(notice.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="bg-card p-10 rounded-3xl border border-border text-center text-muted-foreground text-sm">
+                No new notices.
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -271,28 +372,28 @@ const ResidentialDashboard: React.FC = () => {
       {/* Add Visitor Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
-          <div className="relative bg-white rounded-[32px] w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
+          <div className="relative bg-card rounded-[32px] w-full max-w-lg shadow-none overflow-hidden animate-in fade-in zoom-in duration-200 border border-border">
+            <div className="p-8 border-b border-border flex items-center justify-between bg-muted/30">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-100">
+                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center border border-primary/20">
                   <UserPlus size={24} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-800">Pre-Approve Visitor</h3>
-                  <p className="text-sm text-slate-500 font-medium">Generate a secure entry code</p>
+                  <h3 className="text-xl font-bold text-foreground">Pre-Approve Visitor</h3>
+                  <p className="text-sm text-muted-foreground font-medium">Generate a secure entry code</p>
                 </div>
               </div>
-              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-white rounded-xl text-slate-400 transition-colors border border-transparent hover:border-slate-100">
+              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-muted rounded-xl text-muted-foreground transition-colors border border-transparent hover:border-border">
                 <XCircle size={24} />
               </button>
             </div>
 
             <form onSubmit={handleCreateVisitor}>
-              <div className="p-8 space-y-6">
+              <div className="p-8 space-y-6 text-left">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Visitor Name</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Visitor Name</label>
                     <input 
                       type="text" required
                       placeholder="e.g. Shivam"
@@ -302,7 +403,7 @@ const ResidentialDashboard: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Phone Number</label>
                     <input 
                       type="tel" required
                       placeholder="e.g. 9759477504"
@@ -315,7 +416,7 @@ const ResidentialDashboard: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Purpose of Visit</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Purpose of Visit</label>
                     <select 
                       className={inputCls}
                       value={newVisitor.purpose}
@@ -328,7 +429,7 @@ const ResidentialDashboard: React.FC = () => {
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Vehicle Number</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Vehicle Number</label>
                     <input 
                       type="text"
                       placeholder="e.g. UP32AB1234"
@@ -341,7 +442,7 @@ const ResidentialDashboard: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Visit Date</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Visit Date</label>
                     <input 
                       type="date" required
                       className={inputCls} 
@@ -350,7 +451,7 @@ const ResidentialDashboard: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Visit Time</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Visit Time</label>
                     <input 
                       type="text" required
                       placeholder="e.g. 10:30 AM"
@@ -361,20 +462,20 @@ const ResidentialDashboard: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex gap-3">
-                  <Info className="text-blue-600 shrink-0" size={20} />
-                  <p className="text-[11px] font-medium text-blue-700 leading-relaxed">
+                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex gap-3">
+                  <Info className="text-primary shrink-0" size={20} />
+                  <p className="text-[11px] font-medium text-primary leading-relaxed">
                     Once created, you will receive a 4-digit code. Share this with your visitor to allow them entry at the gate.
                   </p>
                 </div>
               </div>
 
-              <div className="p-8 bg-slate-50/80 border-t border-slate-100 flex items-center gap-3">
-                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-3 rounded-2xl text-sm font-bold text-slate-600 hover:bg-white transition-all">Cancel</button>
+              <div className="p-8 bg-muted/50 border-t border-border flex items-center gap-3">
+                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-3 rounded-2xl text-sm font-bold text-muted-foreground hover:bg-card transition-all">Cancel</button>
                 <button 
                   type="submit" 
                   disabled={visitorLoading}
-                  className="flex-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50"
+                  className="flex-2 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-2xl font-bold text-sm transition-all active:scale-95 disabled:opacity-50"
                 >
                   {visitorLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : "Create & Get Code"}
                 </button>
@@ -384,52 +485,37 @@ const ResidentialDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Success Modal (Showing Verification Code) */}
+      {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowSuccessModal(false)} />
-          <div className="relative bg-white rounded-[40px] w-full max-w-sm shadow-2xl animate-in fade-in zoom-in duration-300 overflow-hidden">
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={() => setShowSuccessModal(false)} />
+          <div className="relative bg-card rounded-[40px] w-full max-sm shadow-none animate-in fade-in zoom-in duration-300 overflow-hidden border border-border">
             <div className="p-10 text-center">
-              <div className="w-24 h-24 bg-emerald-50 text-emerald-600 rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-inner">
+              <div className="w-24 h-24 bg-success/10 text-success rounded-[32px] flex items-center justify-center mx-auto mb-8">
                 <ShieldCheck size={48} />
               </div>
-              <h3 className="text-2xl font-bold text-slate-800">Visitor Approved!</h3>
-              <p className="text-sm text-slate-500 mt-2 font-medium">Please share this entry code with your visitor</p>
+              <h3 className="text-2xl font-bold text-foreground">Visitor Approved!</h3>
+              <p className="text-sm text-muted-foreground mt-2 font-medium">Please share this entry code with your visitor</p>
               
-              <div className="mt-10 mb-10 py-8 bg-slate-50 border-2 border-slate-100 rounded-[32px] relative group overflow-hidden">
-                <div className="absolute inset-0 bg-blue-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-[0.02]" />
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Verification Code</p>
-                <p className="text-6xl font-black text-blue-600 tracking-[8px]">{generatedCode || '####'}</p>
+              <div className="mt-10 mb-10 py-8 bg-muted border-2 border-border rounded-[32px] relative group overflow-hidden">
+                <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-500 opacity-[0.02]" />
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">Verification Code</p>
+                <p className="text-6xl font-black text-primary tracking-[8px]">{generatedCode || '####'}</p>
               </div>
 
               <div className="space-y-4">
-                <div className="p-5 bg-blue-50/30 rounded-3xl border border-blue-50 text-left space-y-3">
-                   <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <MapPin size={16} className="text-blue-500" />
-                      </div>
-                      <p className="text-xs font-bold text-slate-700">Flat {user?.unit?.flatNumber}</p>
-                   </div>
-                   <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <Phone size={16} className="text-blue-500" />
-                      </div>
-                      <p className="text-xs font-bold text-slate-700">{newVisitor.visitorPhone || 'Visitor Mobile'}</p>
-                   </div>
-                </div>
-
                 <button 
                   onClick={() => setShowSuccessModal(false)}
-                  className="w-full py-4 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
+                  className="w-full py-4 rounded-2xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all"
                 >
                   Done
                 </button>
                 <button 
                    onClick={() => {
-                     const text = `Hi, I have pre-approved your visit to Greenwood Heights. Your entry code is: ${generatedCode}. Please show this to the guard at the gate.`;
+                     const text = `Hi, I have pre-approved your visit. Your entry code is: ${generatedCode}. Please show this to the guard at the gate.`;
                      window.open(`https://wa.me/${newVisitor.visitorPhone}?text=${encodeURIComponent(text)}`, '_blank');
                    }}
-                   className="w-full py-4 rounded-2xl font-bold text-sm bg-white text-emerald-600 border border-emerald-100 hover:bg-emerald-50 transition-all flex items-center justify-center gap-2"
+                   className="w-full py-4 rounded-2xl font-bold text-sm bg-card text-success border border-success/20 hover:bg-success/5 transition-all flex items-center justify-center gap-2"
                 >
                   Share via WhatsApp
                 </button>
@@ -439,6 +525,7 @@ const ResidentialDashboard: React.FC = () => {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 };
 

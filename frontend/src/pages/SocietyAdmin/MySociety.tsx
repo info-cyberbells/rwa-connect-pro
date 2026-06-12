@@ -25,6 +25,8 @@ const currencies = ["INR", "USD", "EUR"];
 const timezones = ["Asia/Kolkata", "UTC", "America/New_York"];
 
 const MySociety = () => {
+  const { user } = useAppSelector((state) => state.auth);
+  const role = user?.role || localStorage.getItem("role") || "guard";
   const dispatch = useAppDispatch();
   const { society } = useAppSelector((state) => state.admin);
 
@@ -87,8 +89,8 @@ const MySociety = () => {
 
 
   return (
-    <DashboardLayout role="society-admin"> 
-    <div className="max-w-5xl mx-auto bg-white p-6 rounded-2xl border shadow-sm">
+    <DashboardLayout role={role as any}> 
+    <div className="max-w-5xl mx-auto bg-card p-6 rounded-2xl border shadow-sm">
       <h1 className="text-2xl font-bold mb-6">My Society Details</h1>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <InputField label="Society Name" name="name" value={formData.name} onChange={handleChange} />
@@ -122,18 +124,29 @@ const MySociety = () => {
 
 // ─── InputField Component ─────────────────────────────
 const InputField = ({ label, name, value, onChange, type = "text" }: any) => (
-  <div className="flex flex-col">
-    <label className="text-[11px] font-bold text-slate-400 uppercase mb-1">{label}</label>
-    <input type={type} name={name} value={value} onChange={onChange} className="border rounded-xl p-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+  <div className="flex flex-col text-left">
+    <label className="text-[11px] font-bold text-muted-foreground uppercase mb-1">{label}</label>
+    <input 
+      type={type} 
+      name={name} 
+      value={value} 
+      onChange={onChange} 
+      className="border border-border bg-muted/30 rounded-xl p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
+    />
   </div>
 );
 
 // ─── SelectField Component ─────────────────────────────
 const SelectField = ({ label, name, value, onChange, options }: any) => (
-  <div className="flex flex-col">
-    <label className="text-[11px] font-bold text-slate-400 uppercase mb-1">{label}</label>
-    <select name={name} value={value} onChange={onChange} className="border rounded-xl p-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
-      {options.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+  <div className="flex flex-col text-left">
+    <label className="text-[11px] font-bold text-muted-foreground uppercase mb-1">{label}</label>
+    <select 
+      name={name} 
+      value={value} 
+      onChange={onChange} 
+      className="border border-border bg-muted/30 rounded-xl p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+    >
+      {options.map((opt: string) => <option key={opt} value={opt} className="bg-card">{opt}</option>)}
     </select>
   </div>
 );

@@ -83,6 +83,8 @@ const DeactivationRequests: React.FC = () => {
   const dispatch = useAppDispatch();
   const { deactivationRequests: requests, deactivationLoading: loading, error } =
     useAppSelector(state => state.admin);
+  const { user } = useAppSelector(state => state.auth);
+  const role = user?.role || localStorage.getItem("role") || "guard";
 
   const [expandedId, setExpandedId]           = useState<string | null>(null);
   const [searchQuery, setSearchQuery]         = useState('');
@@ -120,7 +122,7 @@ const DeactivationRequests: React.FC = () => {
   };
 
   return (
-    <DashboardLayout role="society-admin">
+    <DashboardLayout role={role as any}>
       <div className="max-w-4xl mx-auto px-4 py-6">
 
         {/* ── Header ── */}
@@ -130,13 +132,13 @@ const DeactivationRequests: React.FC = () => {
               <UserX size={20} className="text-rose-600" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-800 leading-tight">Deactivation Requests</h1>
-              <p className="text-xs text-slate-400 mt-0.5">Review and manage resident deactivation requests</p>
+              <h1 className="text-lg font-bold text-foreground leading-tight">Deactivation Requests</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">Review and manage resident deactivation requests</p>
             </div>
           </div>
           <button
             onClick={() => dispatch(getDeactivationRequests())}
-            className="flex items-center gap-2 text-xs text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 px-3 py-2 rounded-xl transition-all font-medium">
+            className="flex items-center gap-2 text-xs text-muted-foreground border border-border bg-card hover:bg-muted/50 px-3 py-2 rounded-xl transition-all font-medium">
             <RefreshCw size={12} />
             Refresh
           </button>
@@ -149,9 +151,9 @@ const DeactivationRequests: React.FC = () => {
             className={`rounded-2xl border p-4 text-left transition-all
               ${statusFilter === 'all'
                 ? 'bg-slate-800 border-slate-800 ring-2 ring-slate-300 ring-offset-1'
-                : 'bg-slate-50 border-slate-200 hover:bg-white hover:border-slate-300'}`}>
-            <p className={`text-2xl font-black ${statusFilter === 'all' ? 'text-white' : 'text-slate-800'}`}>{counts.all}</p>
-            <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${statusFilter === 'all' ? 'text-slate-300' : 'text-slate-500'}`}>Total</p>
+                : 'bg-muted/50 border-border hover:bg-card hover:border-slate-300'}`}>
+            <p className={`text-2xl font-black ${statusFilter === 'all' ? 'text-white' : 'text-foreground'}`}>{counts.all}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${statusFilter === 'all' ? 'text-slate-300' : 'text-muted-foreground'}`}>Total</p>
           </button>
 
           {(['pending', 'approved', 'rejected'] as const).map(s => {
@@ -162,12 +164,12 @@ const DeactivationRequests: React.FC = () => {
                 className={`rounded-2xl border p-4 text-left transition-all
                   ${active
                     ? `${cfg.stat} ring-2 ring-offset-1 ${s === 'pending' ? 'ring-amber-300' : s === 'approved' ? 'ring-emerald-300' : 'ring-rose-300'}`
-                    : 'bg-white border-slate-200 hover:border-slate-300'}`}>
+                    : 'bg-card border-border hover:border-slate-300'}`}>
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-                  <p className={`text-2xl font-black ${active ? cfg.statText : 'text-slate-800'}`}>{counts[s]}</p>
+                  <p className={`text-2xl font-black ${active ? cfg.statText : 'text-foreground'}`}>{counts[s]}</p>
                 </div>
-                <p className={`text-[10px] font-bold uppercase tracking-widest ${active ? cfg.statText : 'text-slate-400'}`}>{cfg.label}</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest ${active ? cfg.statText : 'text-muted-foreground'}`}>{cfg.label}</p>
               </button>
             );
           })}
@@ -175,15 +177,15 @@ const DeactivationRequests: React.FC = () => {
 
         {/* ── Search ── */}
         <div className="relative mb-5">
-          <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by name, email or flat..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-20 py-2.5 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 text-slate-700 placeholder:text-slate-400 transition-all"
+            className="w-full pl-9 pr-20 py-2.5 text-sm bg-card border border-border rounded-xl outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 text-slate-700 placeholder:text-muted-foreground transition-all"
           />
-          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-lg">
+          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground bg-slate-100 px-2 py-0.5 rounded-lg">
             {filtered.length} results
           </span>
         </div>
@@ -192,7 +194,7 @@ const DeactivationRequests: React.FC = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <div className="w-8 h-8 border-2 border-indigo-100 border-t-indigo-500 rounded-full animate-spin" />
-            <p className="text-sm text-slate-400">Loading requests...</p>
+            <p className="text-sm text-muted-foreground">Loading requests...</p>
           </div>
         ) : error ? (
           <div className="bg-rose-50 border border-rose-100 rounded-2xl p-6 text-center">
@@ -201,11 +203,11 @@ const DeactivationRequests: React.FC = () => {
               className="mt-3 text-xs text-rose-500 underline underline-offset-2">Try again</button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="bg-white border border-slate-100 rounded-2xl p-16 flex flex-col items-center gap-3">
+          <div className="bg-card border border-border rounded-2xl p-16 flex flex-col items-center gap-3">
             <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center">
-              <UserX size={22} className="text-slate-400" />
+              <UserX size={22} className="text-muted-foreground" />
             </div>
-            <p className="text-sm text-slate-400 font-medium">No requests found</p>
+            <p className="text-sm text-muted-foreground font-medium">No requests found</p>
             {searchQuery && <p className="text-xs text-slate-300">Try a different search term</p>}
           </div>
         ) : (
@@ -220,8 +222,8 @@ const DeactivationRequests: React.FC = () => {
 
               return (
                 <div key={req._id}
-                  className={`bg-white border rounded-2xl overflow-hidden transition-all
-                    ${isExpanded ? 'border-indigo-200' : 'border-slate-100 hover:border-slate-200'}`}>
+                  className={`bg-card border rounded-2xl overflow-hidden transition-all
+                    ${isExpanded ? 'border-indigo-200' : 'border-border hover:border-border'}`}>
 
                   {/* Card Header Row */}
                   <button
@@ -234,13 +236,13 @@ const DeactivationRequests: React.FC = () => {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-semibold text-slate-800 truncate">{req.user?.name}</span>
+                        <span className="text-sm font-semibold text-foreground truncate">{req.user?.name}</span>
                         <span className={`flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border ${cfg.badge}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
                           {cfg.label}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                      <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Home size={10} />
                           {req.user?.unit?.towerBlock}-{req.user?.unit?.flatNumber} · {req.user?.unit?.type}
@@ -250,7 +252,7 @@ const DeactivationRequests: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className="text-[11px] text-slate-400 hidden sm:flex items-center gap-1">
+                      <span className="text-[11px] text-muted-foreground hidden sm:flex items-center gap-1">
                         <Clock size={10} />
                         {formatDate(req.createdAt)}
                       </span>
@@ -258,14 +260,14 @@ const DeactivationRequests: React.FC = () => {
                         ${isExpanded ? 'bg-indigo-50' : 'bg-slate-100 hover:bg-slate-200'}`}>
                         {isExpanded
                           ? <ChevronUp size={13} className="text-indigo-500" />
-                          : <ChevronDown size={13} className="text-slate-500" />}
+                          : <ChevronDown size={13} className="text-muted-foreground" />}
                       </div>
                     </div>
                   </button>
 
                   {/* Expanded Panel */}
                   {isExpanded && (
-                    <div className="border-t border-slate-100 px-5 py-4 bg-slate-50/70">
+                    <div className="border-t border-border px-5 py-4 bg-muted/50/70">
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
                         <DetailItem icon={<FileText size={11} />} label="Reason">
                           {REASON_LABELS[req.reason] || req.reason}
@@ -291,7 +293,7 @@ const DeactivationRequests: React.FC = () => {
                       </div>
 
                       {req.status === 'pending' ? (
-                        <div className="flex gap-2 pt-3 border-t border-slate-100">
+                        <div className="flex gap-2 pt-3 border-t border-border">
                           <button
                             onClick={() => handleApprove(req._id)}
                             disabled={isApproving || isRejecting}
@@ -327,7 +329,7 @@ const DeactivationRequests: React.FC = () => {
 
 const DetailItem = ({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) => (
   <div>
-    <div className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+    <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
       <span className="opacity-70">{icon}</span>
       {label}
     </div>

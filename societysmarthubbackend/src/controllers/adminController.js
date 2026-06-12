@@ -1,6 +1,9 @@
 import User from "../models/user.js";
 import Society from "../models/Society.js";
 import DeactivationRequest from "../models/DeactivationRequest.js";
+import Complaint from "../models/Complaint.js";
+import Payment from "../models/Payment.js";
+import ActivityLog from "../models/ActivityLog.js";
 import bcrypt from "bcryptjs";
 import { attachBaseUrl, attachBaseUrlToArray } from "../utils/addBaseUrl.js";
 import { logActivity } from "../utils/logActivity.js";
@@ -16,6 +19,55 @@ const USER_IMG_FIELDS = {
   array: [],
 };
 const SOCIETY_IMG_FIELDS = { single: ["logoUrl"], array: [] };
+
+// Society Admin Dashboard Stats
+export async function getDashboardStats(req, res, next) {
+  try {
+    const adminSociety = req.user.society;
+
+    if (!adminSociety) {
+      return res
+        .status(403)
+        .json({ message: "Admin must be assigned to a society" });
+    }
+
+    // 1. Total Residents
+    const totalResidents = await User.countDocuments({ 
+      society: adminSociety, 
+      role: "user" 
+    });
+
+    // 2. Maintenance Collected (Approved payments only)
+    const paymentStats = await Payment.aggregate([
+      { $match: { society: adminSociety, status: "approved" } },
+      { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
+    ]);
+    const maintenanceCollected = paymentStats.length > 0 ? paymentStats[0].totalAmount : 0;
+
+    // 3. Active Complaints (Open or In Progress)
+    const activeComplaints = await Complaint.countDocuments({
+      society: adminSociety,
+      status: { $in: ["open", "in_progress"] }
+    });
+
+    // 4. Recent Activity (Last 5 logs)
+    const recentActivity = await ActivityLog.find({ society: adminSociety })
+      .populate("user", "name")
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({
+      stats: {
+        totalResidents,
+        maintenanceCollected,
+        activeComplaints,
+      },
+      recentActivity
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 // Society Admin can create users in their society
 export async function createUser(req, res, next) {
@@ -195,15 +247,18 @@ export async function createUser(req, res, next) {
 // Society Admin can list all users in their society
 export async function getSocietyUsers(req, res, next) {
   try {
-    const adminSociety = req.user.society;
+    // If superadmin, allow passing societyId via query
+    const targetSocietyId = (req.user.role === 'superadmin' || req.user.role === 'super-admin') 
+      ? req.query.societyId 
+      : req.user.society;
 
-    if (!adminSociety) {
+    if (!targetSocietyId) {
       return res
-        .status(403)
-        .json({ message: "Admin must be assigned to a society" });
+        .status(400)
+        .json({ message: "Society ID is required" });
     }
 
-    const users = await User.find({ society: adminSociety, role: "user" })
+    const users = await User.find({ society: targetSocietyId, role: "user" })
       .select("-passwordHash")
       .sort({ createdAt: -1 });
 
@@ -214,8 +269,10 @@ export async function getSocietyUsers(req, res, next) {
       USER_IMG_FIELDS.array,
     );
     res.json({
+      success: true,
       count: result.length,
       users: result,
+      data: result // Added for frontend compatibility
     });
   } catch (error) {
     next(error);

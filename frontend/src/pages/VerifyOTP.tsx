@@ -68,11 +68,11 @@ export default function VerifyOTP() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8 bg-slate-50">
+    <div className="min-h-screen flex items-center justify-center p-8 bg-muted/50">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-white rounded-3xl p-8 shadow-xl border border-slate-100 text-center"
+        className="w-full max-w-md bg-card rounded-3xl p-8 shadow-xl border border-border text-center"
       >
         <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <ShieldCheck size={32} />
@@ -81,7 +81,7 @@ export default function VerifyOTP() {
         <h1 className="text-3xl font-heading font-bold mb-2">Verify OTP</h1>
         <p className="text-muted-foreground mb-6">
           We've sent a 6-digit verification code to <br />
-          <span className="font-bold text-slate-800">{email}</span>
+          <span className="font-bold text-foreground">{email}</span>
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -96,7 +96,7 @@ export default function VerifyOTP() {
                 <InputOTPSlot index={5} className="w-12 h-14 text-xl font-bold rounded-xl border-2" />
               </InputOTPGroup>
             </InputOTP>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
               Code expires in 10 minutes
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function VerifyOTP() {
         </form>
 
         <div className="mt-8 text-sm">
-          <p className="text-slate-500">
+          <p className="text-muted-foreground">
             Didn't receive the code?{" "}
             {timer > 0 ? (
               <span className="font-bold text-primary">Resend in {timer}s</span>

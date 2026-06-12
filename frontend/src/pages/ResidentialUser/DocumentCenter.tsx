@@ -57,14 +57,14 @@ const DocumentCenter = () => {
     <DashboardLayout role="member">
       <div className="p-6 space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Document Center</h1>
-          <p className="text-slate-500">Access and download important society documents</p>
+          <h1 className="text-2xl font-bold text-foreground">Document Center</h1>
+          <p className="text-muted-foreground">Access and download important society documents</p>
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-card p-4 rounded-xl shadow-sm border border-border">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
               placeholder="Search documents..." 
               className="pl-10"
@@ -89,28 +89,28 @@ const DocumentCenter = () => {
         {documentsLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-            <p className="text-slate-500 font-medium">Loading documents...</p>
+            <p className="text-muted-foreground font-medium">Loading documents...</p>
           </div>
         ) : filteredDocuments.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDocuments.map((doc) => (
-              <div key={doc._id} className="bg-white rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow p-5 flex flex-col group">
+              <div key={doc._id} className="bg-card rounded-xl shadow-sm border border-border hover:shadow-md transition-shadow p-5 flex flex-col group">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                     <FileIcon className="w-6 h-6" />
                   </div>
-                  <Badge variant="outline" className="bg-slate-50 text-xs font-normal">{doc.category}</Badge>
+                  <Badge variant="outline" className="bg-muted/50 text-xs font-normal">{doc.category}</Badge>
                 </div>
                 
-                <h3 className="font-semibold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                <h3 className="font-semibold text-foreground mb-1 group-hover:text-indigo-600 transition-colors line-clamp-1">
                   {doc.title}
                 </h3>
-                <p className="text-sm text-slate-500 mb-4 line-clamp-2 flex-grow">
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-grow">
                   {doc.description || "No description provided."}
                 </p>
                 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-muted-foreground">
                     {formatFileSize(doc.fileSize)}
                   </span>
                   <div className="flex gap-2">
@@ -130,12 +130,12 @@ const DocumentCenter = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center px-4 bg-white rounded-xl border border-slate-100 border-dashed">
-            <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center justify-center py-20 text-center px-4 bg-card rounded-xl border border-border border-dashed">
+            <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mb-4">
               <FolderOpen className="w-10 h-10 text-slate-300" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-800 mb-1">No documents available</h3>
-            <p className="text-slate-500 max-w-sm">
+            <h3 className="text-lg font-semibold text-foreground mb-1">No documents available</h3>
+            <p className="text-muted-foreground max-w-sm">
               {searchTerm || selectedCategory !== 'All' 
                 ? "No documents match your filters."
                 : "Your society hasn't shared any public documents yet."}

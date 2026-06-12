@@ -4,6 +4,7 @@ import authReducer from "../features/authSlice";
 import adminReducer from "../features/admin/adminSlice";
 import superAdminReducer from "../features/Superadmin/superAdminSlice";
 import userReducer from "../features/User/userSlice"
+import notificationReducer from "../features/notificationSlice"; //Import notification reducer
  
 const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ const store = configureStore({
     admin: adminReducer,
     superAdmin: superAdminReducer,
     user: userReducer,
+    notifications: notificationReducer, //  Register notification reducer
   },
 });
  

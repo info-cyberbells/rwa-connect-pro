@@ -3,6 +3,7 @@ import Plan from "../models/Plan.js";
 import RefreshToken from "../models/RefreshToken.js";
 import User from "../models/user.js";
 import { attachBaseUrl } from "../utils/addBaseUrl.js";
+import { createNotification } from "./notificationController.js";
 
 const SETTINGS_IMG_FIELDS = { single: ["logoUrl"], array: [] };
 
@@ -113,6 +114,18 @@ export async function createPlan(req, res, next) {
       isPopular: isPopular === true || isPopular === "true",
     });
 
+    // Notify all admins about new platform offering
+    await createNotification({
+      sender: req.user.id,
+      title: "New Subscription Plan Available",
+      message: `A new plan "${name}" has been added. Upgrade now for better society management!`,
+      category: "general",
+      targetAudience: "admins",
+      type: "info",
+      link: "/admin/subscription",
+      isRead: false
+    }).catch(err => console.error("Plan Create Notify Error:", err));
+
     res.status(201).json({ message: "Plan created successfully", plan });
   } catch (error) {
     next(error);
@@ -137,6 +150,19 @@ export async function updatePlan(req, res, next) {
     if (isActive !== undefined) plan.isActive = isActive === true || isActive === "true";
 
     await plan.save();
+
+    // Notify about plan upgrades
+    await createNotification({
+      sender: req.user.id,
+      title: "Plan Features Updated",
+      message: `The subscription plan "${plan.name}" has been upgraded with new features. Check it out now!`,
+      category: "general",
+      targetAudience: "admins",
+      type: "success",
+      link: "/admin/subscription",
+      isRead: false
+    }).catch(err => console.error("Plan Update Notify Error:", err));
+
     res.json({ message: "Plan updated successfully", plan });
   } catch (error) {
     next(error);

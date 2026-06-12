@@ -8,6 +8,7 @@ import {
   getAllSocieties,
   getSocietyDetails,
   toggleUserStatus,
+  getDashboardStats,
 } from "../controllers/superAdminController.js";
 import {
   getPlatformConfig,
@@ -27,6 +28,9 @@ const router = Router();
 // All routes require authentication and superadmin role
 router.use(auth);
 router.use(permit("superadmin"));
+
+// GET /api/superadmin/dashboard-stats
+router.get("/dashboard-stats", getDashboardStats);
 
 // ─── Societies ────────────────────────────────────────────────────────────────
 router.post("/societies", uploadSocietyLogo, createSociety);

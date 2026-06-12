@@ -17,31 +17,31 @@ import Sidebar from '../components/Sidebar';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 const DocCard = ({ title, size, date, icon: Icon, color }) => (
-  <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group">
+  <div className="bg-card p-5 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow group">
     <div className="flex justify-between items-start mb-4">
       <div className={`p-3 rounded-xl ${color}`}>
         <Icon size={20} />
       </div>
-      <button className="text-slate-400 hover:text-slate-600">
+      <button className="text-muted-foreground hover:text-slate-600">
         <MoreVertical size={18} />
       </button>
     </div>
     
-    <h3 className="font-bold text-slate-800 text-sm mb-1 truncate group-hover:text-blue-600 transition-colors">
+    <h3 className="font-bold text-foreground text-sm mb-1 truncate group-hover:text-blue-600 transition-colors">
       {title}
     </h3>
-    <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">
+    <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
       {size} • {date}
     </p>
 
     <div className="flex items-center gap-2 mt-5">
-      <button className="flex-1 py-2 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-lg text-xs font-bold transition-colors">
+      <button className="flex-1 py-2 bg-muted/50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-lg text-xs font-bold transition-colors">
         View
       </button>
-      <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
+      <button className="p-2 text-muted-foreground hover:text-blue-600 transition-colors">
         <Download size={16} />
       </button>
-      <button className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
+      <button className="p-2 text-muted-foreground hover:text-blue-600 transition-colors">
         <Share2 size={16} />
       </button>
     </div>
@@ -52,7 +52,7 @@ const SectionHeader = ({ title, count, badgeColor }) => (
   <div className="flex justify-between items-center mb-6 mt-10 first:mt-0">
     <div className="flex items-center gap-3">
       <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
-      <h2 className="text-lg font-bold text-slate-800">{title}</h2>
+      <h2 className="text-lg font-bold text-foreground">{title}</h2>
       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${badgeColor}`}>
         {count} Files
       </span>
@@ -70,14 +70,14 @@ const DocumentCenter = () => {
           {/* Top Header */}
           <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pt-10 md:pt-0">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Document <span className='text-blue-600'>Center</span></h1>
-              <p className="text-slate-500 text-sm mt-1">Manage global society bylaws, deeds, and statutory reports.</p>
+              <h1 className="text-3xl font-bold text-foreground">Document <span className='text-blue-600'>Center</span></h1>
+              <p className="text-muted-foreground text-sm mt-1">Manage global society bylaws, deeds, and statutory reports.</p>
             </div>
             <div className="flex items-center gap-3">
               <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-blue-200 transition-all active:scale-95">
                 <Plus size={18} /> Global Upload
               </button>
-              <button className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-blue-600 transition-all">
+              <button className="p-2.5 bg-card border border-border rounded-xl text-muted-foreground hover:text-blue-600 transition-all">
                 <Bell size={20} />
               </button>
             </div>
@@ -86,22 +86,22 @@ const DocumentCenter = () => {
           {/* Search and Filters Bar */}
           <div className="flex flex-col sm:flex-row gap-4 mb-10">
             <div className="relative flex-1 group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-blue-500 transition-colors" size={18} />
               <input 
                 type="text" 
                 placeholder="Search documents, societies, or categories..." 
-                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-card border border-border rounded-2xl text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all"
               />
             </div>
             <div className="flex items-center gap-2">
-              <button className="flex items-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-slate-50">
+              <button className="flex items-center gap-2 px-4 py-3 bg-card border border-border rounded-2xl text-sm font-semibold text-slate-600 hover:bg-muted/50">
                 <Filter size={18} /> Filters
               </button>
-              <div className="flex bg-white border border-slate-200 rounded-2xl p-1">
+              <div className="flex bg-card border border-border rounded-2xl p-1">
                 <button className="p-2 bg-blue-50 text-blue-600 rounded-xl">
                   <LayoutGrid size={18} />
                 </button>
-                <button className="p-2 text-slate-400 hover:text-slate-600">
+                <button className="p-2 text-muted-foreground hover:text-slate-600">
                   <List size={18} />
                 </button>
               </div>

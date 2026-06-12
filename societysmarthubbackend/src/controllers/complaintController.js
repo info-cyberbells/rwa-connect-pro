@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Complaint from "../models/Complaint.js";
 import { attachBaseUrl, attachBaseUrlToArray } from "../utils/addBaseUrl.js";
 import { logActivity } from "../utils/logActivity.js";
+import { createNotification } from "./notificationController.js"; // [NEW] Import notification utility
 
 const COMPLAINT_IMG_FIELDS = { single: [], array: ["imageUrls"] };
 
@@ -171,6 +172,19 @@ export async function updateComplaintStatus(req, res, next) {
     if (adminRemarks !== undefined) complaint.adminRemarks = adminRemarks;
 
     await complaint.save();
+
+    // [NEW] Trigger notification for the user who submitted the complaint
+    if (status) {
+      await createNotification({
+        recipient: complaint.submittedBy,
+        society,
+        title: "Complaint Update",
+        message: `Your complaint "${complaint.title}" status has been updated to "${status}".`,
+        category: "complaint",
+        type: status === "resolved" ? "success" : "info",
+        link: "/member/complaints",
+      }).catch(err => console.error("Notification Error:", err));
+    }
 
     const updated = await Complaint.findById(complaint._id)
       .populate("submittedBy", "name email unit.flatNumber unit.towerBlock");

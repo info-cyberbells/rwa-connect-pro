@@ -28,6 +28,8 @@ interface Ticket {
 const ComplaintsDetail: React.FC = () => {
   const dispatch = useAppDispatch();
   const { complaints } = useAppSelector((state) => state.admin);
+  const { user } = useAppSelector((state) => state.auth);
+  const role = user?.role || localStorage.getItem("role") || "guard";
 
   const tickets = ((complaints as any)?.complaints || complaints || []).map((c: any) => ({
     _id: c._id,
@@ -92,45 +94,45 @@ const ComplaintsDetail: React.FC = () => {
   const activeTicket = tickets.find((t) => t._id === selectedTicketId) || tickets[0] || null;
 
   const statusConfig: Record<string, { label: string; cls: string }> = {
-    open:        { label: "Open",        cls: "bg-rose-50 text-rose-600 border-rose-100" },
-    in_progress: { label: "In Progress", cls: "bg-amber-50 text-amber-600 border-amber-100" },
-    resolved:    { label: "Resolved",    cls: "bg-emerald-50 text-emerald-600 border-emerald-100" },
-    closed:      { label: "Closed",      cls: "bg-slate-100 text-slate-500 border-slate-200" },
+    open:        { label: "Open",        cls: "bg-destructive/10 text-destructive border-destructive/20" },
+    in_progress: { label: "In Progress", cls: "bg-warning/10 text-warning border-warning/20" },
+    resolved:    { label: "Resolved",    cls: "bg-success/10 text-success border-success/20" },
+    closed:      { label: "Closed",      cls: "bg-muted text-muted-foreground border-border" },
   };
-  const getStatus = (s: string) => statusConfig[s] || { label: s, cls: "bg-slate-100 text-slate-500 border-slate-200" };
+  const getStatus = (s: string) => statusConfig[s] || { label: s, cls: "bg-muted text-muted-foreground border-border" };
 
   return (
-    <DashboardLayout role="society-admin">
+    <DashboardLayout role={role as any}>
       <div className="-m-8 h-[calc(100vh-64px)] flex flex-col">
 
         {/* ── Top Bar ── */}
-        <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 bg-card border-b border-border flex-shrink-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
-            <h1 className="text-lg font-black text-slate-800 tracking-tight">Complaints</h1>
+            <div className="w-1.5 h-6 bg-primary rounded-full" />
+            <h1 className="text-lg font-black text-foreground tracking-tight">Complaints</h1>
 
             {/* Total */}
-            <span className="ml-1 bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-0.5 rounded-lg border border-blue-100">
+            <span className="ml-1 bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-lg border border-primary/20">
               {tickets.length} total
             </span>
 
             {/* Open / Active */}
-            <span className="bg-rose-50 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded-lg border border-rose-100">
+            <span className="bg-destructive/10 text-destructive text-[10px] font-black px-2 py-0.5 rounded-lg border border-destructive/20">
               {activeCount} open
             </span>
 
             {/* In Progress */}
-            <span className="bg-amber-50 text-amber-600 text-[10px] font-black px-2 py-0.5 rounded-lg border border-amber-100">
+            <span className="bg-warning/10 text-warning text-[10px] font-black px-2 py-0.5 rounded-lg border border-warning/20">
               {inProgressCount} in progress
             </span>
 
             {/* Resolved */}
-            <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2 py-0.5 rounded-lg border border-emerald-100">
+            <span className="bg-success/10 text-success text-[10px] font-black px-2 py-0.5 rounded-lg border border-success/20">
               {resolvedCount} resolved
             </span>
           </div>
 
-          <button className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl transition-colors">
+          <button className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground bg-muted border border-border px-3 py-1.5 rounded-xl transition-colors">
             <Filter size={13} /> Filter
           </button>
         </div>
@@ -139,26 +141,26 @@ const ComplaintsDetail: React.FC = () => {
         <div className="flex flex-1 overflow-hidden">
 
           {/* ── Sidebar ── */}
-          <aside className={`${selectedTicketId ? "hidden md:flex" : "flex"} w-full md:w-[300px] flex-col border-r border-slate-100 bg-white flex-shrink-0`}>
+          <aside className={`${selectedTicketId ? "hidden md:flex" : "flex"} w-full md:w-[300px] flex-col border-r border-border bg-card flex-shrink-0`}>
 
-            <div className="px-4 py-3 border-b border-slate-100">
+            <div className="px-4 py-3 border-b border-border">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
                 <input
                   type="text"
                   placeholder="Search tickets..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none focus:border-blue-300 transition-colors"
+                  className="w-full pl-9 pr-4 py-2 bg-muted/50 border border-border rounded-xl text-sm outline-none focus:border-primary transition-colors text-foreground"
                 />
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
+            <div className="flex-1 overflow-y-auto divide-y divide-border">
               {filteredTickets.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-40 gap-2">
-                  <Inbox size={24} className="text-slate-300" />
-                  <p className="text-xs text-slate-400 font-semibold">No tickets found</p>
+                  <Inbox size={24} className="text-muted-foreground/30" />
+                  <p className="text-xs text-muted-foreground font-semibold">No tickets found</p>
                 </div>
               ) : filteredTickets.map((ticket) => {
                 const isActive = selectedTicketId === ticket._id;
@@ -166,39 +168,39 @@ const ComplaintsDetail: React.FC = () => {
                   <div
                     key={ticket._id}
                     onClick={() => setSelectedTicketId(ticket._id)}
-                    className={`relative px-4 py-4 cursor-pointer transition-all ${isActive ? "bg-blue-50" : "hover:bg-slate-50/80"}`}
+                    className={`relative px-4 py-4 cursor-pointer transition-all ${isActive ? "bg-primary/10" : "hover:bg-muted/50"}`}
                   >
-                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-600 rounded-r-full" />}
+                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary rounded-r-full" />}
 
                     <div className="flex justify-between items-start mb-2">
-                      <span className="text-[10px] font-black text-slate-300 tracking-wider">#{ticket._id.slice(-6)}</span>
+                      <span className="text-[10px] font-black text-muted-foreground/40 tracking-wider">#{ticket._id.slice(-6)}</span>
                       <PriorityBadge priority={ticket.priority} />
                     </div>
 
-                    <h4 className={`text-sm font-bold truncate mb-2 ${isActive ? "text-blue-700" : "text-slate-800"}`}>
+                    <h4 className={`text-sm font-bold truncate mb-2 ${isActive ? "text-primary" : "text-foreground"}`}>
                       {ticket.title}
                     </h4>
 
                     <div className="flex items-center gap-1.5 mb-3">
-                      <div className="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center text-[8px] font-black text-slate-500">
+                      <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[8px] font-black text-muted-foreground">
                         {ticket.resident?.charAt(0)}
                       </div>
-                      <span className="text-[11px] text-slate-500 font-semibold truncate">{ticket.resident}</span>
+                      <span className="text-[11px] text-muted-foreground font-semibold truncate">{ticket.resident}</span>
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-[9px] font-black bg-slate-100 text-slate-500 px-2 py-1 rounded-lg uppercase tracking-wide">
+                      <span className="text-[9px] font-black bg-muted text-muted-foreground px-2 py-1 rounded-lg uppercase tracking-wide border border-border">
                         {ticket.category}
                       </span>
-                      <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                         <Clock size={9} /> {ticket.timeAgo}
                       </span>
                     </div>
 
                     {ticket.adminRemarks && (
                       <div className="mt-2 flex items-center gap-1">
-                        <CheckCircle size={10} className="text-emerald-500" />
-                        <span className="text-[10px] text-emerald-600 font-bold">Replied</span>
+                        <CheckCircle size={10} className="text-success" />
+                        <span className="text-[10px] text-success font-bold">Replied</span>
                       </div>
                     )}
                   </div>
@@ -208,48 +210,48 @@ const ComplaintsDetail: React.FC = () => {
           </aside>
 
           {/* ── Right Panel ── */}
-          <main className={`flex-1 flex flex-col bg-slate-50/30 ${!selectedTicketId ? "hidden md:flex" : "flex"}`}>
+          <main className={`flex-1 flex flex-col bg-muted/30 ${!selectedTicketId ? "hidden md:flex" : "flex"}`}>
 
             {activeTicket ? (
               <>
                 {/* Ticket Header */}
-                <div className="px-6 py-4 bg-white border-b border-slate-100 flex-shrink-0">
+                <div className="px-6 py-4 bg-card border-b border-border flex-shrink-0">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
-                      <button onClick={() => setSelectedTicketId(null)} className="md:hidden mt-0.5 p-1.5 hover:bg-slate-100 rounded-lg">
+                      <button onClick={() => setSelectedTicketId(null)} className="md:hidden mt-0.5 p-1.5 hover:bg-muted rounded-lg">
                         <ChevronLeft size={18} />
                       </button>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                          <h2 className="text-base font-black text-slate-800">{activeTicket.title}</h2>
+                          <h2 className="text-base font-black text-foreground">{activeTicket.title}</h2>
                           <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg border uppercase ${getStatus(activeTicket.status).cls}`}>
                             {getStatus(activeTicket.status).label}
                           </span>
                           <PriorityBadge priority={activeTicket.priority} />
                         </div>
-                        <div className="flex items-center gap-3 text-[11px] text-slate-400 font-semibold flex-wrap">
+                        <div className="flex items-center gap-3 text-[11px] text-muted-foreground font-semibold flex-wrap">
                           <span className="flex items-center gap-1"><User size={11} /> {activeTicket.resident}</span>
-                          <span className="text-slate-200">•</span>
-                          <span className="flex items-center gap-1"><MapPin size={11} className="text-blue-400" /> {activeTicket.location}</span>
-                          <span className="text-slate-200">•</span>
+                          <span className="text-border">•</span>
+                          <span className="flex items-center gap-1"><MapPin size={11} className="text-primary" /> {activeTicket.location}</span>
+                          <span className="text-border">•</span>
                           <span className="flex items-center gap-1"><Building2 size={11} /> {activeTicket.category}</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <button className="p-2 text-slate-400 hover:bg-slate-50 rounded-xl border border-slate-100 transition-colors">
+                      <button className="p-2 text-muted-foreground hover:bg-muted rounded-xl border border-border transition-colors">
                         <MoreVertical size={16} />
                       </button>
                       <button
                         onClick={handleResolve}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black shadow-sm shadow-emerald-100 transition-all flex items-center gap-1.5"
+                        className="bg-success hover:bg-success/90 text-success-foreground px-4 py-2 rounded-xl text-xs font-black shadow-sm transition-all flex items-center gap-1.5"
                       >
                         <CheckCircle size={13} /> Resolve
                       </button>
                       <button
                         onClick={handleInProgress}
-                        className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-black"
+                        className="bg-warning hover:bg-warning/90 text-warning-foreground px-4 py-2 rounded-xl text-xs font-black shadow-sm"
                       >
                         In Progress
                       </button>
@@ -258,28 +260,28 @@ const ComplaintsDetail: React.FC = () => {
                 </div>
 
                 {/* Complaint Details */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                <div className="flex-1 overflow-y-auto p-6 space-y-6 text-left">
 
                   {/* Complaint Description */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5">
-                    <h3 className="text-sm font-bold text-slate-700 mb-2">
+                  <div className="bg-card border border-border rounded-xl p-5">
+                    <h3 className="text-sm font-bold text-foreground mb-2">
                       Complaint Description
                     </h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {activeTicket.description}
                     </p>
-                    <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
+                    <p className="text-xs text-muted-foreground/60 mt-2 flex items-center gap-1">
                       <Clock size={12} /> {activeTicket.timeAgo}
                     </p>
                   </div>
 
                   {/* Admin Response */}
                   {activeTicket.adminRemarks && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
-                      <h3 className="text-sm font-bold text-blue-700 mb-2">
+                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-5">
+                      <h3 className="text-sm font-bold text-primary mb-2">
                         Admin Response
                       </h3>
-                      <p className="text-sm text-blue-800 leading-relaxed">
+                      <p className="text-sm text-foreground leading-relaxed">
                         {activeTicket.adminRemarks}
                       </p>
                     </div>
@@ -287,28 +289,28 @@ const ComplaintsDetail: React.FC = () => {
 
                   {/* Assigned To */}
                   {activeTicket.assignedTo && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-                      <h3 className="text-sm font-bold text-amber-700 mb-2">
-                        Assigned Plumber
+                    <div className="bg-warning/5 border border-warning/20 rounded-xl p-5">
+                      <h3 className="text-sm font-bold text-warning mb-2">
+                        Assigned Help
                       </h3>
-                      <p className="text-sm text-amber-800">Name: {activeTicket.assignedTo.name}</p>
-                      <p className="text-sm text-amber-800">Contact: {activeTicket.assignedTo.contact}</p>
+                      <p className="text-sm text-foreground">Name: {activeTicket.assignedTo.name}</p>
+                      <p className="text-sm text-foreground">Contact: {activeTicket.assignedTo.contact}</p>
                     </div>
                   )}
                 </div>
 
                 {/* Reply Input */}
-                <div className="px-6 py-2 bg-white border-t border-slate-100">
+                <div className="px-6 py-2 bg-card border-t border-border">
                   <textarea
                     placeholder="Write admin response..."
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="w-full border border-slate-200 rounded-lg p-3 text-sm outline-none focus:border-blue-400"
+                    className="w-full bg-muted/50 border border-border rounded-lg p-3 text-sm outline-none focus:border-primary text-foreground"
                   />
                   <div className="flex justify-end mt-3">
                     <button
                       onClick={handleSendResponse}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+                      className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
                       disabled={!replyText.trim()}
                     >
                       Send Response
@@ -318,12 +320,12 @@ const ComplaintsDetail: React.FC = () => {
               </>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center p-8">
-                <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center">
-                  <Inbox size={28} className="text-slate-300" />
+                <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center">
+                  <Inbox size={28} className="text-muted-foreground/30" />
                 </div>
                 <div>
-                  <p className="text-slate-500 font-bold text-sm">No ticket selected</p>
-                  <p className="text-slate-400 text-xs mt-1">Select a ticket from the list to view details</p>
+                  <p className="text-muted-foreground font-bold text-sm">No ticket selected</p>
+                  <p className="text-muted-foreground text-xs mt-1">Select a ticket from the list to view details</p>
                 </div>
               </div>
             )}
@@ -336,9 +338,9 @@ const ComplaintsDetail: React.FC = () => {
 
 const PriorityBadge = ({ priority }: { priority: string }) => {
   const styles: Record<string, string> = {
-    HIGH:   "bg-rose-50 text-rose-600 border-rose-100",
-    MEDIUM: "bg-amber-50 text-amber-600 border-amber-100",
-    LOW:    "bg-slate-100 text-slate-500 border-slate-200",
+    HIGH:   "bg-destructive/10 text-destructive border-destructive/20",
+    MEDIUM: "bg-warning/10 text-warning border-warning/20",
+    LOW:    "bg-muted text-muted-foreground border-border",
   };
   return (
     <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg border uppercase tracking-wide ${styles[priority] || styles.LOW}`}>

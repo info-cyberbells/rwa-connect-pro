@@ -100,6 +100,43 @@ export const toggleUserStatusBySuperAdminService = async (id: string): Promise<a
   return response.data;
 }
 
+// SUPER ADMIN SETTINGS SERVICES
+
+export const getPlatformConfigService = async (): Promise<any> => {
+  const response = await axiosInstance.get(AUTHROUTES.SUPERADMIN_GET_PLATFORM_CONFIG);
+  return response.data;
+};
+
+export const updatePlatformConfigService = async (payload: any): Promise<any> => {
+  const response = await axiosInstance.patch(AUTHROUTES.SUPERADMIN_UPDATE_PLATFORM_CONFIG, payload);
+  return response.data;
+};
+
+export const updateNotificationRulesService = async (payload: any): Promise<any> => {
+  const response = await axiosInstance.patch(AUTHROUTES.SUPERADMIN_UPDATE_NOTIFICATION_RULES, payload);
+  return response.data;
+};
+
+export const getPlansService = async (): Promise<any> => {
+  const response = await axiosInstance.get(AUTHROUTES.SUPERADMIN_GET_PLANS);
+  return response.data;
+};
+
+export const createPlanService = async (payload: any): Promise<any> => {
+  const response = await axiosInstance.post(AUTHROUTES.SUPERADMIN_CREATE_PLAN, payload);
+  return response.data;
+};
+
+export const updatePlanService = async (id: string, payload: any): Promise<any> => {
+  const response = await axiosInstance.patch(`${AUTHROUTES.SUPERADMIN_UPDATE_PLAN}/${id}`, payload);
+  return response.data;
+};
+
+export const deletePlanService = async (id: string): Promise<any> => {
+  const response = await axiosInstance.delete(`${AUTHROUTES.SUPERADMIN_DELETE_PLAN}/${id}`);
+  return response.data;
+};
+
  
 // SOCIETY USER SERVICES
  
@@ -107,6 +144,14 @@ export const toggleUserStatusBySuperAdminService = async (id: string): Promise<a
 export const getMyProfileService = async (): Promise<any> => {
   const response = await axiosInstance.get(
     AUTHROUTES.USER_GET_MY_PROFILE
+  );
+  return response.data;
+}
+
+// SOCIETY USER GET DASHBOARD SUMMARY
+export const getDashboardSummaryService = async (): Promise<any> => {
+  const response = await axiosInstance.get(
+    `${AUTHROUTES.USER_GET_MY_PROFILE}/dashboard-summary`
   );
   return response.data;
 }
@@ -314,8 +359,8 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
     };
 
     // GET NOTICES
-    export const getNoticesAdminService = async (): Promise<any> => {
-    const response = await axiosInstance.get(AUTHROUTES.ADMIN_GET_NOTICES);
+    export const getNoticesAdminService = async (params = {}): Promise<any> => {
+    const response = await axiosInstance.get(AUTHROUTES.ADMIN_GET_NOTICES, { params });
     return response.data;
     };
 
@@ -414,7 +459,7 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
     };
 
     // DAILY STAFF SERVICES
-
+// createStaffService
     export const createStaffService = async (payload: any): Promise<any> => {
     const isFormData = payload instanceof FormData;
     const response = await axiosInstance.post(AUTHROUTES.STAFF_CREATE, payload, {
@@ -422,24 +467,24 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
     });
     return response.data;
     };
-
+// markStaffEntryService
     export const markStaffEntryService = async (payload: any): Promise<any> => {
     const response = await axiosInstance.post(AUTHROUTES.STAFF_ENTRY, payload);
     return response.data;
     };
-
+// markStaffExitService
     export const markStaffExitService = async (payload: any): Promise<any> => {
     const response = await axiosInstance.post(AUTHROUTES.STAFF_EXIT, payload);
     return response.data;
     };
-
+// getStaffLogsService
     export const getStaffLogsService = async (type?: string): Promise<any> => {
     const response = await axiosInstance.get(AUTHROUTES.STAFF_GET_LOGS, {
       params: { type }
     });
     return response.data;
     };
-
+// oneTimeStaffEntryService
     export const oneTimeStaffEntryService = async (payload: any): Promise<any> => {
     const isFormData = payload instanceof FormData;
     const response = await axiosInstance.post(AUTHROUTES.STAFF_ONE_TIME_ENTRY, payload, {
@@ -447,32 +492,32 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
     });
     return response.data;
     };
-
+// blockStaffService
     export const blockStaffService = async (payload: any): Promise<any> => {
     const response = await axiosInstance.post(AUTHROUTES.STAFF_BLOCK, payload);
     return response.data;
     };
-
+// unblockStaffService
     export const unblockStaffService = async (payload: any): Promise<any> => {
     const response = await axiosInstance.post(AUTHROUTES.STAFF_UNBLOCK, payload);
     return response.data;
     };
-
+// getBlockedStaffService
     export const getBlockedStaffService = async (): Promise<any> => {
     const response = await axiosInstance.get(AUTHROUTES.STAFF_BLOCKED_LIST);
     return response.data;
     };
-
+// getStaffDirectoryService
     export const getStaffDirectoryService = async (): Promise<any> => {
       const response = await axiosInstance.get(AUTHROUTES.STAFF_DIRECTORY);
       return response.data;
     };
-
+// searchStaffService
     export const searchStaffService = async (params: any): Promise<any> => {
     const response = await axiosInstance.get(AUTHROUTES.STAFF_SEARCH, { params });
     return response.data;
     };
-
+// getStaffAttendanceHistoryService
     export const getStaffAttendanceHistoryService = async (staffId: string): Promise<any> => {
     const response = await axiosInstance.get(`${AUTHROUTES.STAFF_ATTENDANCE_HISTORY}/${staffId}`);
     return response.data;
@@ -492,7 +537,7 @@ export const submitComplaintService = async(payload: any): Promise<any>=>{
       const response = await axiosInstance.post("/ratings/add", payload);
       return response.data;
     };
-
+// getStaffReviewsService
     export const getStaffReviewsService = async (staffId: string): Promise<any> => {
       const response = await axiosInstance.get(`/ratings/staff/${staffId}`);
       return response.data;

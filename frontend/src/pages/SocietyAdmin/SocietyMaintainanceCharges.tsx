@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import DeleteConfirmationModal from './Delete';
+import { useAppSelector } from '../../store/store';
 
 const INITIAL_DATA = [
   { id: 1, billingDate: 'Oct 01, 2023', billingTime: '08:00 AM', unit: 'B402', wing: 'WING B', recipient: 'John Doe', chargeTitle: 'Monthly Maintenance', amount: 245.00, dueDate: 'Oct 15, 2023', status: 'Paid' },
@@ -67,6 +68,8 @@ const UnitBadge = ({ unit, wing, recipient }) => {
 
 const SocietyMaintainanceCharges = () => {
 
+    const { user } = useAppSelector((state) => state.auth);
+    const role = user?.role || localStorage.getItem("role") || "guard";
     const [searchTerm, setSearchTerm] = useState('');
     const [data, setData] = useState(INITIAL_DATA);
     const [currentPage, setCurrentPage] = useState(1);
@@ -106,7 +109,7 @@ const SocietyMaintainanceCharges = () => {
 
   return (
 
-    <DashboardLayout role="society-admin">
+    <DashboardLayout role={role as any}>
      <div className="min-h-screen text-[#0F172A]">
       <div className="max-w-7xl mx-auto">
         
@@ -116,21 +119,21 @@ const SocietyMaintainanceCharges = () => {
             <h1 className="text-2xl md:text-3xl font-bold  text-[#0F172A] tracking-wide mb-2">Society Maintenance Charges</h1>
             <p className="text-base text-[#64748B] font-medium">Manage and track all housing society maintenance and utility billing records.</p>
           </div>
-          <button className="flex items-center justify-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-semibold text-[#0F172A] hover:bg-slate-50 transition-colors shadow-sm self-start md:self-center">
+          <button className="flex items-center justify-center gap-2 bg-card border border-border px-4 py-2 rounded-lg text-sm font-semibold text-[#0F172A] hover:bg-muted/50 transition-colors shadow-sm self-start md:self-center">
             <Download size={18} />
             Export CSV
           </button>
         </div>
 
         {/* Filters Card */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-6">
+        <div className="bg-card rounded-2xl p-4 shadow-sm border border-border mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
               <input 
                 type="text" 
                 placeholder="Search by unit or name..." 
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -138,8 +141,8 @@ const SocietyMaintainanceCharges = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 flex-1 lg:flex-[0.6]">
               <div className="relative flex-1">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <select className="w-full pl-10 pr-2 py-2.5 bg-slate-50 border border-slate-200 rounded-xl appearance-none focus:outline-none text-sm cursor-pointer">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <select className="w-full pl-10 pr-2 py-2.5 bg-muted/50 border border-border rounded-xl appearance-none focus:outline-none text-sm cursor-pointer">
                   <option>Last 30 Days</option>
                   <option>Last 6 Months</option>
                   <option>Year to Date</option>
@@ -147,8 +150,8 @@ const SocietyMaintainanceCharges = () => {
               </div>
 
               <div className="relative flex-1">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <select className="w-full pl-10 pr-1.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl appearance-none focus:outline-none text-sm cursor-pointer">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <select className="w-full pl-10 pr-1.5 py-2.5 bg-muted/50 border border-border rounded-xl appearance-none focus:outline-none text-sm cursor-pointer">
                   <option>All Categories</option>
                   <option>Maintenance</option>
                   <option>Utilities</option>
@@ -164,11 +167,11 @@ const SocietyMaintainanceCharges = () => {
         </div>
 
         {/* Table Container */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-100 bg-[#F8FAFC]/50 uppercase text-[11px] font-bold tracking-widest text-[#94A3B8]">
+                <tr className="border-b border-border bg-[#F8FAFC]/50 uppercase text-[11px] font-bold tracking-widest text-[#94A3B8]">
                   <th className="px-6 py-5">Billing Date</th>
                   <th className="px-6 py-5">Recipient Unit</th>
                   <th className="px-6 py-5">Charge Title</th>
@@ -180,7 +183,7 @@ const SocietyMaintainanceCharges = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {paginatedData.length > 0 ? paginatedData.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <tr key={item.id} className="hover:bg-muted/50/50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-[#334155] whitespace-nowrap">{item.billingDate}</span>
@@ -222,7 +225,7 @@ const SocietyMaintainanceCharges = () => {
                     <td colSpan={7} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <AlertCircle className="text-slate-300" size={48} />
-                        <p className="text-slate-500 font-medium">No records found</p>
+                        <p className="text-muted-foreground font-medium">No records found</p>
                       </div>
                     </td>
                   </tr>
@@ -232,9 +235,9 @@ const SocietyMaintainanceCharges = () => {
           </div>
 
           {/* Pagination Footer */}
-          <div className="px-6 py-5 bg-white border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="px-6 py-5 bg-card border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-[#64748B] tracking-normal">
-              Showing <span className="font-semibold text-slate-900">
+              Showing <span className="font-semibold text-foreground">
                 {filteredData.length > 0 ? (currentPage - 1) * ROWS_PER_PAGE + 1 : 0} to {Math.min(currentPage * ROWS_PER_PAGE, filteredData.length)}
               </span> of {filteredData.length} records
             </p>
@@ -242,7 +245,7 @@ const SocietyMaintainanceCharges = () => {
               <button 
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-2 text-slate-400 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="p-2 text-muted-foreground hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft size={20} />
               </button>
@@ -264,7 +267,7 @@ const SocietyMaintainanceCharges = () => {
               <button 
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages || totalPages === 0}
-                className="p-2 text-slate-400 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="p-2 text-muted-foreground hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight size={20} />
               </button>
@@ -273,7 +276,7 @@ const SocietyMaintainanceCharges = () => {
         </div>
 
         {/* Footer Meta */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-1 text-[11px] font-bold tracking-wide text-slate-400 uppercase">
+        <div className="mt-8 flex flex-col items-center justify-center gap-1 text-[11px] font-bold tracking-wide text-muted-foreground uppercase">
           <p>Society Admin Portal v2.4.0 • Maintenance Ledger Verified</p>
         </div>
       </div>

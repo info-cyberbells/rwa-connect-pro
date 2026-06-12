@@ -244,12 +244,12 @@ export default function About() {
         </div>
       </section> */}
       {/* Trust & Responsibility section */}
-    <section className="bg-gray-50 py-16">
+    <section className="bg-muted/30 py-16">
   <div className="max-w-7xl mx-auto px-6 text-center mb-12">
-    <h2 className="text-3xl font-bold text-gray-800">
+    <h2 className="text-3xl font-bold text-foreground">
       Trust & Responsibility
     </h2>
-    <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+    <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
       At SocietySmartHub, we focus on keeping society management secure,
       transparent, and reliable for committees and residents every day.
     </p>
@@ -259,19 +259,19 @@ export default function About() {
     {features.map((feature, index) => (
       <div
         key={index}
-        className="bg-white p-6 rounded-xl shadow 
-                   hover:shadow-xl transition"
+        className="bg-card p-6 rounded-xl shadow-sm border border-border/50
+                   hover:shadow-md transition-all"
       >
 <div className="mb-4 flex justify-center">
   <div className="w-14 h-14 flex items-center justify-center 
-                  rounded-full bg-indigo-50">
+                  rounded-full bg-primary/10">
     {feature.icon}
   </div>
 </div>       
- <h3 className="text-xl font-semibold text-gray-800 mb-2 flex justify-center">
+ <h3 className="text-xl font-semibold text-foreground mb-2 flex justify-center text-center">
           {feature.title}
         </h3>
-        <p className="text-gray-600 flex justify-center">{feature.desc}</p>
+        <p className="text-muted-foreground flex justify-center text-center">{feature.desc}</p>
       </div>
     ))}
   </div>

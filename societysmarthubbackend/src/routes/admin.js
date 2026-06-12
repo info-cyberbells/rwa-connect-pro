@@ -13,46 +13,49 @@ import {
   removeVehicle,
   getDeactivationRequests,
   reviewDeactivationRequest,
+  getDashboardStats,
 } from "../controllers/adminController.js";
 import { getUserActivity } from "../controllers/activityController.js";
 
 const router = Router();
 
-// All routes require authentication and society_admin role
+// All routes require authentication
 router.use(auth);
-router.use(permit("society_admin"));
 
-// GET /api/admin/society
-router.get("/society", getMySociety);
+// GET /api/admin/dashboard-stats — Both admin and guard can see stats
+router.get("/dashboard-stats", permit("society_admin", "guard"), getDashboardStats);
 
-// POST /api/admin/users - Create user (with optional ID proof upload)
-router.post("/users", uploadUserIdProof, createUser);
+// GET /api/admin/society — Both admin and guard can see society info
+router.get("/society", permit("society_admin", "guard"), getMySociety);
 
-// GET /api/admin/users
-router.get("/users", getSocietyUsers);
+// POST /api/admin/users — Create a resident or guard
+router.post("/users", permit("society_admin"), uploadUserIdProof, createUser);
 
-// GET /api/admin/users/:userId
-router.get("/users/:userId", getUserDetails);
+// GET /api/admin/users — List all residents (excluding guards for this list)
+router.get("/users", permit("society_admin", "guard", "superadmin", "super-admin"), getSocietyUsers);
 
-// PATCH /api/admin/users/:userId - Update user (with optional ID proof upload)
-router.patch("/users/:userId", uploadUserIdProof, updateUser);
+// GET /api/admin/users/:userId — Get specific resident details
+router.get("/users/:userId", permit("society_admin", "guard"), getUserDetails);
 
-// PATCH /api/admin/users/:userId/toggle-status
-router.patch("/users/:userId/toggle-status", toggleUserStatus);
+// PATCH /api/admin/users/:userId — Update user details
+router.patch("/users/:userId", permit("society_admin"), uploadUserIdProof, updateUser);
 
-// POST /api/admin/users/:userId/vehicles - Add a vehicle
-router.post("/users/:userId/vehicles", addVehicle);
+// PATCH /api/admin/users/:userId/toggle-status — Activate/Deactivate user
+router.patch("/users/:userId/toggle-status", permit("society_admin"), toggleUserStatus);
 
-// DELETE /api/admin/users/:userId/vehicles/:vehicleId - Remove a vehicle
-router.delete("/users/:userId/vehicles/:vehicleId", removeVehicle);
+// POST /api/admin/users/:userId/vehicles — Add vehicle to user
+router.post("/users/:userId/vehicles", permit("society_admin"), addVehicle);
 
-// GET /api/admin/deactivation-requests - Get all deactivation requests in society
-router.get("/deactivation-requests", getDeactivationRequests);
+// DELETE /api/admin/users/:userId/vehicles/:vehicleId — Remove vehicle
+router.delete("/users/:userId/vehicles/:vehicleId", permit("society_admin"), removeVehicle);
 
-// PATCH /api/admin/deactivation-requests/:requestId/review - Approve or reject
-router.patch("/deactivation-requests/:requestId/review", reviewDeactivationRequest);
+// GET /api/admin/deactivation-requests — List all requests
+router.get("/deactivation-requests", permit("society_admin"), getDeactivationRequests);
+
+// PATCH /api/admin/deactivation-requests/:requestId/review — Approve/Reject
+router.patch("/deactivation-requests/:requestId/review", permit("society_admin"), reviewDeactivationRequest);
 
 // GET /api/admin/users/:userId/activity - Get activity log for a specific user
-router.get("/users/:userId/activity", getUserActivity);
+router.get("/users/:userId/activity", permit("society_admin", "guard"), getUserActivity);
 
 export default router;

@@ -10,9 +10,11 @@ export default async function auth(req, res, next) {
     // attach user info (not full user object to avoid extra DB hit; but you can fetch if needed)
     req.user = { id: payload.sub || payload.userId, role: payload.role, society: payload.society || null };
     // Optionally fetch fresh user to check isActive:
-    const userDoc = await User.findById(req.user.id).select("isActive role");
+    const userDoc = await User.findById(req.user.id).select("isActive role society");
     if (!userDoc || !userDoc.isActive) return res.status(403).json({ message: "Account disabled" });
-    req.user.role = userDoc.role;
+    
+    req.user.role = userDoc.role === 'admin' ? 'society_admin' : userDoc.role;
+    req.user.society = userDoc.society;
     next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {

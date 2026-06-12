@@ -10,6 +10,15 @@ export const AUTHROUTES = {
     SUPERADMIN_CREATE_SOCIETY_ADMIN: "/superadmin/admins",
  
     SUPERADMIN_TOGGLE_USER_STATUS: "/superadmin/users",
+
+    // SUPER ADMIN SETTINGS
+    SUPERADMIN_GET_PLATFORM_CONFIG: "/superadmin/settings/platform",
+    SUPERADMIN_UPDATE_PLATFORM_CONFIG: "/superadmin/settings/platform",
+    SUPERADMIN_UPDATE_NOTIFICATION_RULES: "/superadmin/settings/notifications",
+    SUPERADMIN_GET_PLANS: "/superadmin/settings/plans",
+    SUPERADMIN_CREATE_PLAN: "/superadmin/settings/plans",
+    SUPERADMIN_UPDATE_PLAN: "/superadmin/settings/plans",
+    SUPERADMIN_DELETE_PLAN: "/superadmin/settings/plans",
  
  
     // SOCIETY USER ROUTES
@@ -102,5 +111,13 @@ export const AUTHROUTES = {
     FORGOT_PASSWORD: "/auth/forgot-password",
     VERIFY_OTP: "/auth/verify-otp",
     RESET_PASSWORD: "/auth/reset-password",
+
+    // NOTIFICATION ROUTES
+    NOTIFICATION_GET_MY: "/notifications/my",
+    NOTIFICATION_UNREAD_COUNT: "/notifications/unread-count",
+    NOTIFICATION_STATS: "/notifications/stats-overview",
+    NOTIFICATION_MARK_READ: "/notifications", // Base for /:id/read
+    NOTIFICATION_MARK_ALL_READ: "/notifications/read-all",
+    NOTIFICATION_BROADCAST: "/notifications/broadcast",
 }
  

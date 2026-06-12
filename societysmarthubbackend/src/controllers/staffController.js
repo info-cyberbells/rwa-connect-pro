@@ -569,16 +569,9 @@ export const blockedStaffList = async (req, res) => {
       blockedAt: -1,
     });
 
-    if (!blockedStaff.length) {
-      return res.status(404).json({
-        success: false,
-        message: "No blocked staff found",
-      });
-    }
-
     return res.status(200).json({
       success: true,
-      message: "Blocked staff fetched successfully",
+      message: blockedStaff.length ? "Blocked staff fetched successfully" : "No blocked staff found",
       totalBlockedStaff: blockedStaff.length,
       data: blockedStaff,
     });

@@ -8,7 +8,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Plus
 } from 'lucide-react';
 import Sidebar from '@/pages/SocietySetup/SuperAdmin/components/Sidebar';
 import { useNavigate } from 'react-router-dom';
@@ -35,38 +36,38 @@ const GlobalSocietyDirectory: React.FC = () => {
     <div className="flex min-h-screen overflow-x-hidden">
       {/* Main */}
       <main className="flex-1">        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 mt-5 lg:mt-0">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 mt-5 lg:mt-0 text-left">
           <div>
 
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
-              Global Society <span className="text-blue-600">Directory</span>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-foreground">
+              Global Society <span className="text-primary">Directory</span>
             </h1>
 
-            <p className="text-slate-500 font-medium mt-1">
-              Centralized directory for 42 housing infrastructures.
+            <p className="text-muted-foreground font-medium mt-1">
+              Centralized directory for housing infrastructures.
             </p>
           </div>
 
           <button
           onClick={()=>navigate("/super-admin/register-society")}
-          className="w-full sm:w-auto bg-blue-600 text-white px-5 py-3 rounded-2xl flex items-center justify-center gap-3 text-sm hover:bg-blue-700 transition">
-            New Society
+          className="w-full sm:w-auto bg-primary text-primary-foreground px-5 py-3 rounded-2xl flex items-center justify-center gap-3 text-sm hover:bg-primary/90 transition shadow-lg shadow-primary/10">
+            <Plus size={18} /> New Society
           </button>
         </div>
 
         {/* Action Bar */}
-        <div className="bg-white rounded-[32px] shadow-lg border overflow-hidden mb-6 max-w-full">
+        <div className="bg-card rounded-[32px] shadow-lg border border-border overflow-hidden mb-6 max-w-full">
           <div className="p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-4 lg:gap-6 items-stretch lg:items-center justify-between max-w-full overflow-hidden">
             {/* Search */}
             <div className="relative w-full max-w-full lg:max-w-lg group">
               <Search
                 size={20}
-                className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"
+                className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground"
               />
               <input
                 type="text"
                 placeholder="Search by Society ID, Manager, or City..."
-                className="w-full bg-slate-50 border-2 border-transparent focus:border-blue-300 focus:bg-white rounded-3xl pl-14 pr-6 py-4 text-sm font-semibold outline-none transition-all"
+                className="w-full bg-muted/50 border-2 border-transparent focus:border-primary focus:bg-card rounded-3xl pl-14 pr-6 py-4 text-sm font-semibold outline-none transition-all text-foreground"
               />
             </div>
 
@@ -74,7 +75,7 @@ const GlobalSocietyDirectory: React.FC = () => {
             <div className="flex flex-wrap gap-3 items-center w-full lg:w-auto justify-start lg:justify-end">
               <FilterTag label="Active Cities" />
               <FilterTag label="Service Plan" />
-              <button className="p-4 bg-slate-900 text-white rounded-2xl hover:bg-blue-600 transition">
+              <button className="p-4 bg-primary text-primary-foreground rounded-2xl hover:bg-primary/90 transition shadow-sm">
                 <Filter size={18} />
               </button>
             </div>
@@ -85,67 +86,47 @@ const GlobalSocietyDirectory: React.FC = () => {
             <div className="min-w-[900px]">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-blue-50/50">
-                    <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">
+                  <tr className="bg-muted/50 border-b border-border">
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       Deployment
                     </th>
-                    <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       Location
                     </th>
-                    <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400 text-center">
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center">
                       Units
                     </th>
-                    <th className="hidden md:table-cell px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">
+                    <th className="hidden md:table-cell px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       Management
                     </th>
-                    <th className="hidden lg:table-cell px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400">
+                    <th className="hidden lg:table-cell px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-xs font-black uppercase tracking-widest text-slate-400 text-right">
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">
                       Action
                     </th>
                   </tr>
                 </thead>
 
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-border">
                   {loading &&
                   Array.from({ length: 5 }).map((_, index) => (
                     <tr key={index} className="animate-pulse">
                       {/* Name + Logo */}
-                      <td className="px-4 py-4">
+                      <td className="px-6 py-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-slate-200"></div>
+                          <div className="w-10 h-10 rounded-xl bg-muted"></div>
                           <div className="space-y-2">
-                            <div className="h-3 w-32 bg-slate-200 rounded"></div>
-                            <div className="h-2 w-20 bg-slate-100 rounded"></div>
+                            <div className="h-3 w-32 bg-muted rounded"></div>
+                            <div className="h-2 w-20 bg-muted/60 rounded"></div>
                           </div>
                         </div>
                       </td>
-
-                      {/* City */}
-                      <td className="px-4 py-4">
-                        <div className="h-3 w-24 bg-slate-200 rounded"></div>
-                      </td>
-
-                      {/* Units */}
-                      <td className="px-4 py-4 text-center">
-                        <div className="h-6 w-12 bg-slate-100 rounded-lg mx-auto"></div>
-                      </td>
-
-                      {/* Admin (md+) */}
-                      <td className="hidden md:table-cell px-4 py-4">
-                        <div className="h-3 w-24 bg-slate-200 rounded"></div>
-                      </td>
-
-                      {/* Status (lg+) */}
-                      <td className="hidden lg:table-cell px-4 py-4">
-                        <div className="h-5 w-20 bg-slate-100 rounded-full"></div>
-                      </td>
-
-                      {/* Action */}
-                      <td className="px-4 py-4 text-right">
-                        <div className="h-8 w-28 bg-slate-200 rounded-xl ml-auto"></div>
-                      </td>
+                      <td className="px-6 py-5"><div className="h-3 w-24 bg-muted rounded"></div></td>
+                      <td className="px-6 py-5 text-center"><div className="h-6 w-12 bg-muted rounded-lg mx-auto"></div></td>
+                      <td className="hidden md:table-cell px-6 py-5"><div className="h-3 w-24 bg-muted rounded"></div></td>
+                      <td className="hidden lg:table-cell px-6 py-5"><div className="h-5 w-20 bg-muted rounded-full"></div></td>
+                      <td className="px-6 py-5 text-right"><div className="h-8 w-28 bg-muted rounded-xl ml-auto"></div></td>
                     </tr>
                   ))}
 
@@ -159,7 +140,7 @@ const GlobalSocietyDirectory: React.FC = () => {
 
                   {!loading && !error && societies?.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="text-center py-6 text-sm text-slate-500">
+                      <td colSpan={6} className="text-center py-6 text-sm text-muted-foreground">
                         No societies found
                       </td>
                     </tr>
@@ -187,7 +168,7 @@ const GlobalSocietyDirectory: React.FC = () => {
 
           {/* Pagination */}
           <div className="p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+            <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
               <ShieldCheck size={16} className="text-emerald-500" />
               Security Verified Grid
             </div>
@@ -218,7 +199,7 @@ const GlobalSocietyDirectory: React.FC = () => {
 };
 
 const FilterTag = ({ label }: { label: string }) => (
-  <button className="flex items-center gap-2 px-4 py-2 bg-white border rounded-xl text-xs font-bold text-slate-600 hover:border-blue-300 hover:text-blue-600 transition">
+  <button className="flex items-center gap-2 px-4 py-2 bg-card border rounded-xl text-xs font-bold text-slate-600 hover:border-blue-300 hover:text-blue-600 transition">
     {label}
     <ChevronDown size={14} />
   </button>
@@ -240,7 +221,7 @@ const NodeRow = ({ name, id, logo ,city, type, units, admin, status }: any) => {
               </div>
           <div>
             <p className="font-bold text-sm">{name}</p>
-            <span className="text-[10px] text-slate-400">{id}</span>
+            <span className="text-[10px] text-muted-foreground">{id}</span>
           </div>
         </div>
       </td>
@@ -277,7 +258,7 @@ const NodeRow = ({ name, id, logo ,city, type, units, admin, status }: any) => {
       <td className="px-4 py-4 text-right">
         <button
           onClick={() => navigate(`/super-admin/globalSocietyDirectory/${id}`)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 text-xs font-bold rounded-xl hover:bg-blue-600 hover:text-white transition"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-muted/50 text-xs font-bold rounded-xl hover:bg-blue-600 hover:text-white transition"
         >
           <span className="hidden sm:inline">View Details</span>
           <ArrowUpRight size={14} />

@@ -72,7 +72,7 @@ const StructureStep = ({ nextStep, prevStep, updateFormData, defaultValues, full
           <p className="text-blue-500 text-sm font-bold mb-2 tracking-wide uppercase">
             Setup <span className="text-slate-300 mx-2 font-normal">/</span> Society Structure
           </p>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-4">
+          <h1 className="text-3xl font-black text-foreground tracking-tight mb-4">
             Define Society Scale
           </h1>
           <p className="text-slate-600 text-lg font-medium">
@@ -85,15 +85,15 @@ const StructureStep = ({ nextStep, prevStep, updateFormData, defaultValues, full
 
           {/* TOTAL UNITS */}
           <motion.div 
-            className="bg-white rounded-[2.5rem] p-10 border border-slate-50 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center group"
+            className="bg-card rounded-[2.5rem] p-10 border border-slate-50 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center group"
             whileHover={{ scale: 1.03 }}
           >
             <div className="w-20 h-20 bg-gradient-to-tr from-blue-50 to-blue-100 rounded-[2rem] flex items-center justify-center mb-6 group-hover:from-blue-500 group-hover:to-blue-600 group-hover:rotate-6 transition-all duration-300">
               <Home size={28} className="text-blue-600 group-hover:text-white" />
             </div>
 
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Total Units *</h3>
-            <p className="text-xs text-slate-500 text-center leading-relaxed mb-6 opacity-80">
+            <h3 className="text-xl font-bold text-foreground mb-2">Total Units *</h3>
+            <p className="text-xs text-muted-foreground text-center leading-relaxed mb-6 opacity-80">
               Total count of residences across all blocks.
             </p>
 
@@ -101,8 +101,8 @@ const StructureStep = ({ nextStep, prevStep, updateFormData, defaultValues, full
               type="number"
               value={formData.totalUnits}
               onChange={(e) => setFormData({ ...formData, totalUnits: e.target.value })}
-              className={`w-full bg-slate-50/80 rounded-2xl py-4 text-center text-2xl font-black tracking-tighter border ${
-                errors.totalUnits ? 'border-red-400' : 'border-slate-100'
+              className={`w-full bg-muted/80 rounded-2xl py-4 text-center text-2xl font-black tracking-tighter border ${
+                errors.totalUnits ? 'border-red-400' : 'border-border'
               } focus:outline-none focus:ring-2 focus:ring-blue-400`}
               placeholder="0"
             />
@@ -110,15 +110,15 @@ const StructureStep = ({ nextStep, prevStep, updateFormData, defaultValues, full
 
           {/* TOTAL FLOORS */}
           <motion.div 
-            className="bg-white rounded-[2.5rem] p-10 border border-slate-50 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center group"
+            className="bg-card rounded-[2.5rem] p-10 border border-slate-50 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center group"
             whileHover={{ scale: 1.03 }}
           >
             <div className="w-20 h-20 bg-gradient-to-tr from-blue-50 to-blue-100 rounded-[2rem] flex items-center justify-center mb-6 group-hover:from-blue-500 group-hover:to-blue-600 group-hover:rotate-6 transition-all duration-300">
               <Layers size={28} className="text-blue-600 group-hover:text-white" />
             </div>
 
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Total Floors *</h3>
-            <p className="text-xs text-slate-500 text-center leading-relaxed mb-6 opacity-80">
+            <h3 className="text-xl font-bold text-foreground mb-2">Total Floors *</h3>
+            <p className="text-xs text-muted-foreground text-center leading-relaxed mb-6 opacity-80">
               Average or maximum floor levels per building.
             </p>
 
@@ -126,8 +126,8 @@ const StructureStep = ({ nextStep, prevStep, updateFormData, defaultValues, full
               type="number"
               value={formData.totalFloors}
               onChange={(e) => setFormData({ ...formData, totalFloors: e.target.value })}
-              className={`w-full bg-slate-50/80 rounded-2xl py-4 text-center text-2xl font-black tracking-tighter border ${
-                errors.totalFloors ? 'border-red-400' : 'border-slate-100'
+              className={`w-full bg-muted/80 rounded-2xl py-4 text-center text-2xl font-black tracking-tighter border ${
+                errors.totalFloors ? 'border-red-400' : 'border-border'
               } focus:outline-none focus:ring-2 focus:ring-blue-400`}
               placeholder="0"
             />
@@ -135,15 +135,15 @@ const StructureStep = ({ nextStep, prevStep, updateFormData, defaultValues, full
 
           {/* TOTAL TOWERS */}
           <motion.div 
-            className="bg-white rounded-[2.5rem] p-10 border border-slate-50 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center group"
+            className="bg-card rounded-[2.5rem] p-10 border border-slate-50 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center group"
             whileHover={{ scale: 1.03 }}
           >
             <div className="w-20 h-20 bg-gradient-to-tr from-blue-50 to-blue-100 rounded-[2rem] flex items-center justify-center mb-6 group-hover:from-blue-500 group-hover:to-blue-600 group-hover:rotate-6 transition-all duration-300">
               <Building2 size={28} className="text-blue-600 group-hover:text-white" />
             </div>
 
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Total Towers *</h3>
-            <p className="text-xs text-slate-500 text-center leading-relaxed mb-6 opacity-80">
+            <h3 className="text-xl font-bold text-foreground mb-2">Total Towers *</h3>
+            <p className="text-xs text-muted-foreground text-center leading-relaxed mb-6 opacity-80">
               Number of standalone blocks or towers.
             </p>
 
@@ -151,8 +151,8 @@ const StructureStep = ({ nextStep, prevStep, updateFormData, defaultValues, full
               type="number"
               value={formData.totalTowers}
               onChange={(e) => setFormData({ ...formData, totalTowers: e.target.value })}
-              className={`w-full bg-slate-50/80 rounded-2xl py-4 text-center text-2xl font-black tracking-tighter border ${
-                errors.totalTowers ? 'border-red-400' : 'border-slate-100'
+              className={`w-full bg-muted/80 rounded-2xl py-4 text-center text-2xl font-black tracking-tighter border ${
+                errors.totalTowers ? 'border-red-400' : 'border-border'
               } focus:outline-none focus:ring-2 focus:ring-blue-400`}
               placeholder="0"
             />
@@ -170,10 +170,10 @@ const StructureStep = ({ nextStep, prevStep, updateFormData, defaultValues, full
       </main>
 
       {/* Footer */}
-      <footer className="bg-white/90 backdrop-blur-md border-t border-slate-200 px-12 py-6 flex justify-between items-center shadow-sm">
+      <footer className="bg-card/90 backdrop-blur-md border-t border-border px-12 py-6 flex justify-between items-center shadow-sm">
         <button
           onClick={prevStep}
-          className="flex items-center gap-2 text-slate-400 font-bold text-sm hover:text-slate-700 transition-all"
+          className="flex items-center gap-2 text-muted-foreground font-bold text-sm hover:text-slate-700 transition-all"
         >
           <ChevronLeft size={18} /> Back
         </button>

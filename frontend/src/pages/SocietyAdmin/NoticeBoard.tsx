@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { DashboardLayout } from "../../components/layout/DashboardLayout"; 
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../store/store';
+import { AppDispatch, RootState, useAppSelector } from '../../store/store';
 import { 
   getNotices,
   createNotice, 
@@ -72,6 +72,8 @@ const AUDIENCES = ['all', 'owners', 'tenants'];
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 const NoticeBoard = () => {
+  const { user } = useAppSelector((state) => state.auth);
+  const role = user?.role || localStorage.getItem("role") || "guard";
   const dispatch = useDispatch<AppDispatch>();
 
   const { notices, noticesLoading, isLoading, isSuccess, error } = useSelector(
@@ -97,8 +99,17 @@ const NoticeBoard = () => {
     images: null as File | null,
   });
 
+  const isAdmin = role === 'society_admin' || role === 'admin' || role === 'superadmin' || role === 'super-admin';
+  const isGuard = role === 'guard';
+
+  // Filter Tabs
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    dispatch(getNotices(tab));
+  };
+
   useEffect(() => {
-    dispatch(getNotices());
+    dispatch(getNotices(activeTab));
   }, [dispatch]);
 
  useEffect(() => {
@@ -106,7 +117,7 @@ const NoticeBoard = () => {
     setShowModal(false);
     setSelectedNotice(null);
     resetForm();
-    dispatch(getNotices());
+    dispatch(getNotices(activeTab));
     dispatch(resetAdminState());
   }
 }, [isSuccess]);
@@ -144,7 +155,7 @@ const NoticeBoard = () => {
 
   const handlePin = (noticeId: string) => {
   dispatch(pinNotice(noticeId)).then(() => {
-    dispatch(getNotices()); // refresh
+    dispatch(getNotices(activeTab)); // refresh
   });
 };
 const handleDelete = (noticeId: string) => {
@@ -155,7 +166,7 @@ const handleDelete = (noticeId: string) => {
     setShowDetailModal(false);
     setSelectedNotice(null);
 
-    dispatch(getNotices());
+    dispatch(getNotices(activeTab));
   });
 };
 const handleUpdate = (id: string) => {
@@ -168,37 +179,32 @@ const handleUpdate = (id: string) => {
     setShowModal(false);
     setSelectedNotice(null);
 
-    dispatch(getNotices());
+    dispatch(getNotices(activeTab));
   });
 };
-  const filteredNotices = (notices as Notice[]).filter((n) => {
-    if (activeTab === 'All Notices') return true;
-    // Tab names: 'Official', 'Events', 'General' → compare lowercase
-    return n.category?.toLowerCase() === activeTab.toLowerCase();
-  });
 
   const featuredNotice = (notices as Notice[]).find((n) => n.isPinned) || (notices as Notice[])[0];
 
   return (
-    <DashboardLayout role="society-admin">
+    <DashboardLayout role={role as any}>
       <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-8">
 
         {/* ── Main Feed ── */}
         <div className="flex-1 min-w-0">
 
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-slate-800">Notice Board</h1>
-            <p className="text-sm text-slate-500">Updates, alerts, and events for your community</p>
+            <h1 className="text-2xl font-bold text-foreground">Notice Board</h1>
+            <p className="text-sm text-muted-foreground">Updates, alerts, and events for your community</p>
           </div>
 
           {/* Featured Card */}
           {featuredNotice ? (
             <div
-              className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-6 text-white relative overflow-hidden mb-8 shadow-xl shadow-blue-100/50 group cursor-pointer"
+              className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-6 text-white relative overflow-hidden mb-8 group cursor-pointer"
               onClick={() => handleReadMore(featuredNotice)}
             >
               <div className="relative z-10">
-                <div className="bg-white/20 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest w-fit mb-4 backdrop-blur-md border border-white/10">
+                <div className="bg-card/20 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest w-fit mb-4 backdrop-blur-md border border-white/10">
                   {featuredNotice.category || 'Notice'}
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">{featuredNotice.title}</h2>
@@ -206,11 +212,11 @@ const handleUpdate = (id: string) => {
                   {featuredNotice.description}
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl text-[11px] font-bold backdrop-blur-md border border-white/10 shadow-sm">
+                  <div className="flex items-center gap-2 bg-card/10 px-4 py-2 rounded-xl text-[11px] font-bold backdrop-blur-md border border-white/10">
                     <Calendar size={14} className="text-blue-200" />
                     {new Date(featuredNotice.visibleFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </div>
-                  <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl text-[11px] font-bold backdrop-blur-md border border-white/10 shadow-sm">
+                  <div className="flex items-center gap-2 bg-card/10 px-4 py-2 rounded-xl text-[11px] font-bold backdrop-blur-md border border-white/10">
                     <Clock size={14} className="text-blue-200" />
                     Until: {new Date(featuredNotice.visibleUntil).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </div>
@@ -219,9 +225,9 @@ const handleUpdate = (id: string) => {
               <Users className="absolute -bottom-6 -right-6 text-white/10 w-48 h-48 rotate-12 transition-transform group-hover:scale-110 duration-700" />
             </div>
           ) : !noticesLoading && (
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-6 text-white relative overflow-hidden mb-8 shadow-xl shadow-blue-100/50 group">
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[24px] p-6 text-white relative overflow-hidden mb-8 group">
               <div className="relative z-10">
-                <div className="bg-white/20 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest w-fit mb-4 backdrop-blur-md border border-white/10">
+                <div className="bg-card/20 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest w-fit mb-4 backdrop-blur-md border border-white/10">
                   Upcoming Event
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">Annual General Meeting</h2>
@@ -229,10 +235,10 @@ const handleUpdate = (id: string) => {
                   Join us for the yearly discussion on community improvements and financial reports.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl text-[11px] font-bold backdrop-blur-md border border-white/10 shadow-sm">
+                  <div className="flex items-center gap-2 bg-card/10 px-4 py-2 rounded-xl text-[11px] font-bold backdrop-blur-md border border-white/10">
                     <Calendar size={14} className="text-blue-200" /> Oct 05, 2023
                   </div>
-                  <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl text-[11px] font-bold backdrop-blur-md border border-white/10 shadow-sm">
+                  <div className="flex items-center gap-2 bg-card/10 px-4 py-2 rounded-xl text-[11px] font-bold backdrop-blur-md border border-white/10">
                     <Clock size={14} className="text-blue-200" /> 6:00 PM
                   </div>
                 </div>
@@ -246,11 +252,11 @@ const handleUpdate = (id: string) => {
             {TABS.map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => handleTabChange(tab)}
                 className={`px-5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
                   activeTab === tab
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
-                    : 'bg-white border border-slate-100 text-slate-500 hover:bg-slate-50 shadow-sm'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-card border border-border text-muted-foreground hover:bg-muted/50'
                 }`}
               >
                 {tab}
@@ -272,8 +278,8 @@ const handleUpdate = (id: string) => {
 
           {!noticesLoading && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredNotices.length > 0 ? (
-                filteredNotices.map((notice: Notice) => (
+              {notices.length > 0 ? (
+                notices.map((notice: Notice) => (
                   <NoticeCard
                     key={notice._id}
                     category={notice.category?.toUpperCase()}
@@ -284,15 +290,8 @@ const handleUpdate = (id: string) => {
                     onReadMore={() => handleReadMore(notice)}
                   />
                 ))
-              ) : notices.length === 0 ? (
-                <>
-                  <NoticeCard category="OFFICIAL" time="6 hours ago" title="Elevator Maintenance Schedule" color="blue" desc="Please note that Elevator A will undergo routine maintenance this Friday between 10:00 AM and 4:00 PM." onReadMore={() => {}} />
-                  <NoticeCard category="REPAIRS" time="12 hours ago" title="Water Tank Cleaning" color="blue" desc="The overhead water tank cleaning is scheduled for Block C. Expect low pressure during afternoon hours." onReadMore={() => {}} />
-                  <NoticeCard category="EVENTS" time="Yesterday" title="Yoga Sessions - Winter Batch" color="purple" desc="New yoga sessions are starting from November 1st at the Clubhouse. Registration is now open for all ages." onReadMore={() => {}} />
-                  <NoticeCard category="GENERAL" time="2 days ago" title="Parking Lot Painting" color="purple" desc="New line marking will be done in the visitors' parking area. Kindly cooperate with the security team." onReadMore={() => {}} />
-                </>
               ) : (
-                <div className="col-span-2 text-center py-16 text-slate-400 text-sm font-bold">
+                <div className="col-span-2 text-center py-16 text-muted-foreground text-sm font-bold">
                   No notices found for this category.
                 </div>
               )}
@@ -302,9 +301,9 @@ const handleUpdate = (id: string) => {
 
         {/* ── Sidebar ── */}
         <aside className="w-full lg:w-80 space-y-8">
-          <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
+          <div className="bg-card p-6 rounded-[24px] border border-border shadow-sm">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-slate-800">Community Calendar</h3>
+              <h3 className="font-bold text-foreground">Community Calendar</h3>
               <button className="text-[10px] text-blue-600 font-black uppercase hover:underline">View All</button>
             </div>
             <div className="space-y-6">
@@ -314,13 +313,13 @@ const handleUpdate = (id: string) => {
             </div>
           </div>
 
-          <div className="bg-slate-900 rounded-[24px] p-8 text-white text-center shadow-xl shadow-slate-200 border border-slate-800 relative overflow-hidden group">
+          <div className="bg-muted border-border shadow-sm relative overflow-hidden group">
             <div className="relative z-10">
               <div className="bg-blue-600/20 w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-blue-500/20 group-hover:scale-110 transition-transform">
                 <Plus size={24} className="text-blue-500" strokeWidth={3} />
               </div>
               <h4 className="font-bold mb-2 text-lg">Post a Notice?</h4>
-              <p className="text-[10px] text-slate-400 mb-6 font-bold uppercase tracking-widest leading-relaxed">
+              <p className="text-[10px] text-muted-foreground mb-6 font-bold uppercase tracking-widest leading-relaxed">
                 Only authorized admins can post official society updates.
               </p>
               <button
@@ -340,7 +339,7 @@ const handleUpdate = (id: string) => {
       ══════════════════════════════════════════ */}
       {showDetailModal && selectedNotice && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 pt-20">
-          <div className="bg-white rounded-[28px] w-full max-w-lg shadow-2xl overflow-hidden">
+          <div className="bg-card rounded-[28px] w-full max-w-lg shadow-2xl overflow-hidden">
 
             {/* Detail Modal Header */}
             <div className="relative">
@@ -370,9 +369,9 @@ const handleUpdate = (id: string) => {
                 </div>
                 <button
                   onClick={() => { setShowDetailModal(false); setSelectedNotice(null); }}
-                  className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors flex-shrink-0"
+                  className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center hover:bg-slate-200 transition-colors flex-shrink-0"
                 >
-                  <X size={14} className="text-slate-500" />
+                  <X size={14} className="text-muted-foreground" />
                 </button>
               </div>
             </div>
@@ -381,29 +380,29 @@ const handleUpdate = (id: string) => {
             <div className="px-8 pb-8 space-y-5 max-h-[70vh] overflow-y-auto">
 
               {/* Title */}
-              <h2 className="text-xl font-bold text-slate-800 leading-snug">
+              <h2 className="text-xl font-bold text-foreground leading-snug">
                 {selectedNotice.title}
               </h2>
 
               {/* Meta info row */}
               <div className="flex flex-wrap gap-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
                   <Calendar size={12} className="text-blue-400" />
                   From: {new Date(selectedNotice.visibleFrom).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
                   <Clock size={12} className="text-blue-400" />
                   Until: {new Date(selectedNotice.visibleUntil).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </div>
               </div>
 
               {/* Divider */}
-              <div className="border-t border-slate-100" />
+              <div className="border-t border-border" />
 
               {/* Description */}
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Description</p>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">Description</p>
+                <p className="text-sm text-foreground leading-relaxed">
                   {selectedNotice.description}
                 </p>
               </div>
@@ -411,14 +410,14 @@ const handleUpdate = (id: string) => {
               {/* Images if any */}
               {selectedNotice.imageUrls && selectedNotice.imageUrls.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Attachments</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">Attachments</p>
                   <div className="grid grid-cols-2 gap-3">
                     {selectedNotice.imageUrls.map((url, idx) => (
                       <img
                         key={idx}
                         src={url}
                         alt={`Notice image ${idx + 1}`}
-                        className="w-full h-36 object-cover rounded-2xl border border-slate-100"
+                        className="w-full h-36 object-cover rounded-2xl border border-border"
                       />
                     ))}
                   </div>
@@ -426,67 +425,71 @@ const handleUpdate = (id: string) => {
               )}
 
               {/* Divider */}
-              <div className="border-t border-slate-100" />
+              <div className="border-t border-border" />
 
               {/* Footer meta */}
               <div className="flex flex-wrap justify-between gap-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
-                  <User size={12} className="text-slate-300" />
-                  Audience: <span className="text-slate-600 ml-1 capitalize">{selectedNotice.targetAudience}</span>
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
+                  <User size={12} className="text-muted-foreground" />
+                  Audience: <span className="text-foreground ml-1 capitalize">{selectedNotice.targetAudience}</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
-                  <Bell size={12} className="text-slate-300" />
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
+                  <Bell size={12} className="text-muted-foreground" />
                   Posted: {getTimeAgo(selectedNotice.createdAt)}
                 </div>
               </div>
               {/* Pin / Unpin Button */}
-<div className="px-8 pb-6">
-  <button
-    onClick={() => {
-      handlePin(selectedNotice._id);
-      setShowDetailModal(false);
-      setSelectedNotice(null);
-    }}
-    className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 ${
-      selectedNotice.isPinned
-        ? 'bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100'
-        : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200'
-    }`}
-  >
-    {selectedNotice.isPinned ? '📌 Unpin Notice' : '📌 Pin Notice'}
-  </button>
-</div>
-<button
-  onClick={() => {
-    setFormData({
-      title: selectedNotice.title,
-      description: selectedNotice.description,
-      category: selectedNotice.category,
-      priority: selectedNotice.priority,
-      visibleFrom: selectedNotice.visibleFrom.slice(0,10),
-      visibleUntil: selectedNotice.visibleUntil.slice(0,10),
-      isPinned: selectedNotice.isPinned ? "true" : "false",
-      targetAudience: selectedNotice.targetAudience,
-      images: null
-    });
+{!isGuard && (
+  <>
+    <div className="px-8 pb-6">
+      <button
+        onClick={() => {
+          handlePin(selectedNotice._id);
+          setShowDetailModal(false);
+          setSelectedNotice(null);
+        }}
+        className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 ${
+          selectedNotice.isPinned
+            ? 'bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100'
+            : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200'
+        }`}
+      >
+        {selectedNotice.isPinned ? '📌 Unpin Notice' : '📌 Pin Notice'}
+      </button>
+    </div>
+    <button
+      onClick={() => {
+        setFormData({
+          title: selectedNotice.title,
+          description: selectedNotice.description,
+          category: selectedNotice.category,
+          priority: selectedNotice.priority,
+          visibleFrom: selectedNotice.visibleFrom.slice(0,10),
+          visibleUntil: selectedNotice.visibleUntil.slice(0,10),
+          isPinned: selectedNotice.isPinned ? "true" : "false",
+          targetAudience: selectedNotice.targetAudience,
+          images: null
+        });
 
-    setShowModal(true); // open form modal
-    setShowDetailModal(false);
-  }}
-  className="w-full mt-3 py-3 bg-green-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-green-700"
->
-  Edit Notice
-</button>
-<button
-  onClick={() => {
-    handleDelete(selectedNotice._id);
-    setShowDetailModal(false);
-    setSelectedNotice(null);
-  }}
-  className="w-full mt-3 py-3 bg-red-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-700"
->
-  Delete Notice
-</button>
+        setShowModal(true); // open form modal
+        setShowDetailModal(false);
+      }}
+      className="w-full mt-3 py-3 bg-green-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-green-700"
+    >
+      Edit Notice
+    </button>
+    <button
+      onClick={() => {
+        handleDelete(selectedNotice._id);
+        setShowDetailModal(false);
+        setSelectedNotice(null);
+      }}
+      className="w-full mt-3 py-3 bg-red-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-700"
+    >
+      Delete Notice
+    </button>
+  </>
+)}
             </div>
           </div>
         </div>
@@ -497,62 +500,62 @@ const handleUpdate = (id: string) => {
       ══════════════════════════════════════════ */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[24px] w-full max-w-lg shadow-2xl overflow-hidden">
+          <div className="bg-card rounded-[24px] w-full max-w-lg shadow-2xl overflow-hidden">
 
-            <div className="flex justify-between items-center px-8 py-6 border-b border-slate-100">
+            <div className="flex justify-between items-center px-8 py-6 border-b border-border">
               <div>
-                <h3 className="font-bold text-slate-800 text-lg">Create Notice</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Community Board</p>
+                <h3 className="font-bold text-foreground text-lg">Create Notice</h3>
+                <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mt-0.5">Community Board</p>
               </div>
               <button
                 onClick={() => { setShowModal(false); dispatch(resetAdminState()); }}
-                className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors"
+                className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center hover:bg-slate-200 transition-colors"
               >
-                <X size={14} className="text-slate-500" />
+                <X size={14} className="text-muted-foreground" />
               </button>
             </div>
 
             <div className="px-8 py-6 space-y-4 max-h-[65vh] overflow-y-auto">
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Title *</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5 block">Title *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Notice title"
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition"
+                  className="w-full px-4 py-3 rounded-xl border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Description *</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5 block">Description *</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Write your notice here..."
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Category</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5 block">Category</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition bg-white"
+                    className="w-full px-4 py-3 rounded-xl border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition bg-card"
                   >
                     {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Priority</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5 block">Priority</label>
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition bg-white"
+                    className="w-full px-4 py-3 rounded-xl border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition bg-card"
                   >
                     {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
@@ -561,42 +564,42 @@ const handleUpdate = (id: string) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Visible From *</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5 block">Visible From *</label>
                   <input
                     type="date"
                     value={formData.visibleFrom}
                     onChange={(e) => setFormData({ ...formData, visibleFrom: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition"
+                    className="w-full px-4 py-3 rounded-xl border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Visible Until *</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5 block">Visible Until *</label>
                   <input
                     type="date"
                     value={formData.visibleUntil}
                     onChange={(e) => setFormData({ ...formData, visibleUntil: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition"
+                    className="w-full px-4 py-3 rounded-xl border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Audience</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5 block">Audience</label>
                   <select
                     value={formData.targetAudience}
                     onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition bg-white"
+                    className="w-full px-4 py-3 rounded-xl border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition bg-card"
                   >
                     {AUDIENCES.map(a => <option key={a} value={a}>{a}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Pin Notice</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5 block">Pin Notice</label>
                   <select
                     value={formData.isPinned}
                     onChange={(e) => setFormData({ ...formData, isPinned: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition bg-white"
+                    className="w-full px-4 py-3 rounded-xl border border-border text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition bg-card"
                   >
                     <option value="false">No</option>
                     <option value="true">Yes</option>
@@ -605,12 +608,12 @@ const handleUpdate = (id: string) => {
               </div>
 
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Image (optional)</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5 block">Image (optional)</label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => setFormData({ ...formData, images: e.target.files?.[0] || null })}
-                  className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-black file:uppercase file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 transition"
+                  className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-black file:uppercase file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 transition"
                 />
               </div>
 
@@ -621,10 +624,10 @@ const handleUpdate = (id: string) => {
               )}
             </div>
 
-            <div className="px-8 py-5 border-t border-slate-100 flex gap-3">
+            <div className="px-8 py-5 border-t border-border flex gap-3">
               <button
                 onClick={() => { setShowModal(false); dispatch(resetAdminState()); }}
-                className="flex-1 py-3 rounded-xl border border-slate-200 text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition"
+                className="flex-1 py-3 rounded-xl border border-border text-xs font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition"
               >
                 Cancel
               </button>
@@ -659,17 +662,17 @@ className="flex-1 py-3 bg-blue-600 rounded-xl text-white text-xs font-black uppe
 // ─── Sub Components ──────────────────────────────────────────────────────────
 
 const NoticeCard = ({ category, time, title, color, desc, onReadMore }: any) => (
-  <div className="p-6 bg-white rounded-[24px] border border-slate-100 hover:shadow-xl hover:shadow-blue-100/30 transition-all cursor-pointer group border-b-4 hover:border-b-blue-500">
+  <div className="p-6 bg-card rounded-[24px] border border-border hover:shadow-none hover:shadow-blue-100/30 transition-all cursor-pointer group border-b-4 hover:border-b-blue-500">
     <div className="flex justify-between items-start mb-4">
       <span className={`text-[9px] font-black px-2.5 py-1 rounded-md tracking-widest ${
         color === 'blue' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
       }`}>
         {category}
       </span>
-      <span className="text-[10px] font-bold text-slate-300 uppercase tracking-tight">{time}</span>
+      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{time}</span>
     </div>
-    <h4 className="font-bold text-slate-800 mb-2 leading-tight group-hover:text-blue-600 transition-colors text-lg">{title}</h4>
-    <p className="text-[12px] text-slate-400 leading-relaxed mb-6 line-clamp-2">{desc}</p>
+    <h4 className="font-bold text-foreground mb-2 leading-tight group-hover:text-blue-600 transition-colors text-lg">{title}</h4>
+    <p className="text-[12px] text-muted-foreground leading-relaxed mb-6 line-clamp-2">{desc}</p>
     <div className="flex items-center justify-between">
       <button
         onClick={onReadMore}
@@ -680,7 +683,7 @@ const NoticeCard = ({ category, time, title, color, desc, onReadMore }: any) => 
       </button>
       <div className="flex -space-x-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-slate-100" />
+          <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-muted" />
         ))}
       </div>
     </div>
@@ -689,14 +692,14 @@ const NoticeCard = ({ category, time, title, color, desc, onReadMore }: any) => 
 
 const CalendarItem = ({ date, title, loc }: any) => (
   <div className="flex items-center gap-4 group cursor-pointer">
-    <div className="w-14 h-14 bg-slate-50 border border-slate-100 text-slate-400 rounded-2xl flex flex-col items-center justify-center font-black text-[9px] shadow-sm group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300">
+    <div className="w-14 h-14 bg-muted/50 border border-border text-muted-foreground rounded-2xl flex flex-col items-center justify-center font-black text-[9px] shadow-sm group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all duration-300">
       <span className="opacity-60">{date.split(' ')[0]}</span>
-      <span className="text-base -mt-1 tracking-tighter text-slate-800 group-hover:text-white">{date.split(' ')[1]}</span>
+      <span className="text-base -mt-1 tracking-tighter text-foreground group-hover:text-white">{date.split(' ')[1]}</span>
     </div>
     <div className="min-w-0">
-      <p className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate">{title}</p>
-      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight flex items-center gap-1">
-        <span className="w-1 h-1 bg-slate-300 rounded-full" /> {loc}
+      <p className="text-sm font-bold text-foreground group-hover:text-blue-600 transition-colors truncate">{title}</p>
+      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight flex items-center gap-1">
+        <span className="w-1 h-1 bg-muted-foreground rounded-full" /> {loc}
       </p>
     </div>
   </div>

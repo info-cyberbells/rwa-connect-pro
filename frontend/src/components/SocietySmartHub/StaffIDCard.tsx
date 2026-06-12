@@ -34,7 +34,7 @@ const StaffIDCard: React.FC<StaffIDCardProps> = ({ staff }) => {
       {/* [MODULE-A]: Digital ID Card Component */}
       <div 
         ref={cardRef}
-        className="w-[320px] h-[500px] bg-white rounded-[32px] overflow-hidden shadow-2xl border border-slate-100 flex flex-col relative"
+        className="w-[320px] h-[500px] bg-card rounded-[32px] overflow-hidden shadow-2xl border border-border flex flex-col relative"
       >
         {/* Header/Society Info */}
         <div className="bg-blue-600 p-6 text-white text-center pb-20">
@@ -54,21 +54,21 @@ const StaffIDCard: React.FC<StaffIDCardProps> = ({ staff }) => {
             {!staff.photo && <div className="w-full h-full flex items-center justify-center text-slate-300 font-bold text-4xl">{staff.staffName[0]}</div>}
           </div>
 
-          <h2 className="text-xl font-black text-slate-800 text-center uppercase tracking-tight">{staff.staffName}</h2>
+          <h2 className="text-xl font-black text-foreground text-center uppercase tracking-tight">{staff.staffName}</h2>
           <div className="bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mt-1 mb-10">
             {staff.role}
           </div>
 
           {/* Contact Details */}
           <div className="w-full space-y-3 mb-4">
-            <div className="flex items-center gap-3 text-slate-500">
-              <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center">
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <div className="w-8 h-8 rounded-xl bg-muted/50 flex items-center justify-center">
                 <Phone size={14} />
               </div>
               <span className="text-xs font-bold">{staff.mobileNumber}</span>
             </div>
-            <div className="flex items-center gap-3 text-slate-500">
-              <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center">
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <div className="w-8 h-8 rounded-xl bg-muted/50 flex items-center justify-center">
                 <MapPin size={14} />
               </div>
               <span className="text-xs font-bold">Flat: {staff.flatNumber}</span>
@@ -77,7 +77,7 @@ const StaffIDCard: React.FC<StaffIDCardProps> = ({ staff }) => {
         </div>
 
         {/* Background Decorative Element */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-card/10 rounded-full -mr-16 -mt-16 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-600/5 rounded-full -ml-16 -mb-16 blur-3xl" />
       </div>
 

@@ -16,7 +16,7 @@ const Admin: React.FC = () => {
       <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[140px]" />
 
       {/* Card */}
-      <div className="relative z-10 w-full max-w-md bg-white/90 backdrop-blur-xl rounded-[3rem] p-10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] border border-slate-100">
+      <div className="relative z-10 w-full max-w-md bg-card/90 backdrop-blur-xl rounded-[3rem] p-10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] border border-border">
 
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
@@ -26,7 +26,7 @@ const Admin: React.FC = () => {
           <h1 className="text-3xl font-black tracking-tight">
             Luxe<span className="text-blue-600">Society</span>
           </h1>
-          <p className="text-slate-400 text-sm mt-2">
+          <p className="text-muted-foreground text-sm mt-2">
             Sign in to your society dashboard
           </p>
         </div>
@@ -36,41 +36,41 @@ const Admin: React.FC = () => {
 
           {/* Email */}
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-widest text-slate-500">
+            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <input
                 type="email"
                 placeholder="admin@society.com"
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-14 pr-5 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition"
+                className="w-full bg-muted/50 border border-border rounded-2xl py-4 pl-14 pr-5 focus:bg-card focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition"
               />
             </div>
           </div>
 
           {/* Password */}
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-widest text-slate-500">
+            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <input
                 type="password"
                 placeholder="••••••••"
-                className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-14 pr-14 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition"
+                className="w-full bg-muted/50 border border-border rounded-2xl py-4 pl-14 pr-14 focus:bg-card focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition"
               />
               <Eye
                 size={18}
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
               />
             </div>
           </div>
 
           {/* Forgot */}
           <div className="flex justify-end">
-            <span className="text-xs font-bold text-slate-400 hover:text-blue-600 cursor-pointer">
+            <span className="text-xs font-bold text-muted-foreground hover:text-blue-600 cursor-pointer">
               Forgot password?
             </span>
           </div>
@@ -84,7 +84,7 @@ const Admin: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-400 mt-8">
+        <p className="text-center text-xs text-muted-foreground mt-8">
           © 2026 LuxeSociety. All rights reserved.
         </p>
       </div>

@@ -37,7 +37,7 @@ interface SocietyProps {
 
 const SocietyCard: React.FC<SocietyProps> = ({ society }) => {
   return (
-    <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden mt-8">
+    <div className="max-w-3xl mx-auto bg-card shadow-lg rounded-xl overflow-hidden mt-8">
       {/* Header */}
       <div className="flex items-center p-5 bg-indigo-600 text-white">
         <img

@@ -18,14 +18,17 @@ import {
   addStaffRatingService,
   getStaffReviewsService,
   getStaffDirectoryService,
-  getPublicDocumentsService
+  getPublicDocumentsService,
+  getDashboardSummaryService
 } from "@/auth/authServices";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 
 interface UserState {
   profileData: any;
+  dashboardStats: any;
   loading: boolean;
+  dashboardLoading: boolean;
   singleLoading: boolean,
   error: string | null;
   singleViewError: string | null;
@@ -53,7 +56,9 @@ interface UserState {
 
 const initialState: UserState = {
   profileData: null,
+  dashboardStats: null,
   loading: false,
+  dashboardLoading: false,
   singleLoading: false,
   error: null,
   singleViewError: null,
@@ -94,8 +99,20 @@ export const getPublicDocuments = createAsyncThunk<any, any | undefined, { rejec
   }
 );
 
-
-
+// GET DASHBOARD SUMMARY THUNK
+export const getDashboardSummary = createAsyncThunk<any, void, { rejectValue: string }>(
+  "user/getDashboardSummary",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getDashboardSummaryService();
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch dashboard summary"
+      );
+    }
+  }
+);
 
 // GET MY PROFILE THUNK
 export const getMyProfile = createAsyncThunk< any,void, { rejectValue: string }>(
@@ -385,6 +402,19 @@ const userSlice = createSlice({
         .addCase(getMyProfile.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload || "Error fetching profile";
+        })
+
+        .addCase(getDashboardSummary.pending, (state) => {
+            state.dashboardLoading = true;
+            state.error = null;
+        })
+        .addCase(getDashboardSummary.fulfilled, (state, action) => {
+            state.dashboardLoading = false;
+            state.dashboardStats = action.payload;
+        })
+        .addCase(getDashboardSummary.rejected, (state, action) => {
+            state.dashboardLoading = false;
+            state.error = action.payload || "Error fetching dashboard summary";
         })
 
         .addCase(updateMyProfile.pending, (state) => {

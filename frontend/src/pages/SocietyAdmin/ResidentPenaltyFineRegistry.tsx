@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import DeleteConfirmationModal from './Delete';
+import { useAppSelector } from '../../store/store';
 
 const INITIAL_DATA = [
   { id: 'PEN-1029', issueDate: 'Oct 24, 2023', residentName: 'John Doe', unit: 'A-102', penaltyType: 'Late Payment', amount: 50.00, description: 'Maintenance bill for Oct overdue by 10 days', status: 'Outstanding' },
@@ -57,6 +58,8 @@ const PenaltyTypeBadge = ({ type }) => {
 };
 
 const ResidentPenaltyFineRegistry =() => {
+  const { user } = useAppSelector((state) => state.auth);
+  const role = user?.role || localStorage.getItem("role") || "guard";
   const [searchTerm, setSearchTerm] = useState('');
   const [penalties] = useState(INITIAL_DATA);
 
@@ -93,7 +96,7 @@ const ResidentPenaltyFineRegistry =() => {
     };
 
   return (
-    <DashboardLayout role="society-admin">
+    <DashboardLayout role={role as any}>
     <div className="min-h-screen text-[#0F172A]">
       <div className="max-w-7xl mx-auto">
         
@@ -103,29 +106,29 @@ const ResidentPenaltyFineRegistry =() => {
             <h1 className="text-2xl md:text-3xl font-bold  text-[#0F172A] tracking-wide mb-2">Resident Penalty & Fine Registry</h1>
             <p className="text-[#64748B] font-medium mt-1 text-sm md:text-base">Manage and monitor housing society policy violations and penalties.</p>
           </div>
-          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors shadow-sm w-fit">
+          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-slate-700 font-semibold text-sm hover:bg-muted/50 transition-colors shadow-sm w-fit">
             <Download size={16} />
             Export CSV
           </button>
         </div>
 
         {/* Filters Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 mb-6">
           <div className="flex flex-col lg:flex-row items-center gap-4">
             <div className="relative w-full lg:flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <input 
                 type="text"
                 placeholder="Search by unit (e.g. B-402)..."
-                className="w-full pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                className="w-full pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
             <div className="relative w-full lg:w-56">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <select className="w-full pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-slate-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm">
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <select className="w-full pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm">
                 <option>Issue Date: All Time</option>
                 <option>Last 30 Days</option>
                 <option>Last 6 Months</option>
@@ -133,8 +136,8 @@ const ResidentPenaltyFineRegistry =() => {
             </div>
 
             <div className="relative w-full lg:w-56">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <select className="w-full pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-slate-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm">
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <select className="w-full pl-10 pr-4 py-2.5 bg-[#F8FAFC] border border-border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm">
                 <option>All Penalty Types</option>
                 <option>Late Payment</option>
                 <option>Parking Violation</option>
@@ -149,11 +152,11 @@ const ResidentPenaltyFineRegistry =() => {
         </div>
 
         {/* Table Container */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[1000px]">
               <thead>
-                <tr className="border-b border-slate-100 bg-[#F8FAFC]/50 uppercase text-[11px] font-bold tracking-widest text-[#94A3B8]">
+                <tr className="border-b border-border bg-[#F8FAFC]/50 uppercase text-[11px] font-bold tracking-widest text-[#94A3B8]">
                   <th className="px-6 py-4 ">Issue Date</th>
                   <th className="px-6 py-4 ">Resident Name</th>
                   <th className="px-6 py-4 ">Penalty Type</th>
@@ -166,12 +169,12 @@ const ResidentPenaltyFineRegistry =() => {
               <tbody className="divide-y divide-slate-50">
                 {currentItems.length > 0 ? (
                   currentItems.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
+                    <tr key={item.id} className="hover:bg-muted/50/50 transition-colors group">
                       <td className="px-6 py-6 whitespace-nowrap">
-                        <div className="text-sm font-bold text-slate-800 leading-tight">
+                        <div className="text-sm font-bold text-foreground leading-tight">
                           {item.issueDate}
                         </div>
-                      <div className="text-[10px] text-slate-400 mt-1 font-medium">ID: {item.id}</div>
+                      <div className="text-[10px] text-muted-foreground mt-1 font-medium">ID: {item.id}</div>
                     </td>
                     <td className="px-6 py-6 whitespace-nowrap">
                       <div className="flex items-center gap-3">
@@ -180,7 +183,7 @@ const ResidentPenaltyFineRegistry =() => {
                         </div>
                         <div>
                           <div className="text-sm font-bold ">{item.residentName}</div>
-                          <div className="text-[10px] text-slate-400 font-medium">Unit: {item.unit}</div>
+                          <div className="text-[10px] text-muted-foreground font-medium">Unit: {item.unit}</div>
                         </div>
                       </div>
                     </td>
@@ -218,7 +221,7 @@ const ResidentPenaltyFineRegistry =() => {
                     <td colSpan={7} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <AlertCircle className="text-slate-300" size={48} />
-                        <p className="text-slate-500 font-medium">No records found</p>
+                        <p className="text-muted-foreground font-medium">No records found</p>
                       </div>
                     </td>
                   </tr>
@@ -228,15 +231,15 @@ const ResidentPenaltyFineRegistry =() => {
           </div>
 
           {/* Functional Pagination Footer */}
-          <div className="px-6 py-4 flex flex-col md:flex-row items-center justify-between border-t border-slate-100 bg-white">
+          <div className="px-6 py-4 flex flex-col md:flex-row items-center justify-between border-t border-border bg-card">
             <span className="text-sm text-[#64748B] font-medium mb-4 md:mb-0">
-              Showing <span className="font-semibold text-slate-900"> {startIndex} </span> to <span className="font-semibold text-slate-900"> {endIndex} </span> of <span className="font-semibold text-slate-900"> {penalties.length} </span> active penalties
+              Showing <span className="font-semibold text-foreground"> {startIndex} </span> to <span className="font-semibold text-foreground"> {endIndex} </span> of <span className="font-semibold text-foreground"> {penalties.length} </span> active penalties
             </span>
             <div className="flex items-center gap-1.5">
               <button 
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`p-1.5 transition-colors ${currentPage === 1 ? 'text-slate-200 cursor-not-allowed' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`p-1.5 transition-colors ${currentPage === 1 ? 'text-slate-200 cursor-not-allowed' : 'text-muted-foreground hover:text-slate-600'}`}
               >
                 <ChevronLeft size={18} />
               </button>
@@ -258,7 +261,7 @@ const ResidentPenaltyFineRegistry =() => {
               <button 
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`p-1.5 transition-colors ${currentPage === totalPages ? 'text-slate-200 cursor-not-allowed' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`p-1.5 transition-colors ${currentPage === totalPages ? 'text-slate-200 cursor-not-allowed' : 'text-muted-foreground hover:text-slate-600'}`}
               >
                 <ChevronRight size={18} />
               </button>
@@ -266,7 +269,7 @@ const ResidentPenaltyFineRegistry =() => {
           </div>
         </div>
 
-        <div className="mt-8 text-center text-[10px] text-slate-400 font-medium tracking-wide">
+        <div className="mt-8 text-center text-[10px] text-muted-foreground font-medium tracking-wide">
           Society Admin Portal v2.4.0 • Internal Registry Secured
         </div>
       </div>

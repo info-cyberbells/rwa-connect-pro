@@ -68,7 +68,7 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-6xl bg-white/80 backdrop-blur-md rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white overflow-hidden"
+        className="w-full max-w-6xl bg-card/80 backdrop-blur-md rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white overflow-hidden"
       >
 
         <main className="p-12 grid grid-cols-1 lg:grid-cols-2 gap-20">
@@ -76,15 +76,15 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
           {/* LEFT SIDE FORM */}
           <section className="space-y-8">
             <header>
-              <h2 className="text-4xl font-black text-slate-800 tracking-tight mb-2">Society Identity</h2>
-              <p className="text-slate-500 font-medium">Please provide the registered details of your society.</p>
+              <h2 className="text-4xl font-black text-foreground tracking-tight mb-2">Society Identity</h2>
+              <p className="text-muted-foreground font-medium">Please provide the registered details of your society.</p>
             </header>
 
             <div className="space-y-6">
 
               {/* Society Name */}
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                <label className="block text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-2">
                   Society Legal Name *
                 </label>
                 <input 
@@ -95,14 +95,14 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                   }
                   placeholder="e.g. Green Acres Residency"
                   className={`w-full p-4 rounded-2xl border ${
-                    errors.societyName ? 'border-red-400' : 'border-slate-100'
-                  } bg-slate-50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none`}
+                    errors.societyName ? 'border-red-400' : 'border-border'
+                  } bg-muted/50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none`}
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                <label className="block text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-2">
                   Contact Email Address *
                 </label>
                 <input 
@@ -113,14 +113,14 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                   }
                   placeholder="admin@society.com"
                   className={`w-full p-4 rounded-2xl border ${
-                    errors.email ? 'border-red-400' : 'border-slate-100'
-                  } bg-slate-50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none`}
+                    errors.email ? 'border-red-400' : 'border-border'
+                  } bg-muted/50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none`}
                 />
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                <label className="block text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-2">
                   Primary Phone Number *
                 </label>
                 <input 
@@ -131,8 +131,8 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                   }
                   placeholder="+91 00000 00000"
                   className={`w-full p-4 rounded-2xl border ${
-                    errors.phone ? 'border-red-400' : 'border-slate-100'
-                  } bg-slate-50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none`}
+                    errors.phone ? 'border-red-400' : 'border-border'
+                  } bg-muted/50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none`}
                 />
               </div>
 
@@ -142,7 +142,7 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
           {/* RIGHT SIDE LOGO */}
           <section className="flex flex-col items-center">
             <div className="w-full space-y-4">
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-6 text-center lg:text-left">
+              <label className="block text-[11px] font-black text-muted-foreground uppercase tracking-widest mb-6 text-center lg:text-left">
                 Society Logo (Optional)
               </label>
 
@@ -154,10 +154,10 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                   className="hidden"
                 />
 
-                <div className="w-full aspect-square max-w-[340px] mx-auto border-2 border-dashed border-blue-100 rounded-[3rem] flex flex-col items-center justify-center p-10 bg-blue-50/20 hover:bg-white hover:border-blue-400 hover:shadow-2xl transition-all duration-500">
+                <div className="w-full aspect-square max-w-[340px] mx-auto border-2 border-dashed border-blue-100 rounded-[3rem] flex flex-col items-center justify-center p-10 bg-blue-50/20 hover:bg-card hover:border-blue-400 hover:shadow-2xl transition-all duration-500">
                   
                   <div className="relative mb-6">
-                    <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center border border-slate-50 shadow-lg">
+                    <div className="w-24 h-24 bg-card rounded-3xl flex items-center justify-center border border-slate-50 shadow-lg">
 
                       {formData.logoPreview ? (
                         <img
@@ -182,8 +182,8 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-slate-800">Logo Preview</h3>
-                  <p className="text-[11px] text-slate-400 mt-1 text-center font-medium">
+                  <h3 className="font-bold text-foreground">Logo Preview</h3>
+                  <p className="text-[11px] text-muted-foreground mt-1 text-center font-medium">
                     Click to upload logo
                   </p>
                 </div>
@@ -194,10 +194,10 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
         </main>
 
         {/* FOOTER */}
-        <footer className="px-10 py-8 border-t border-dashed border-blue-100 bg-slate-50/50 flex items-center justify-between">
+        <footer className="px-10 py-8 border-t border-dashed border-blue-100 bg-muted/50 flex items-center justify-between">
           <button
           onClick={()=>navigate(-1)}
-          className="text-slate-400 font-black text-xs uppercase tracking-widest">
+          className="text-muted-foreground font-black text-xs uppercase tracking-widest">
             Cancel Process
           </button>
 

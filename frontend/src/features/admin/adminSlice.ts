@@ -584,9 +584,10 @@ export const updateComplaintStatus = createAsyncThunk(
 
 export const getNotices = createAsyncThunk(
   "admin/getNotices",
-  async (_, { rejectWithValue }) => {
+  async (category: string | undefined, { rejectWithValue }) => {
     try {
-      const data = await getNoticesAdminService();
+      const params = category && category !== "All Notices" ? { category: category.toLowerCase() } : {};
+      const data = await getNoticesAdminService(params);
       return data.notices || data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch notices");

@@ -33,7 +33,7 @@ import {
   // COMMUNITY STAFF DIRECTORY (Residents can view)
   // ==============================
   // Moving this to the top to ensure priority
-  router.get("/directory", auth, permit("user", "admin", "society_admin", "guard"), staffLogs);
+  router.get("/directory", auth, permit("user", "society_admin", "guard"), staffLogs);
 
   // ==============================
   // ONE-TIME STAFF ENTRY (GUARD)
@@ -41,7 +41,7 @@ import {
   router.post(
   "/one-time-entry",
   auth,
-  permit("guard", "admin", "society_admin"),
+  permit("guard", "society_admin"),
   uploadStaffDocuments,
   oneTimeStaffEntry,
   );
@@ -53,7 +53,7 @@ import {
   router.post(
   "/create",
   auth,
-  permit("admin", "society_admin"),
+  permit("society_admin", "guard"),
   uploadStaffDocuments, // [MODULE-C]: Handle document uploads
   createStaffValidation,
   validationMiddleware,
@@ -67,7 +67,7 @@ import {
 router.patch(
   "/verify-member/:staffId",
   auth,
-  permit("admin", "society_admin"),
+  permit("society_admin"),
   uploadStaffDocuments, // Add this to handle file uploads
   verifyStaff,
 );
@@ -79,7 +79,7 @@ router.patch(
 router.get(
   "/search",
   auth,
-  permit("guard", "admin", "society_admin"),
+  permit("guard", "society_admin"),
   searchStaff,
 );
 
@@ -90,7 +90,7 @@ router.get(
 router.post(
   "/entry",
   auth,
-  permit("guard", "admin", "society_admin"),
+  permit("guard", "society_admin"),
   staffEntry,
 );
 
@@ -101,7 +101,7 @@ router.post(
 router.post(
   "/exit",
   auth,
-  permit("guard", "admin", "society_admin"),
+  permit("guard", "society_admin"),
   staffExit,
 );
 
@@ -109,19 +109,19 @@ router.post(
 // ADMIN STAFF LOGS
 // ==============================
 
-router.get("/logs", auth, permit("admin", "society_admin", "guard"), staffLogs);
+router.get("/logs", auth, permit("society_admin", "guard"), staffLogs);
 
 // ==============================
 // ADMIN BLOCK STAFF
 // ==============================
 
-router.post("/block", auth, permit("admin", "society_admin"), blockStaff);
+router.post("/block", auth, permit("society_admin"), blockStaff);
 
 // ==============================
 // ADMIN UNBLOCK STAFF
 // ==============================
 
-router.post("/unblock", auth, permit("admin", "society_admin"), unblockStaff);
+router.post("/unblock", auth, permit("society_admin"), unblockStaff);
 
 // ==============================
 // ADMIN BLOCKED STAFF LIST
@@ -130,7 +130,7 @@ router.post("/unblock", auth, permit("admin", "society_admin"), unblockStaff);
 router.get(
   "/blocked-list",
   auth,
-  permit("admin", "society_admin", "guard"),
+  permit("society_admin", "guard"),
   blockedStaffList,
 );
 

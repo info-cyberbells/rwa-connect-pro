@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Users, CreditCard, Bell, ClipboardList, ArrowUpRight, UserPlus, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { useAppSelector } from "../../store/store";
 
 const stats = [
   { label: "Total Members", value: "124", change: "+5", icon: Users, color: "bg-primary" },
@@ -23,8 +24,13 @@ const pendingPayments = [
 ];
 
 export default function SocietyAdminDashboard() {
+  const { user } = useAppSelector((state) => state.auth);
+  const role = user?.role || localStorage.getItem("role") || "guard";
+  const normalizedRole = role === 'admin' ? 'society_admin' : role;
+  const isAdmin = normalizedRole === 'society_admin';
+
   return (
-    <DashboardLayout role="society-admin">
+    <DashboardLayout role={normalizedRole as any}>
       <div className="space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -32,16 +38,18 @@ export default function SocietyAdminDashboard() {
             <h1 className="text-3xl font-heading font-bold">Society Dashboard</h1>
             <p className="text-muted-foreground">Green Valley Apartments</p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline">
-              <Bell className="w-4 h-4" />
-              Post Notice
-            </Button>
-            <Button>
-              <UserPlus className="w-4 h-4" />
-              Add Member
-            </Button>
-          </div>
+          {isAdmin && (
+            <div className="flex gap-3">
+              <Button variant="outline" className="border-border hover:bg-muted">
+                <Bell className="w-4 h-4 mr-2" />
+                Post Notice
+              </Button>
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Add Member
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Stats Grid */}
@@ -58,7 +66,7 @@ export default function SocietyAdminDashboard() {
                 <div className={`p-3 rounded-xl ${stat.color}`}>
                   <stat.icon className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <span className="text-xs text-muted-foreground font-medium bg-muted px-2 py-1 rounded">
+                <span className="text-xs text-muted-foreground font-medium bg-muted px-2 py-1 rounded border border-border">
                   {stat.change}
                 </span>
               </div>
@@ -74,7 +82,7 @@ export default function SocietyAdminDashboard() {
           <div className="bg-card rounded-2xl card-shadow">
             <div className="p-6 border-b border-border flex items-center justify-between">
               <h2 className="text-xl font-heading font-semibold">Pending Registrations</h2>
-              <Button variant="ghost" size="sm">View All</Button>
+              {isAdmin && <Button variant="ghost" size="sm">View All</Button>}
             </div>
             <div className="p-4 space-y-4">
               {pendingRegistrations.map((reg, index) => (
@@ -88,15 +96,17 @@ export default function SocietyAdminDashboard() {
                       <p className="text-sm text-muted-foreground">Flat: {reg.flat}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground">
-                      Reject
-                    </Button>
-                    <Button size="sm" variant="success">
-                      <CheckCircle className="w-4 h-4" />
-                      Approve
-                    </Button>
-                  </div>
+                  {isAdmin && (
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground">
+                        Reject
+                      </Button>
+                      <Button size="sm" variant="success">
+                        <CheckCircle className="w-4 h-4" />
+                        Approve
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -106,7 +116,7 @@ export default function SocietyAdminDashboard() {
           <div className="bg-card rounded-2xl card-shadow">
             <div className="p-6 border-b border-border flex items-center justify-between">
               <h2 className="text-xl font-heading font-semibold">Payment Verifications</h2>
-              <Button variant="ghost" size="sm">View All</Button>
+              {isAdmin && <Button variant="ghost" size="sm">View All</Button>}
             </div>
             <div className="p-4 space-y-4">
               {pendingPayments.map((payment, index) => (
@@ -120,10 +130,12 @@ export default function SocietyAdminDashboard() {
                       <p className="text-sm text-muted-foreground">{payment.flat} • {payment.type}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold">{payment.amount}</p>
-                    <Button size="sm" className="mt-2">Verify</Button>
-                  </div>
+                  {isAdmin && (
+                    <div className="text-right">
+                      <p className="font-semibold">{payment.amount}</p>
+                      <Button size="sm" className="mt-2">Verify</Button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

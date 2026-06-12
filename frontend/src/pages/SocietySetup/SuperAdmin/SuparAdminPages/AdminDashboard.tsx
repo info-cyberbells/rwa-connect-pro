@@ -39,17 +39,17 @@ const AdminDashboard: React.FC = () => {
         {/* Top Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div className="w-full">
-            <h1 className="text-2xl md:text-3xl pt-12 font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl md:text-3xl pt-12 font-bold text-foreground tracking-tight">
               Super Admin <span className="text-blue-600">Dashboard</span>
             </h1>
-            <p className="text-slate-500 text-sm mt-1">Managing 42 housing societies across the country.</p>
+            <p className="text-muted-foreground text-sm mt-1">Managing 42 housing societies across the country.</p>
           </div>
           
           <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
             <button className="flex-1 md:flex-none bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
               <Zap size={14}/> <span>New Society</span>
             </button>
-            <button className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 relative">
+            <button className="p-2.5 bg-card border border-border rounded-xl text-muted-foreground relative">
               <Bell size={20} />
               <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
             </button>
@@ -58,21 +58,21 @@ const AdminDashboard: React.FC = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-10">
-          <StatCard title="Total Societies" value="42" icon={<Building size={20} className="text-blue-600" />} bg="bg-white" />
-          <StatCard title="Active Residents" value="5.2k" icon={<Users size={20} className="text-emerald-600" />} bg="bg-white" />
-          <StatCard title="Pending Approvals" value="12" icon={<ShieldCheck size={20} className="text-amber-600" />} bg="bg-white" />
-          <StatCard title="Revenue" value="₹245k" icon={<CreditCard size={20} className="text-purple-600" />} bg="bg-white" />
+          <StatCard title="Total Societies" value="42" icon={<Building size={20} className="text-blue-600" />} bg="bg-card" />
+          <StatCard title="Active Residents" value="5.2k" icon={<Users size={20} className="text-emerald-600" />} bg="bg-card" />
+          <StatCard title="Pending Approvals" value="12" icon={<ShieldCheck size={20} className="text-amber-600" />} bg="bg-card" />
+          <StatCard title="Revenue" value="₹245k" icon={<CreditCard size={20} className="text-purple-600" />} bg="bg-card" />
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
+        <div className="bg-card rounded-3xl border border-border/60 shadow-sm overflow-hidden">
           <div className="p-5 md:p-6 flex justify-between items-center border-b border-slate-50">
-            <h2 className="font-bold text-slate-800">Pending Registrations</h2>
+            <h2 className="font-bold text-foreground">Pending Registrations</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[600px]">
               <thead>
-                <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
+                <tr className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-slate-50">
                   <th className="px-6 py-4">Society Name</th>
                   <th className="px-6 py-4">Location</th>
                   <th className="px-6 py-4">Contact Person</th>
@@ -81,20 +81,20 @@ const AdminDashboard: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-50 text-[13px]">
                 {pendingSocieties.map((s, i) => (
-                  <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={i} className="hover:bg-muted/50/50 transition-colors">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-blue-600">
                           <Building size={18}/>
                         </div>
                         <div>
-                          <p className="font-bold text-slate-800">{s.name}</p>
-                          <p className="text-[11px] text-slate-400">{s.units} • {s.type}</p>
+                          <p className="font-bold text-foreground">{s.name}</p>
+                          <p className="text-[11px] text-muted-foreground">{s.units} • {s.type}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-5 text-slate-500 font-medium">{s.location}</td>
-                    <td className="px-6 py-5 text-slate-500 font-medium">{s.admin}</td>
+                    <td className="px-6 py-5 text-muted-foreground font-medium">{s.location}</td>
+                    <td className="px-6 py-5 text-muted-foreground font-medium">{s.admin}</td>
                     <td className="px-6 py-5">
                       <div className="flex justify-center gap-2">
                         <button className="px-3 py-1.5 border border-rose-100 text-rose-500 bg-rose-50 rounded-lg font-bold text-xs">Reject</button>
@@ -120,7 +120,7 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-[#F8FAFC] w-full max-w-5xl h-[95vh] sm:h-[90vh] rounded-t-[32px] sm:rounded-[32px] overflow-hidden flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-300">
             
             {/* Modal Header */}
-            <header className="px-6 py-4 bg-white border-b border-slate-100 flex justify-between items-center shrink-0">
+            <header className="px-6 py-4 bg-card border-b border-border flex justify-between items-center shrink-0">
               <div className="flex items-center gap-4">
                 <button onClick={() => setSelectedSociety(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                   <ArrowLeft size={20} className="text-slate-600" />
@@ -130,10 +130,10 @@ const AdminDashboard: React.FC = () => {
                     <h2 className="text-lg font-black tracking-tight">{selectedSociety.name}</h2>
                     <span className="px-2 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-bold rounded uppercase">Pending Review</span>
                   </div>
-                  <p className="text-[10px] font-semibold text-slate-400">ID: {selectedSociety.id} • Submitted recently</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground">ID: {selectedSociety.id} • Submitted recently</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedSociety(null)} className="p-2 bg-slate-50 text-slate-400 hover:text-slate-600 rounded-full">
+              <button onClick={() => setSelectedSociety(null)} className="p-2 bg-muted/50 text-muted-foreground hover:text-slate-600 rounded-full">
                 <X size={20} />
               </button>
             </header>
@@ -144,10 +144,10 @@ const AdminDashboard: React.FC = () => {
                 
                 {/* Left side */}
                 <div className="lg:col-span-7 space-y-6">
-                  <section className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm">
+                  <section className="bg-card rounded-[24px] p-6 border border-border shadow-sm">
                     <div className="flex items-center gap-2 mb-6">
                       <Info size={18} className="text-blue-500"/>
-                      <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Overview</h3>
+                      <h3 className="text-sm font-black text-foreground uppercase tracking-tight">Overview</h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <InfoBlock label="Admin Name" value={selectedSociety.admin} />
@@ -160,10 +160,10 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   </section>
 
-                  <section className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm">
+                  <section className="bg-card rounded-[24px] p-6 border border-border shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <ShieldCheck size={18} className="text-blue-500"/>
-                      <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Documents</h3>
+                      <h3 className="text-sm font-black text-foreground uppercase tracking-tight">Documents</h3>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <DocCard fileName="Land_Deed.pdf" size="2.4 MB" icon={<FileText />} />
@@ -174,10 +174,10 @@ const AdminDashboard: React.FC = () => {
 
                 {/* Right side */}
                 <div className="lg:col-span-5 space-y-6">
-                  <section className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm">
+                  <section className="bg-card rounded-[24px] p-6 border border-border shadow-sm">
                     <div className="flex items-center gap-2 mb-6">
                       <Layout size={18} className="text-blue-500"/>
-                      <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Structure</h3>
+                      <h3 className="text-sm font-black text-foreground uppercase tracking-tight">Structure</h3>
                     </div>
                     <div className="space-y-3">
                       <StatRow label="Towers" value="06" icon={<Building2 className="text-blue-500"/>} sub="A to F" />
@@ -185,13 +185,13 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   </section>
 
-                  <section className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-sm">
+                  <section className="bg-card rounded-[24px] p-6 border border-border shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <MessageSquare size={18} className="text-blue-500"/>
-                      <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Internal Notes</h3>
+                      <h3 className="text-sm font-black text-foreground uppercase tracking-tight">Internal Notes</h3>
                     </div>
                     <textarea 
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-xs font-medium outline-none min-h-[100px]"
+                      className="w-full bg-muted/50 border border-border rounded-2xl p-4 text-xs font-medium outline-none min-h-[100px]"
                       placeholder="Add a private note for other admins..."
                     />
                   </section>
@@ -200,8 +200,8 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <footer className="px-6 py-4 bg-white border-t border-slate-100 flex justify-end gap-3 shrink-0">
-              <button onClick={() => setSelectedSociety(null)} className="px-6 py-2.5 bg-white border border-slate-200 rounded-xl text-[11px] font-black text-slate-600">
+            <footer className="px-6 py-4 bg-card border-t border-border flex justify-end gap-3 shrink-0">
+              <button onClick={() => setSelectedSociety(null)} className="px-6 py-2.5 bg-card border border-border rounded-xl text-[11px] font-black text-slate-600">
                 Close
               </button>
               <button className="px-6 py-2.5 bg-rose-500 text-white rounded-xl text-[11px] font-black">
@@ -222,33 +222,33 @@ const AdminDashboard: React.FC = () => {
 
 const InfoBlock = ({ label, value }: any) => (
   <div>
-    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-    <p className="text-sm font-bold text-slate-800 tracking-tight">{value}</p>
+    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">{label}</p>
+    <p className="text-sm font-bold text-foreground tracking-tight">{value}</p>
   </div>
 );
 
 const DocCard = ({ fileName, size, icon, isVerified }: any) => (
-  <div className="p-3 border border-slate-100 border-dashed rounded-2xl flex flex-col items-center justify-center bg-slate-50/30">
+  <div className="p-3 border border-border border-dashed rounded-2xl flex flex-col items-center justify-center bg-muted/50/30">
     <div className="relative mb-2">
-      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-slate-300">
+      <div className="w-8 h-8 bg-card rounded-lg flex items-center justify-center text-slate-300">
         {React.cloneElement(icon as React.ReactElement, { size: 18 })}
       </div>
       {isVerified && <CheckCircle2 size={12} className="absolute -top-1 -right-1 text-emerald-500 fill-white" />}
     </div>
     <p className="text-[10px] font-black text-slate-700 truncate w-full">{fileName}</p>
-    <p className="text-[8px] font-bold text-slate-400 uppercase">{size}</p>
+    <p className="text-[8px] font-bold text-muted-foreground uppercase">{size}</p>
   </div>
 );
 
 const StatRow = ({ label, value, icon, sub }: any) => (
-  <div className="flex items-center justify-between p-3 bg-slate-50/50 rounded-2xl border border-slate-50">
+  <div className="flex items-center justify-between p-3 bg-muted/50/50 rounded-2xl border border-slate-50">
     <div className="flex items-center gap-3">
-      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+      <div className="w-8 h-8 bg-card rounded-lg flex items-center justify-center shadow-sm">
         {React.cloneElement(icon as React.ReactElement, { size: 16 })}
       </div>
       <div>
-        <p className="text-[8px] font-black text-slate-400 uppercase mb-1">{label}</p>
-        <p className="text-lg font-black text-slate-800 leading-none">{value}</p>
+        <p className="text-[8px] font-black text-muted-foreground uppercase mb-1">{label}</p>
+        <p className="text-lg font-black text-foreground leading-none">{value}</p>
       </div>
     </div>
     <span className="text-[9px] font-bold text-slate-300 uppercase">{sub}</span>

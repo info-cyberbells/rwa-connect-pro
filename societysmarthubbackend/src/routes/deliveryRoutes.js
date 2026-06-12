@@ -23,7 +23,7 @@ import {
 router.post(
   "/create",
   auth,
-  permit("guard", "admin", "society_admin"),
+  permit("guard", "society_admin"),
   createDeliveryValidation,
   validationMiddleware,
   createDelivery,
@@ -36,7 +36,7 @@ router.post(
 router.post(
   "/exit",
   auth,
-  permit("guard", "admin", "society_admin"),
+  permit("guard", "society_admin"),
   deliveryExit,
 );
 
@@ -47,7 +47,7 @@ router.post(
 router.get(
   "/logs",
   auth,
-  permit("admin", "society_admin", "guard"),
+  permit("society_admin", "guard"),
   deliveryLogs,
 );
 

@@ -1,11 +1,48 @@
 import Society from "../models/Society.js";
 import User from "../models/user.js";
+import Payment from "../models/Payment.js";
 import bcrypt from "bcryptjs";
 import { attachBaseUrl, attachBaseUrlToArray } from "../utils/addBaseUrl.js";
 
 const SALT_ROUNDS = 12;
 const SOCIETY_IMG_FIELDS = { single: ["logoUrl"], array: [] };
 const USER_IMG_FIELDS = { single: ["profilePicUrl", "kyc.governmentIdUrl", "kyc.addressProofUrl"], array: [] };
+
+// SuperAdmin Dashboard Stats
+export async function getDashboardStats(req, res, next) {
+  try {
+    // 1. Total Societies
+    const totalSocieties = await Society.countDocuments();
+
+    // 2. Total Active Members (Users across all societies)
+    const activeMembers = await User.countDocuments({ role: "user", isActive: true });
+
+    // 3. Platform Revenue (Sum of all approved payments platform-wide)
+    const revenueStats = await Payment.aggregate([
+      { $match: { status: "approved" } },
+      { $group: { _id: null, total: { $sum: "$amount" } } }
+    ]);
+    const monthlyRevenue = revenueStats.length > 0 ? revenueStats[0].total : 0;
+
+    // 4. Recent Societies (Last 5 registered)
+    const recentSocieties = await Society.find()
+      .select("name totalUnits createdAt isActive")
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({
+      stats: {
+        totalSocieties,
+        activeMembers,
+        monthlyRevenue,
+        growthRate: "12%", // Static for now, can be calculated based on 30-day window
+      },
+      recentSocieties
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 // SuperAdmin creates a new society
 export async function createSociety(req, res, next) {

@@ -71,109 +71,110 @@ import SocietySetupContainer from "./pages/SocietySetup/SuperAdmin/SuparAdminPag
 import MySociety from "./pages/SocietyAdmin/MySociety.tsx";
  
  
+import { ThemeProvider } from "./components/theme-provider";
+ 
 const queryClient = new QueryClient();
  
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+  <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange storageKey="vite-ui-theme">
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/features" element={<Features />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/verify-otp" element={<VerifyOTP />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
  
-          {/* Super Admin Routes */}
-          <Route path="/super-admin" element={<SuperAdminDashboard />} />
-          <Route path="/Dashboard/*" element={<Dashboard />} />
-          <Route path="/super-admin/globalSocietyDirectory" element={<GlobalSocietyDirectory />} />
-          <Route path="/super-admin/globalSocietyDirectory/:id" element={<SocietyDetails />} />
-          <Route path="/super-admin/register-society" element={<SocietySetupContainer />} />
-          <Route path="/super-admin/globalPayments" element={<GlobalPayments />} />
-          <Route path="/super-admin/support-Tickets" element={<SupportTickets />} />
-          <Route path="/super-admin/document-center" element={<DocumentCenter />} />
-          <Route path="/super-admin/Settings" element={<SuperAdminSettings />} />
-           <Route path="/super-admin/securityAndPreferences" element={<SecurityAndPreferences />} />
-          <Route path="/systemSettings/*" element={<SystemSettings />} />
+            {/* Super Admin Routes */}
+            <Route path="/super-admin" element={<SuperAdminDashboard />} />
+            <Route path="/Dashboard/*" element={<Dashboard />} />
+            <Route path="/super-admin/globalSocietyDirectory" element={<GlobalSocietyDirectory />} />
+            <Route path="/super-admin/globalSocietyDirectory/:id" element={<SocietyDetails />} />
+            <Route path="/super-admin/register-society" element={<SocietySetupContainer />} />
+            <Route path="/super-admin/globalPayments" element={<GlobalPayments />} />
+            <Route path="/super-admin/support-Tickets" element={<SupportTickets />} />
+            {/* <Route path="/super-admin/document-center" element={<DocumentCenter />} /> */}
+            <Route path="/super-admin/Settings" element={<SuperAdminSettings />} />
+             <Route path="/super-admin/securityAndPreferences" element={<SecurityAndPreferences />} />
+            <Route path="/systemSettings/*" element={<SystemSettings />} />
  
  
  
  
  
-          {/* Society Admin Routes */}
-          {/* <Route path="/society-admin" element={<SocietyAdminDashboard />} /> */}
+            {/* Member Routes */}
+            <Route path="/member" element={<MemberDashboard />} />
+            <Route path="/member/*" element={<MemberDashboard />} />
  
-          {/* Member Routes */}
-          <Route path="/member" element={<MemberDashboard />} />
-          <Route path="/member/*" element={<MemberDashboard />} />
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
  
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
+            {/*  Super Admin Routes */}
+            {/* <Route path="/admin/*" element={<Admin />} /> */}
+            <Route path="/societyIdentitySetup/*" element={<SocietyIdentitySetup />} />
+            <Route path="/structureStep/*" element={< StructureStep />} />
+            <Route path="/addressStep/*" element={< AddressStep />} />
+            <Route path="/finalizeSetup/*" element={< FinalizeSetup />} />
+            <Route path="/adminDetailsStep/*" element={< AdminDetailsStep />} /> 
  
-          {/*  Super Admin Routes */}
-          {/* <Route path="/admin/*" element={<Admin />} /> */}
-          <Route path="/societyIdentitySetup/*" element={<SocietyIdentitySetup />} />
-          <Route path="/structureStep/*" element={< StructureStep />} />
-          <Route path="/addressStep/*" element={< AddressStep />} />
-          <Route path="/finalizeSetup/*" element={< FinalizeSetup />} />
-          <Route path="/adminDetailsStep/*" element={< AdminDetailsStep />} /> 
- 
-          <Route path="/sidebar/*" element={<Sidebar />} />
-          <Route path="/adminDashboard/*" element={<AdminDashboard />} />
-         
-          <Route path="/notificationsHub/*" element={<NotificationsHub />} />
-         
-         
- 
-          {/* Society Admin Routes */}
-          <Route path="/society-admin/" element={<SocietyAdminDashboard />} />
-          <Route path="/dashboard/*" element={<Dashboard />} />
-          <Route path="/residentDirectory/*" element={<ResidentDirectory />} />
-          <Route path="/complaintsDetail/*" element={<ComplaintsDetail />} />
-          <Route path="/noticeBoard/*" element={<NoticeBoard />} />
-          <Route path="/finances/*" element={<Finances />} />
-          <Route path="/adminSettings/*" element={<AdminSettings />} />
-          <Route path="/notificationHub/*" element={<NotificationHub />} />
-          <Route path="/maintenance/*" element={<Maintenance/>} />
-         <Route path="/addPenaltyFine/*" element={<AddPenaltyFine/>} />
-         <Route path="/my-society/*" element={<MySociety/>} />
-         <Route path="/deactivationrequests" element={<DeactivationRequests />} />
-         <Route path="/daily-staff" element={<DailyStaff />} />
-         <Route path="/society-admin/documents" element={<AdminDocumentManagement />} />
+            <Route path="/sidebar/*" element={<Sidebar />} />
+            <Route path="/adminDashboard/*" element={<AdminDashboard />} />
+
+            <Route path="/notificationsHub" element={<NotificationHub />} />
 
 
-          {/* All these paths will now render within the DashboardLayout alongside the Sidebar */}
-          <Route path="/residentialDashboard" element={<ResidentialDashboard />} />
-          <Route path="/member/payments" element={<ResidentialPayments />} />
-          <Route path="/member/notices" element={<ResidentialsocietyNotices />} />  
-          <Route path="/member/staff-directory" element={<StaffDirectory />} />
-          <Route path="/member/documents" element={<ResidentDocumentCenter />} />
-          <Route path="/member/support" element={<ResidentialSupport/>} />  
-          <Route path="/member/profile" element={<ProfileHub/>} />
-       
+
+            {/* Society Admin Routes */}
+            <Route path="/society-admin/" element={<SocietyAdminDashboard />} />
+            <Route path="/dashboard/*" element={<Dashboard />} />
+            <Route path="/residentDirectory/*" element={<ResidentDirectory />} />
+            <Route path="/complaintsDetail/*" element={<ComplaintsDetail />} />
+            <Route path="/noticeBoard/*" element={<NoticeBoard />} />
+            <Route path="/finances/*" element={<Finances />} />
+            <Route path="/adminSettings/*" element={<AdminSettings />} />
+            <Route path="/notificationHub" element={<NotificationHub />} />
+            <Route path="/maintenance/*" element={<Maintenance/>} />
+           <Route path="/addPenaltyFine/*" element={<AddPenaltyFine/>} />
+           <Route path="/my-society/*" element={<MySociety/>} />
+           <Route path="/deactivationrequests" element={<DeactivationRequests />} />
+           <Route path="/daily-staff" element={<DailyStaff />} />
+           <Route path="/society-admin/documents" element={<AdminDocumentManagement />} />
+
+
+            {/* All these paths will now render within the DashboardLayout alongside the Sidebar */}
+            <Route path="/residentialDashboard" element={<ResidentialDashboard />} />
+            <Route path="/member/payments" element={<ResidentialPayments />} />
+            <Route path="/member/notices" element={<ResidentialsocietyNotices />} />  
+            <Route path="/member/staff-directory" element={<StaffDirectory />} />
+            <Route path="/member/documents" element={<ResidentDocumentCenter />} />
+            <Route path="/member/support" element={<ResidentialSupport/>} />  
+            <Route path="/member/profile" element={<ProfileHub/>} />
+         
  
  
  
  
  
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
  
 export default App;

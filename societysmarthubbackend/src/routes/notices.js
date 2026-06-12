@@ -16,9 +16,9 @@ const router = Router();
 // All routes require authentication
 router.use(auth);
 
-// --- Read routes (society_admin + user both can read) ---
-router.get("/", permit("society_admin", "user"), getNotices);
-router.get("/:noticeId", permit("society_admin", "user"), getNoticeById);
+// --- Read routes (society_admin + user + guard can read) ---
+router.get("/", permit("society_admin", "user", "guard"), getNotices);
+router.get("/:noticeId", permit("society_admin", "user", "guard"), getNoticeById);
 
 // --- Write routes (only society_admin) ---
 router.post("/", permit("society_admin"), uploadNoticeFiles, createNotice);

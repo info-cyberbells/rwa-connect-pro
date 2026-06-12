@@ -35,12 +35,12 @@ const StructureStep = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden flex flex-col font-sans">
       
       {/* NAVBAR */}
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 px-8 py-4 flex items-center justify-between shadow-sm">
+      <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border px-8 py-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
             <Building className="text-white" size={22} />
           </div>
-          <span className="font-bold text-slate-800 text-lg tracking-tight">Society Management</span>
+          <span className="font-bold text-foreground text-lg tracking-tight">Society Management</span>
         </div>
         <div className="hidden md:flex items-center gap-8">
           {[{ name: 'Dashboard', icon: <LayoutDashboard size={18} /> },
@@ -48,7 +48,7 @@ const StructureStep = () => {
             { name: 'Facilities', icon: <Building size={18} /> },
             { name: 'Billing', icon: <CreditCard size={18} /> }
           ].map(item => (
-            <a key={item.name} className="flex items-center gap-2 text-slate-500 hover:text-blue-600 font-semibold text-sm transition-colors cursor-pointer">
+            <a key={item.name} className="flex items-center gap-2 text-muted-foreground hover:text-blue-600 font-semibold text-sm transition-colors cursor-pointer">
               {item.name}
             </a>
           ))}
@@ -73,7 +73,7 @@ const StructureStep = () => {
         {/* Header */}
         <div className="w-full mb-12 text-center md:text-left">
           <p className="text-blue-500 text-sm font-bold mb-2 tracking-wide uppercase">Setup <span className="text-slate-300 mx-2 font-normal">/</span> Society Structure</p>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-4">Define Society Scale</h1>
+          <h1 className="text-3xl font-black text-foreground tracking-tight mb-4">Define Society Scale</h1>
           <p className="text-slate-600 text-lg font-medium">Step 2 of 4: Enter the total architectural capacity of your property.</p>
         </div>
 
@@ -96,7 +96,7 @@ const StructureStep = () => {
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center border-4 transition-all duration-500
                   ${s.status === 'completed' ? 'bg-blue-600 border-blue-50 text-white' :
                   s.status === 'active' ? 'bg-gradient-to-r from-blue-500 to-blue-400 border-white text-white shadow-xl' :
-                  'bg-white border-slate-100 text-slate-300'}`}>
+                  'bg-card border-border text-slate-300'}`}>
                   {s.status === 'completed' ? "✓" : i + 1}
                 </div>
                 <span className={`text-[11px] font-black uppercase tracking-widest ${s.status !== 'pending' ? 'text-blue-600' : 'text-slate-300'}`}>
@@ -111,7 +111,7 @@ const StructureStep = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
           {metrics.map((item, index) => (
             <motion.div key={index} 
-              className="bg-white rounded-[2.5rem] p-10 border border-slate-50 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center cursor-pointer group"
+              className="bg-card rounded-[2.5rem] p-10 border border-slate-50 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.03)] hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col items-center cursor-pointer group"
               whileHover={{ scale: 1.03 }}
             >
               <div className="w-20 h-20 bg-gradient-to-tr from-blue-50 to-blue-100 rounded-[2rem] flex items-center justify-center mb-6 group-hover:from-blue-500 group-hover:to-blue-600 group-hover:rotate-6 transition-all duration-300">
@@ -119,10 +119,10 @@ const StructureStep = () => {
                   {item.icon}
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">{item.title}</h3>
-              <p className="text-xs text-slate-500 text-center leading-relaxed h-8 px-4 opacity-80">{item.desc}</p>
-              <div className="mt-10 w-full bg-slate-50/80 rounded-2xl py-5 flex items-center justify-center relative border border-slate-100 group-hover:bg-blue-50 transition-colors">
-                <motion.span className="text-3xl font-black text-slate-800 tracking-tighter" 
+              <h3 className="text-xl font-bold text-foreground mb-2">{item.title}</h3>
+              <p className="text-xs text-muted-foreground text-center leading-relaxed h-8 px-4 opacity-80">{item.desc}</p>
+              <div className="mt-10 w-full bg-muted/80 rounded-2xl py-5 flex items-center justify-center relative border border-border group-hover:bg-blue-50 transition-colors">
+                <motion.span className="text-3xl font-black text-foreground tracking-tighter" 
                   initial={{ y: 20, opacity: 0 }} 
                   animate={{ y: 0, opacity: 1 }} 
                   transition={{ delay: index * 0.2, type: 'spring' }}
@@ -140,7 +140,7 @@ const StructureStep = () => {
 
         {/* Pro Tip */}
         <div className="mt-16 bg-blue-50/40 border border-blue-100/40 p-6 rounded-[2rem] flex items-center gap-4 max-w-4xl w-full">
-          <div className="bg-white p-2.5 rounded-xl shadow-sm">
+          <div className="bg-card p-2.5 rounded-xl shadow-sm">
             <Info size={20} className="text-blue-500" />
           </div>
           <p className="text-[13px] text-blue-700/80 font-semibold leading-relaxed">
@@ -151,8 +151,8 @@ const StructureStep = () => {
       </main>
 
       {/* Sticky Footer */}
-      <footer className="bg-white/90 backdrop-blur-md border-t border-slate-200 px-12 py-6 flex justify-between items-center relative z-20 shadow-sm">
-        <button className="flex items-center gap-2 text-slate-400 font-bold text-sm hover:text-slate-700 transition-all active:translate-x-[-3px]">
+      <footer className="bg-card/90 backdrop-blur-md border-t border-border px-12 py-6 flex justify-between items-center relative z-20 shadow-sm">
+        <button className="flex items-center gap-2 text-muted-foreground font-bold text-sm hover:text-slate-700 transition-all active:translate-x-[-3px]">
           <ChevronLeft size={18} /> Back
         </button>
         <div className="flex items-center gap-6">

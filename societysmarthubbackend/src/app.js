@@ -17,6 +17,7 @@ import deliveryRoutes from "./routes/deliveryRoutes.js";
 import staffRoutes from "./routes/staffRoutes.js";
 import ratingsRouter from "./routes/ratings.js";
 import documentsRouter from "./routes/documents.js";
+import notificationRouter from "./routes/notifications.js"; // [NEW] Import notifications router
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use(
 
 // Health check
 app.get("/health", (req, res) => res.json({ status: "ok", version: "2.0-verified-code" }));
+app.get("/api/test-ping", (req, res) => res.json({ message: "pong" }));
 
 // API routes
 app.use("/api/auth", authRouter);
@@ -58,9 +60,9 @@ app.use("/api/delivery", deliveryRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/ratings", ratingsRouter);
 app.use("/api/documents", documentsRouter);
+app.use("/api/notifications", notificationRouter); // [NEW] Mount notifications router
 
 // Error handler (must be last)
 app.use(errorHandler);
 
 export default app;
-

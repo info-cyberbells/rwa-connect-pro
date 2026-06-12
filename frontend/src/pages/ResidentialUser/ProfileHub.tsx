@@ -242,48 +242,48 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
   const SettingsRow = ({ icon: Icon, label, value, onClick }) => (
     <button 
       onClick={onClick}
-      className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors group"
+      className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors group"
     >
       <div className="flex items-center gap-4">
         <div className="p-2 rounded-xl bg-blue-50 text-blue-500">
           <Icon size={20} />
         </div>
-        <span className="font-semibold text-[15px] text-[#334155]">{label}</span>
+        <span className="font-semibold text-[15px] text-foreground">{label}</span>
       </div>
       <div className="flex items-center gap-2">
-        {value && <span className="text-sm text-slate-400 font-medium">{value}</span>}
-        <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-400 transition-colors" />
+        {value && <span className="text-sm text-muted-foreground font-medium">{value}</span>}
+        <ChevronRight size={18} className="text-slate-300 group-hover:text-muted-foreground transition-colors" />
       </div>
     </button>
   );
 
   const SectionHeader = ({ title }) => (
-    <h3 className="text-xs uppercase tracking-[0.2em] font-semibold text-[#94A3B8] mb-3 mt-6 first:mt-2 px-2">
+    <h3 className="text-xs uppercase tracking-[0.2em] font-semibold text-muted-foreground mb-3 mt-6 first:mt-2 px-2">
       {title}
     </h3>
   );
 
   return (
     <DashboardLayout role='member'>
-    <div className="min-h-screen flex flex-col text-[#0F172A] ">
+    <div className="min-h-screen flex flex-col text-foreground ">
       
       {/* --- Main Content --- */}
 <main className="w-full max-w-5xl mx-auto space-y-5">        
         {currentView === 'hub' && (
-          <div className="w-full max-w-4xl rounded-[2.5rem] shadow-xl shadow-slate-200/40 border bg-white border-[#F8FAFC] overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+          <div className="w-full max-w-4xl rounded-[2.5rem] shadow-xl shadow-slate-200/40 border bg-card border-border overflow-hidden animate-in fade-in zoom-in-95 duration-500">
             {/* Profile Info Header */}
             {loading ? (
-              <div className="p-10 text-center flex flex-col items-center border-b border-slate-50 animate-pulse">
+              <div className="p-10 text-center flex flex-col items-center border-b border-border animate-pulse">
 
-                <div className="w-32 h-32 rounded-full bg-slate-200 mb-4"></div>
+                <div className="w-32 h-32 rounded-full bg-muted mb-4"></div>
 
-                <div className="h-6 w-48 bg-slate-200 rounded mb-2"></div>
+                <div className="h-6 w-48 bg-muted rounded mb-2"></div>
 
-                <div className="h-4 w-32 bg-slate-200 rounded"></div>
+                <div className="h-4 w-32 bg-muted rounded"></div>
 
               </div>
             ) : (
-            <div className="p-10 text-center flex flex-col items-center border-b border-slate-50">
+            <div className="p-10 text-center flex flex-col items-center border-b border-border">
               <div className="relative group mb-4">
                 <img
                     src={
@@ -291,7 +291,7 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
                       `https://ui-avatars.com/api/?name=${profileData?.name || "User"}&background=3B82F6&color=fff&size=150`
                     }
                     alt="Avatar"
-                    className="w-32 h-32 rounded-full object-cover ring-8 ring-slate-50"
+                    className="w-32 h-32 rounded-full object-cover ring-8 ring-muted/20"
                   />
                 <button 
                   onClick={() => {
@@ -312,7 +312,7 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
                   <Edit2 size={16} />
                 </button>
               </div>
-              <h2 className="text-3xl font-semibold uppercase text-[#0F172A] grid md:flex items-center gap-4 md:gap-2">
+              <h2 className="text-3xl font-semibold uppercase text-foreground grid md:flex items-center gap-4 md:gap-2">
                 {userData?.name || "N/A"}
                 <span className="text-xs px-4 py-1 -mb-2  uppercase tracking-widest bg-blue-100 text-[#2563EB] rounded-full font-bold">
                   {userData?.role || "N/A"}
@@ -327,7 +327,7 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
                   {profileData?.kyc?.verified ? "KYC Verified" : "KYC Pending"}
                 </span>
               </h2>
-              <p className="text-[#64748B] mt-4 md:mt-1 font-semibold text-sm">Block {userData?.unit?.towerBlock || "N/A"} - {userData?.unit?.flatNumber || "N/A"}</p>
+              <p className="text-muted-foreground mt-4 md:mt-1 font-semibold text-sm">Block {userData?.unit?.towerBlock || "N/A"} - {userData?.unit?.flatNumber || "N/A"}</p>
             </div>)}
 
             {/* List Sections */}
@@ -348,28 +348,26 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
                       setCurrentView("edit");
                     }}
                    value={undefined} />
-                <div className='h-[1px] bg-[#F8FAFC]'></div>
+                <div className='h-[1px] bg-border'></div>
                 <SettingsRow icon={Lock} label="Change Password" onClick={() => setCurrentView("chnagePassword")} value={undefined} />
               </div>
 
               <SectionHeader title="Notifications" />
               <div className="space-y-1">
                 <SettingsRow icon={Bell} label="Push Notifications" value={undefined} onClick={undefined} />
-                <div className='h-[1px] bg-[#F8FAFC]'></div>
+                <div className='h-[1px] bg-border'></div>
                 <SettingsRow icon={Mail} label="Email Notifications" value={undefined} onClick={undefined} />
               </div>
 
               <SectionHeader title="Preferences" />
               <div className="space-y-1">
                 <SettingsRow icon={Languages} label="Language" value="English" onClick={undefined} />
-                <div className='h-[1px] bg-[#F8FAFC]'></div>
-                <SettingsRow icon={Moon} label="Theme" value={undefined} onClick={undefined} />
               </div>
 
               <SectionHeader title="Support" />
               <div className="space-y-1">
                 <SettingsRow icon={HelpCircle} label="Help Center" value={undefined} onClick={undefined} />
-                <div className='h-[1px] bg-[#F8FAFC]'></div>
+                <div className='h-[1px] bg-border'></div>
                 <SettingsRow icon={ShieldCheck} label="Privacy Policy" value={undefined} onClick={undefined} />
               </div>
 
@@ -398,7 +396,7 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
               </button>
             </div>
 
-            <div className="rounded-[2.5rem] shadow-xl shadow-slate-200/40 border bg-white border-slate-100 p-8 md:p-12">
+            <div className="rounded-[2.5rem] shadow-xl shadow-slate-200/40 border bg-card border-border p-8 md:p-12">
               {/* Photo Change Section */}
               <div className="flex flex-col items-center mb-10">
                 <div className="relative border-2 border-blue-100 rounded-[20rem] p-1">
@@ -507,16 +505,16 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
                 <div>
                   <label className="block text-xs font-semibold text-[#334155] uppercase tracking-wider mb-2.5 ml-1">Apartment No.</label>
                   <div className="relative">
-                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400/50" size={18} />
+                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={18} />
                     <div 
                     
-                      className="w-full pl-12 pr-4 py-4 border rounded-2xl cursor-not-allowed font-medium bg-[#F8FAFC] border-[#E2E8F0] text-slate-400"
+                      className="w-full pl-12 pr-4 py-4 border rounded-2xl cursor-not-allowed font-medium bg-[#F8FAFC] border-[#E2E8F0] text-muted-foreground"
                     >
                       <p>Block {userData?.unit?.towerBlock || "N/A"} - {userData?.unit?.flatNumber || "N/A"}</p>
                       </div>
                   </div>
-                  <p className="flex items-center gap-2 text-[11px] text-slate-400 mt-4 ml-1">
-                    <Info size={14} className="text-slate-500" />
+                  <p className="flex items-center gap-2 text-[11px] text-muted-foreground mt-4 ml-1">
+                    <Info size={14} className="text-muted-foreground" />
                     Contact your admin to change building allocation.
                   </p>
                 </div>
@@ -539,7 +537,7 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
                   <button 
                     type="button"
                     onClick={() => setCurrentView('hub')}
-                    className="w-full py-2 text-slate-400 font-bold text-sm hover:text-slate-600 transition-colors"
+                    className="w-full py-2 text-muted-foreground font-bold text-sm hover:text-slate-600 transition-colors"
                   >
                     Cancel & Go Back
                   </button>
@@ -561,7 +559,7 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
           {currentView === "chnagePassword" && (
           <form onSubmit={handlePasswordSubmit}>
             <div className="flex justify-center">
-            <div className="bg-white w-full max-w-3xl p-8  rounded-3xl shadow-sm border border-slate-100">
+            <div className="bg-card w-full max-w-3xl p-8  rounded-3xl shadow-sm border border-border">
               
               <div className="flex items-center gap-3 mb-8">
                 <div className="p-2 bg-blue-50 text-[#1D6AEE] rounded-full">
@@ -601,7 +599,7 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
                     <button
                       type="button"
                       onClick={() => setShowCurrent(!showCurrent)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                     >
                       {showCurrent ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -636,7 +634,7 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
                       <button
                         type="button"
                         onClick={() => setShowNew(!showNew)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                       >
                         {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
@@ -670,7 +668,7 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
                       <button
                         type="button"
                         onClick={() => setShowConfirm(!showConfirm)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                       >
                         {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>

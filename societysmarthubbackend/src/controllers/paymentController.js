@@ -3,6 +3,7 @@ import Charge from "../models/Charge.js";
 import User from "../models/user.js";
 import { attachBaseUrl, attachBaseUrlToArray } from "../utils/addBaseUrl.js";
 import { logActivity } from "../utils/logActivity.js";
+import { createNotification } from "./notificationController.js"; // [NEW] Import notification utility
 
 const PAYMENT_FIELDS = { single: ["paymentScreenshotUrl"], array: [] };
 
@@ -215,6 +216,19 @@ export async function reviewPayment(req, res, next) {
       refModel: "Payment",
       meta: { amount: payment.amount, ...(rejectionReason && { rejectionReason }) },
     });
+
+    // [NEW] Trigger notification for the user
+    await createNotification({
+      recipient: payment.user,
+      society: adminSociety,
+      title: status === "approved" ? "Payment Approved" : "Payment Rejected",
+      message: status === "approved" 
+        ? `Your payment of ₹${payment.amount} for "${updated.charge.title}" has been approved.`
+        : `Your payment of ₹${payment.amount} for "${updated.charge.title}" was rejected. Reason: ${rejectionReason}`,
+      category: "payment",
+      type: status === "approved" ? "success" : "error",
+      link: "/member/payments",
+    }).catch(err => console.error("Notification Error:", err));
 
     res.json({
       message: `Payment ${status} successfully`,

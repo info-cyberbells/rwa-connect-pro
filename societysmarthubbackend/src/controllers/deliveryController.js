@@ -1,6 +1,8 @@
 // controllers/deliveryController.js
 
 import Delivery from "../models/Delivery.js";
+import User from "../models/user.js"; // [NEW] Import User model
+import { createNotification } from "./notificationController.js"; // [NEW] Import notification utility
 
 export const createDelivery = async (req, res) => {
   try {
@@ -21,6 +23,45 @@ export const createDelivery = async (req, res) => {
       vehicleNumber,
       guardId,
     });
+
+    // [NEW] Find residents of the flat and notify them
+    const residents = await User.find({
+      society: req.user.society,
+      "unit.flatNumber": flatNumber,
+      role: "user"
+    });
+
+    for (const resident of residents) {
+      createNotification({
+        recipient: resident._id,
+        society: req.user.society,
+        title: "Delivery at Gate",
+        message: `${deliveryBoyName} from ${companyName} is at the gate with a delivery for flat ${flatNumber}.`,
+        category: "visitor",
+        type: "info",
+        link: "/member/deliveries",
+      }).catch(err => console.error("Notification Error:", err));
+    }
+
+    // [NEW] Trigger notification for GUARDS of the same society
+    await createNotification({
+      society: req.user.society,
+      title: "New Delivery Registered",
+      message: `${deliveryBoyName} (${companyName}) has entered for flat ${flatNumber}.`,
+      category: "visitor", // [FIX]: Use lowercase 'visitor' for backend filter compatibility
+      targetAudience: "guards",
+      type: "info",
+    }).catch(err => console.error("Guard Notification Error:", err));
+
+    // [NEW] Log Activity
+    logActivity({
+      userId: req.user.id,
+      societyId: req.user.society,
+      action: "delivery_registered",
+      description: `Delivery from ${companyName} (${deliveryBoyName}) registered for flat ${flatNumber}.`,
+      meta: { deliveryId: newDelivery._id, flatNumber }
+    });
+
     return res.status(201).json({
       success: true,
       message: "Delivery entry created successfully",
@@ -80,15 +121,10 @@ export const deliveryLogs = async (req, res) => {
     }).sort({
       createdAt: -1,
     });
-    if (!deliveries.length) {
-      return res.status(404).json({
-        success: false,
-        message: "No delivery logs found",
-      });
-    }
+    
     return res.status(200).json({
       success: true,
-      message: "Delivery logs fetched successfully",
+      message: deliveries.length ? "Delivery logs fetched successfully" : "No delivery logs found",
       totalDeliveries: deliveries.length,
       data: deliveries,
     });

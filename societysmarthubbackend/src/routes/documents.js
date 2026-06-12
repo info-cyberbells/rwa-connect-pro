@@ -15,25 +15,25 @@ const router = Router();
 router.post(
   "/",
   auth,
-  permit("admin", "society_admin"),
+  permit("society_admin"),
   uploadSocietyDocument,
   createDocument
 );
 
-// GET /api/documents - Admin (All) & Members (Public only)
-router.get("/", auth, getDocuments);
+// GET /api/documents - Admin (All) & Members (Public only) & Guards
+router.get("/", auth, permit("society_admin", "user", "guard"), getDocuments);
 
 // PATCH /api/documents/:id - Admin only
 router.patch(
   "/:id",
   auth,
-  permit("admin", "society_admin"),
+  permit("society_admin"),
   uploadSocietyDocument,
   updateDocument
 );
 
 // DELETE /api/documents/:id - Admin only
-router.delete("/:id", auth, permit("admin", "society_admin"), deleteDocument);
+router.delete("/:id", auth, permit("society_admin"), deleteDocument);
 
 
 export default router;
