@@ -57,8 +57,6 @@ const SocietySetupContainer = () => {
       [key]: data,
     };
 
-    console.log(" CUMULATIVE FORM DATA:", updated);
-
     return updated;
   });
 };
@@ -96,17 +94,12 @@ const handleFinalSubmit = async (settingsData: any) => {
   };
 
   try {
-    console.log(" Society created successfully with data:", finalData);
 
     //  Call API and get response
     const response = await dispatch(
       createSocietyBySuperAdmin(finalData)
     ).unwrap();
 
-    // Console created society response
-    console.log("🎉 Created Society Response:", response);
-
-    console.log("🆔 Created Society ID:", response?.society?._id);
 
     // Clear form
     setFormData(initialFormState);
@@ -141,10 +134,10 @@ const handleFinalSubmit = async (settingsData: any) => {
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300
                     ${
                       isCompleted
-                        ? "bg-blue-600 text-white"
+                        ? "bg-primary text-primary-foreground"
                         : isActive
-                        ? "bg-card border-2 border-blue-600 text-blue-600 scale-110 shadow-md"
-                        : "bg-slate-100 text-muted-foreground"
+                        ? "bg-card border-2 border-primary text-primary scale-110 shadow-md"
+                        : "bg-muted text-muted-foreground"
                     }`}
                 >
                   {isCompleted ? "✓" : stepNumber}
@@ -153,7 +146,7 @@ const handleFinalSubmit = async (settingsData: any) => {
                 <span
                   className={`text-[10px] mt-2 font-bold uppercase tracking-wider ${
                     isActive || isCompleted
-                      ? "text-blue-600"
+                      ? "text-primary"
                       : "text-muted-foreground"
                   }`}
                 >
@@ -165,9 +158,9 @@ const handleFinalSubmit = async (settingsData: any) => {
         </div>
 
         {/* Progress Line */}
-        <div className="relative w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+        <div className="relative w-full h-2 bg-muted rounded-full overflow-hidden">
           <div
-            className="absolute top-0 left-0 h-full bg-blue-600 transition-all duration-500"
+            className="absolute top-0 left-0 h-full bg-primary transition-all duration-500"
             style={{ width: `${(activeStep - 1) * 33.33}%` }}
           />
         </div>

@@ -228,7 +228,6 @@ const handlePasswordSubmit = async (e: React.FormEvent) => {
     setShowPasswordSection(false);
 
   } catch (error: any) {
-    console.log(error);
     toast({
       title: "Update Failed",
       description: error || "Something went wrong",

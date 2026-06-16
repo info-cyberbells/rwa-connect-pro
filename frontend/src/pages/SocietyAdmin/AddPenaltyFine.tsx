@@ -38,7 +38,7 @@ const AddPenaltyFine = ({ initialData = null }) => {
   };
 
   const handlePost = () => {
-    console.log("Saving Data:", formData);
+    // Logic for saving/posting the fine goes here
   };
 
   return (

@@ -49,11 +49,9 @@ const MySociety = () => {
   });
 
   useEffect(() => {
-    console.log("Dispatching getMySociety");
     dispatch(getMySociety())
       .unwrap()
-      .then((res) => console.log("Society Data:", res))
-      .catch((err) => console.log("Error fetching society:", err));
+      .catch((err) => console.error("Error fetching society:", err));
   }, [dispatch]);
 
   useEffect(() => {
@@ -84,7 +82,7 @@ const MySociety = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted locally:", formData);
+    // Logic for updating society details can be added here
   };
 
 
@@ -144,7 +142,7 @@ const SelectField = ({ label, name, value, onChange, options }: any) => (
       name={name} 
       value={value} 
       onChange={onChange} 
-      className="border border-border bg-muted/30 rounded-xl p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+      className="border border-border bg-muted/30 rounded-xl p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
     >
       {options.map((opt: string) => <option key={opt} value={opt} className="bg-card">{opt}</option>)}
     </select>

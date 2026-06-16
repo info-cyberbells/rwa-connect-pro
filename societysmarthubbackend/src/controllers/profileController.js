@@ -301,3 +301,27 @@ export async function changePassword(req, res, next) {
     next(error);
   }
 }
+
+// Update my preferences (any logged-in user)
+export async function updateMyPreferences(req, res, next) {
+  try {
+    const { notifications, theme } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (notifications) {
+      if (notifications.email !== undefined) user.preferences.notifications.email = notifications.email;
+      if (notifications.sms !== undefined) user.preferences.notifications.sms = notifications.sms;
+      if (notifications.push !== undefined) user.preferences.notifications.push = notifications.push;
+    }
+    if (theme) user.preferences.theme = theme;
+
+    user.markModified("preferences");
+    await user.save();
+
+    res.json({ message: "Preferences updated successfully", preferences: user.preferences });
+  } catch (error) {
+    next(error);
+  }
+}

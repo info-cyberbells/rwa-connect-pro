@@ -9,6 +9,7 @@ import {
   getMyDeactivationRequest,
   cancelDeactivationRequest,
   getDashboardSummary,
+  updateMyPreferences,
 } from "../controllers/profileController.js";
 
 const router = Router();
@@ -27,6 +28,9 @@ router.patch("/", uploadProfilePic, updateMyProfile);
 
 // PATCH /api/profile/password — change password
 router.patch("/password", changePassword);
+
+// PATCH /api/profile/preferences — update notification/theme settings
+router.patch("/preferences", updateMyPreferences);
 
 // POST /api/profile/deactivation-request — user submits deactivation request
 router.post("/deactivation-request", requestDeactivation);

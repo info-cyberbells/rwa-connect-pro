@@ -1,7 +1,20 @@
-import { createSocietyAdminBySuperAdminService, createSocietyBySuperAdminService, getAllSocietiesSuperAdminService, getSocietyDetailsSuperAdminService } from "@/auth/authServices";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-// import { clear } from "console";
+import { 
+  createSocietyAdminBySuperAdminService, 
+  createSocietyBySuperAdminService, 
+  getAllSocietiesSuperAdminService, 
+  getSocietyDetailsSuperAdminService,
+  getAllSupportTicketsService,
+  getSupportTicketDetailsService,
+  addSupportTicketMessageService,
+  updateSupportTicketStatusService,
+  updateMyPreferencesService,
+  getAdminProfileService,
+  updateAdminProfileService,
+  changeMyPasswordService
+} from "@/auth/authServices";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+// SOCIETIES THUNKS
 export const getAllSocietiesSuperAdminThunk = createAsyncThunk<
   any,
   void,
@@ -30,7 +43,6 @@ export const viewSocietyDetailsBySuperAdminThunk = createAsyncThunk<any, string,
     }
 );
 
-// CREATE SOCIETY BY SUPERADMIN THUNK
 export const createSocietyBySuperAdmin = createAsyncThunk<any, any, { rejectValue: any }>(
     "superAdmin/createSociety",
     async(payload, { rejectWithValue}) => {
@@ -43,7 +55,6 @@ export const createSocietyBySuperAdmin = createAsyncThunk<any, any, { rejectValu
     }
 );
 
-// CREATE SOCIETY ADMIN BY SUPERADMIN THUNK
 export const createSocietyAdminBySuperAdmin = createAsyncThunk<any, any, {rejectValue: any}>(
   'superAdmin/createSocietyAdmin',
   async(payload, {rejectWithValue} ) => {
@@ -51,6 +62,99 @@ export const createSocietyAdminBySuperAdmin = createAsyncThunk<any, any, {reject
       const response = await createSocietyAdminBySuperAdminService(payload);
       return response;
     } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Something went wrong");
+    }
+  }
+);
+
+// SUPPORT THUNKS
+export const fetchAllSupportTickets = createAsyncThunk(
+  "superAdmin/fetchAllSupportTickets",
+  async (params: any = {}, { rejectWithValue }) => {
+    try {
+      return await getAllSupportTicketsService(params);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Something went wrong");
+    }
+  }
+);
+
+export const fetchSupportTicketDetails = createAsyncThunk(
+  "superAdmin/fetchSupportTicketDetails",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      return await getSupportTicketDetailsService(id);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Something went wrong");
+    }
+  }
+);
+
+export const addSupportMessage = createAsyncThunk(
+  "superAdmin/addSupportMessage",
+  async ({ id, payload }: { id: string; payload: any }, { rejectWithValue }) => {
+    try {
+      return await addSupportTicketMessageService(id, payload);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Something went wrong");
+    }
+  }
+);
+
+export const updateTicketStatus = createAsyncThunk(
+  "superAdmin/updateTicketStatus",
+  async ({ id, status }: { id: string; status: string }, { rejectWithValue }) => {
+    try {
+      return await updateSupportTicketStatusService(id, { status });
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Something went wrong");
+    }
+  }
+);
+
+// SETTINGS & PROFILE THUNKS
+export const getSuperAdminProfile = createAsyncThunk(
+  "superAdmin/getProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getAdminProfileService();
+      return res.user;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Something went wrong");
+    }
+  }
+);
+
+export const updateSuperAdminProfile = createAsyncThunk(
+  "superAdmin/updateProfile",
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      const res = await updateAdminProfileService(payload);
+      return res.user;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Something went wrong");
+    }
+  }
+);
+
+export const updateSuperAdminPassword = createAsyncThunk(
+  "superAdmin/updatePassword",
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      return await changeMyPasswordService(payload);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Something went wrong");
+    }
+  }
+);
+
+export const updateSuperAdminPreferences = createAsyncThunk(
+  "superAdmin/updatePreferences",
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      const res = await updateMyPreferencesService(payload);
+      return res.preferences;
+    } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Something went wrong");
     }
   }
@@ -67,6 +171,27 @@ const superAdminSlice = createSlice({
     societyDetails: null as any,
     loading2: false,
     createdSociety: {},
+    
+    // Support State
+    tickets: [] as any[],
+    selectedTicket: null as any,
+    messages: [] as any[],
+    societyStats: null as any,
+    relatedTickets: [] as any[],
+    supportLoading: false,
+    isSending: false,
+
+    // Settings State
+    profile: null as any,
+    preferences: {
+      notifications: {
+        email: true,
+        sms: false,
+        push: true
+      }
+    } as any,
+    settingsLoading: false,
+    isSaving: false,
   },
   reducers: {
     clearSocietyDetails(state) {
@@ -75,6 +200,10 @@ const superAdminSlice = createSlice({
     clearCreatedSociety(state) {
       state.createdSociety = {};
     },
+    clearSelectedTicket(state) {
+      state.selectedTicket = null;
+      state.messages = [];
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -106,7 +235,7 @@ const superAdminSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // CREATE SOCIETY BY SUPERADMIN
+      // CREATE SOCIETY
       .addCase(createSocietyBySuperAdmin.pending, (state)=>{
         state.loading = true;
         state.error = null;
@@ -120,20 +249,61 @@ const superAdminSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // CREATE SOCIETY ADMIN BY SUPERADMIN
-      .addCase(createSocietyAdminBySuperAdmin.pending, (state)=>{
-        state.loading = true;
-        state.error = null;
+      // Support Tickets
+      .addCase(fetchAllSupportTickets.pending, (state) => {
+        state.supportLoading = true;
       })
-      .addCase(createSocietyAdminBySuperAdmin.fulfilled, (state)=>{
-        state.loading = false;
+      .addCase(fetchAllSupportTickets.fulfilled, (state, action) => {
+        state.supportLoading = false;
+        state.tickets = action.payload.tickets;
       })
-      .addCase(createSocietyAdminBySuperAdmin.rejected, (state, action)=>{
-        state.loading = false;
-        state.error = action.payload as string;
+      .addCase(fetchSupportTicketDetails.fulfilled, (state, action) => {
+        state.selectedTicket = action.payload.ticket;
+        state.messages = action.payload.ticket.messages;
+        state.societyStats = action.payload.societyContext;
+        state.relatedTickets = action.payload.relatedTickets;
       })
+      .addCase(addSupportMessage.pending, (state) => {
+        state.isSending = true;
+      })
+      .addCase(addSupportMessage.fulfilled, (state, action) => {
+        state.isSending = false;
+        state.selectedTicket = action.payload.ticket;
+        state.messages = action.payload.ticket.messages;
+      })
+      .addCase(addSupportMessage.rejected, (state) => {
+        state.isSending = false;
+      })
+      .addCase(updateTicketStatus.fulfilled, (state, action) => {
+        state.selectedTicket = action.payload.ticket;
+      })
+
+      // Profile & Settings
+      .addCase(getSuperAdminProfile.pending, (state) => {
+        state.settingsLoading = true;
+      })
+      .addCase(getSuperAdminProfile.fulfilled, (state, action) => {
+        state.settingsLoading = false;
+        state.profile = action.payload;
+        if (action.payload.preferences) {
+          state.preferences = action.payload.preferences;
+        }
+      })
+      .addCase(updateSuperAdminProfile.pending, (state) => {
+        state.isSaving = true;
+      })
+      .addCase(updateSuperAdminProfile.fulfilled, (state, action) => {
+        state.isSaving = false;
+        state.profile = action.payload;
+      })
+      .addCase(updateSuperAdminProfile.rejected, (state) => {
+        state.isSaving = false;
+      })
+      .addCase(updateSuperAdminPreferences.fulfilled, (state, action) => {
+        state.preferences = action.payload;
+      });
   },
 });
 
-export const { clearSocietyDetails, clearCreatedSociety } = superAdminSlice.actions;
+export const { clearSocietyDetails, clearCreatedSociety, clearSelectedTicket } = superAdminSlice.actions;
 export default superAdminSlice.reducer;

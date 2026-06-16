@@ -5,10 +5,18 @@ import {
   Camera, Edit2, ChevronDown, Upload, Info, X,
   ChevronLeft, ChevronRight, Paperclip, Moon, ImageIcon,
   TrendingUp, Bell, Calendar, ArrowUpRight, Wrench, Clock,
-  Loader2, ListFilter, RefreshCw
+  Loader2, ListFilter, RefreshCw, Zap
 } from "lucide-react";
 import { DashboardLayout } from "../../components/layout/DashboardLayout";
-import { useAppSelector } from "../../store/store";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { useNavigate } from "react-router-dom";
+import { 
+  createNotice, 
+  addNewResident, 
+  createCharge, 
+  getResidents, 
+  resetAdminState 
+} from "../../features/admin/adminSlice";
 import axiosInstance from "@/auth/axiosInstance";
 import { toast } from "sonner";
 import notificationService from "@/auth/notificationService";
@@ -36,7 +44,20 @@ const StatCard = ({ title, value, subtitle, icon, color, trend, loading, onClick
   </div>
 );
 
+const QuickActionButton = ({ label, icon, color, onClick }: any) => (
+  <button 
+    onClick={onClick}
+    className="flex flex-col items-center justify-center gap-3 p-6 bg-card rounded-3xl border border-border shadow-sm hover:shadow-md hover:scale-[1.02] transition-all active:scale-95 group"
+  >
+    <div className={`${color} p-4 rounded-2xl group-hover:scale-110 transition-transform`}>
+      {icon}
+    </div>
+    <span className="text-xs font-bold text-foreground tracking-tight">{label}</span>
+  </button>
+);
+
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
   const role = user?.role || localStorage.getItem("role") || "guard";
   
@@ -52,6 +73,12 @@ const Dashboard = () => {
   const [selectedAlert, setSelectedAlert] = useState<any>(null);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showAllAlertsModal, setShowAllAlertsModal] = useState(false);
+
+  // Quick Action Modals State
+  const [showNoticeModal, setShowNoticeModal] = useState(false);
+  const [showAddResidentModal, setShowAddResidentModal] = useState(false);
+  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
+  const [showFineModal, setShowFineModal] = useState(false);
   
   const isGuard = role === 'guard';
   const lastAlertIdRef = useRef<string | null>(null);
@@ -174,6 +201,41 @@ const Dashboard = () => {
           />
         </div>
 
+        {/* ── Quick Actions ── */}
+        {!isGuard && (
+          <div className="mb-8">
+            <h2 className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Zap size={14} className="text-primary" /> Quick Actions
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <QuickActionButton 
+                label="Post Notice" 
+                icon={<Bell size={20} />} 
+                color="bg-blue-500/10 text-blue-600"
+                onClick={() => setShowNoticeModal(true)}
+              />
+              <QuickActionButton 
+                label="Add Resident" 
+                icon={<UserPlus size={20} />} 
+                color="bg-emerald-500/10 text-emerald-600"
+                onClick={() => setShowAddResidentModal(true)}
+              />
+              <QuickActionButton 
+                label="Maintenance Charge" 
+                icon={<IndianRupee size={20} />} 
+                color="bg-orange-500/10 text-orange-600"
+                onClick={() => setShowMaintenanceModal(true)}
+              />
+              <QuickActionButton 
+                label="Add Fine" 
+                icon={<AlertTriangle size={20} />} 
+                color="bg-rose-500/10 text-rose-600"
+                onClick={() => setShowFineModal(true)}
+              />
+            </div>
+          </div>
+        )}
+
         {/* ── Main Layout ── */}
         <div className={`grid grid-cols-1 ${isGuard ? 'lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
           
@@ -290,18 +352,295 @@ const Dashboard = () => {
           </Modal>
         )}
 
+        {/* ── QUICK ACTION MODALS ── */}
+        {showNoticeModal && <PostNoticeModal onClose={() => setShowNoticeModal(false)} />}
+        {showAddResidentModal && <AddResidentModal onClose={() => setShowAddResidentModal(false)} />}
+        {showMaintenanceModal && <MaintenanceChargeModal onClose={() => setShowMaintenanceModal(false)} />}
+        {showFineModal && <AddFineModal onClose={() => setShowFineModal(false)} />}
+
       </div>
     </DashboardLayout>
   );
 };
 
+/* ══════════════════════════════════════════
+   REUSABLE MODAL COMPONENT
+══════════════════════════════════════════ */
 const Modal = ({ children, onClose, wide, zIndex = "z-[1000]" }: any) => (
   <div className={`fixed inset-0 ${zIndex} flex items-center justify-center p-4`}>
-    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
+    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm shadow-2xl" onClick={onClose} />
     <div className={`relative bg-card w-full ${wide ? 'max-w-4xl' : 'max-w-xl'} rounded-[40px] shadow-2xl overflow-hidden border border-border`}>
        {children}
     </div>
   </div>
 );
+
+/* ══════════════════════════════════════════
+   1. POST NOTICE MODAL
+══════════════════════════════════════════ */
+const PostNoticeModal = ({ onClose }: any) => {
+  const dispatch = useAppDispatch();
+  const { isLoading } = useAppSelector(s => s.admin);
+  const [form, setForm] = useState({ title: '', description: '', category: 'maintenance', priority: 'medium', visibleFrom: new Date().toISOString().split('T')[0], visibleUntil: '', targetAudience: 'all' });
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    try {
+      await dispatch(createNotice(form)).unwrap();
+      toast.success("Notice posted successfully");
+      onClose();
+    } catch (err: any) { toast.error(err || "Failed to post notice"); }
+  };
+
+  return (
+    <Modal onClose={onClose}>
+      <div className="p-8 space-y-6 bg-card text-left">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-black text-foreground">Post Society Notice</h2>
+          <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-colors"><X size={20} /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Title</label>
+            <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:border-primary" placeholder="Water Supply Interruption" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Category</label>
+              <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none">
+                <option value="maintenance">Maintenance</option>
+                <option value="event">Event</option>
+                <option value="alert">Alert</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Priority</label>
+              <select value={form.priority} onChange={e => setForm({...form, priority: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Description</label>
+            <textarea required rows={3} value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none resize-none focus:border-primary" placeholder="Write notice details here..." />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Visible Until</label>
+              <input required type="date" value={form.visibleUntil} onChange={e => setForm({...form, visibleUntil: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Target Audience</label>
+              <select value={form.targetAudience} onChange={e => setForm({...form, targetAudience: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none">
+                <option value="all">All Members</option>
+                <option value="owners">Owners Only</option>
+                <option value="tenants">Tenants Only</option>
+              </select>
+            </div>
+          </div>
+          <button disabled={isLoading} className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-primary/20 disabled:opacity-50 mt-4">
+            {isLoading ? "Posting..." : "Post Notice"}
+          </button>
+        </form>
+      </div>
+    </Modal>
+  );
+};
+
+/* ══════════════════════════════════════════
+   2. ADD RESIDENT MODAL
+══════════════════════════════════════════ */
+const AddResidentModal = ({ onClose }: any) => {
+  const dispatch = useAppDispatch();
+  const { isLoading } = useAppSelector(s => s.admin);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', role: 'user', unit: { flatNumber: '', towerBlock: '', floor: 1, type: '2BHK', areaSqFt: 1000, ownershipType: 'owner' } });
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("email", form.email);
+    formData.append("phone", form.phone);
+    formData.append("password", form.password);
+    formData.append("role", form.role);
+    formData.append("unit", JSON.stringify(form.unit));
+    try {
+      await dispatch(addNewResident(formData)).unwrap();
+      toast.success("Resident added successfully");
+      onClose();
+    } catch (err: any) { toast.error(err || "Failed to add resident"); }
+  };
+
+  return (
+    <Modal onClose={onClose} wide>
+      <div className="p-8 space-y-6 bg-card text-left">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-black text-foreground">Add New Resident</h2>
+          <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-colors"><X size={20} /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-6 gap-y-4">
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Full Name</label>
+            <input required type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="Amit Sharma" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Email Address</label>
+            <input required type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="amit@example.com" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Phone Number</label>
+            <input required type="text" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="+91 9876543210" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Password</label>
+            <input required type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="••••••••" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Tower / Block</label>
+            <input required type="text" value={form.unit.towerBlock} onChange={e => setForm({...form, unit: {...form.unit, towerBlock: e.target.value}})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="A" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Flat Number</label>
+            <input required type="text" value={form.unit.flatNumber} onChange={e => setForm({...form, unit: {...form.unit, flatNumber: e.target.value}})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="101" />
+          </div>
+          <button disabled={isLoading} className="col-span-2 bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-emerald-100 disabled:opacity-50 mt-4">
+            {isLoading ? "Saving..." : "Add Resident"}
+          </button>
+        </form>
+      </div>
+    </Modal>
+  );
+};
+
+/* ══════════════════════════════════════════
+   3. MAINTENANCE CHARGE MODAL
+══════════════════════════════════════════ */
+const MaintenanceChargeModal = ({ onClose }: any) => {
+  const dispatch = useAppDispatch();
+  const { isLoading } = useAppSelector(s => s.admin);
+  const [form, setForm] = useState({ title: '', amount: '', category: 'maintenance', appliedTo: 'all', dueDate: '', description: '' });
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    const chargeForm = new FormData();
+    chargeDataToFormData(chargeForm, form);
+    try {
+      await dispatch(createCharge(chargeForm)).unwrap();
+      toast.success("Maintenance charge posted");
+      onClose();
+    } catch (err: any) { toast.error(err || "Failed to post charge"); }
+  };
+
+  return (
+    <Modal onClose={onClose}>
+      <div className="p-8 space-y-6 bg-card text-left">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-black text-foreground">Add Maintenance Charge</h2>
+          <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-colors"><X size={20} /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Charge Title</label>
+            <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="Monthly Maintenance - Dec" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Amount (₹)</label>
+              <input required type="number" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="2500" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Due Date</label>
+              <input required type="date" value={form.dueDate} onChange={e => setForm({...form, dueDate: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Description</label>
+            <textarea rows={2} value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none resize-none" />
+          </div>
+          <button disabled={isLoading} className="w-full bg-orange-600 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-orange-100 disabled:opacity-50 mt-4">
+            {isLoading ? "Posting..." : "Create Charge"}
+          </button>
+        </form>
+      </div>
+    </Modal>
+  );
+};
+
+/* ══════════════════════════════════════════
+   4. ADD FINE MODAL
+══════════════════════════════════════════ */
+const AddFineModal = ({ onClose }: any) => {
+  const dispatch = useAppDispatch();
+  const { residents, isLoading } = useAppSelector(s => s.admin);
+  const [form, setForm] = useState({ title: '', amount: '', category: 'fine', appliedTo: 'specific', targetUsers: [] as string[], description: '', dueDate: new Date().toISOString().split('T')[0] });
+
+  useEffect(() => { dispatch(getResidents()); }, [dispatch]);
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    if (form.targetUsers.length === 0) return toast.error("Please select a resident");
+    const chargeForm = new FormData();
+    chargeDataToFormData(chargeForm, form);
+    try {
+      await dispatch(createCharge(chargeForm)).unwrap();
+      toast.success("Fine applied successfully");
+      onClose();
+    } catch (err: any) { toast.error(err || "Failed to apply fine"); }
+  };
+
+  return (
+    <Modal onClose={onClose}>
+      <div className="p-8 space-y-6 bg-card text-left">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-black text-foreground">Apply Penalty / Fine</h2>
+          <button onClick={onClose} className="p-2 hover:bg-muted rounded-xl transition-colors"><X size={20} /></button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Fine Title</label>
+            <input required type="text" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="Parking Violation" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Resident</label>
+              <select required className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" onChange={e => setForm({...form, targetUsers: [e.target.value]})}>
+                <option value="">Select Resident</option>
+                {residents.map((r: any) => <option key={r._id} value={r._id}>{r.name} ({r.unit?.towerBlock}-{r.unit?.flatNumber})</option>)}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Amount (₹)</label>
+              <input required type="number" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none" placeholder="500" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Description</label>
+            <textarea required rows={2} value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm outline-none resize-none" placeholder="Parked in non-designated area..." />
+          </div>
+          <button disabled={isLoading} className="w-full bg-rose-600 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-rose-100 disabled:opacity-50 mt-4">
+            {isLoading ? "Applying..." : "Apply Fine"}
+          </button>
+        </form>
+      </div>
+    </Modal>
+  );
+};
+
+/* ── Helper ── */
+const chargeDataToFormData = (formData: FormData, data: any) => {
+  formData.append("title", data.title);
+  formData.append("amount", data.amount);
+  formData.append("category", data.category);
+  formData.append("appliedTo", data.appliedTo);
+  formData.append("dueDate", new Date(data.dueDate).toISOString());
+  formData.append("description", data.description);
+  if (data.targetUsers) {
+    data.targetUsers.forEach((id: string) => formData.append("targetUsers[]", id));
+  }
+};
 
 export default Dashboard;

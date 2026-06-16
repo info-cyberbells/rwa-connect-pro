@@ -199,7 +199,7 @@ const GlobalSocietyDirectory: React.FC = () => {
 };
 
 const FilterTag = ({ label }: { label: string }) => (
-  <button className="flex items-center gap-2 px-4 py-2 bg-card border rounded-xl text-xs font-bold text-slate-600 hover:border-blue-300 hover:text-blue-600 transition">
+  <button className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-xl text-xs font-bold text-muted-foreground hover:border-primary hover:text-primary transition">
     {label}
     <ChevronDown size={14} />
   </button>
@@ -209,10 +209,10 @@ const NodeRow = ({ name, id, logo ,city, type, units, admin, status }: any) => {
   const navigate = useNavigate();
 
   return (
-    <tr className="hover:bg-blue-50 transition">
+    <tr className="hover:bg-muted/50 transition border-b border-border/50">
       <td className="px-4 py-4">
         <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
                 {logo ? (
                   <img src={logo} alt="Logo" className="w-10 h-10 rounded-xl object-cover" />
                 ) : (
@@ -220,26 +220,26 @@ const NodeRow = ({ name, id, logo ,city, type, units, admin, status }: any) => {
                 )}
               </div>
           <div>
-            <p className="font-bold text-sm">{name}</p>
+            <p className="font-bold text-sm text-foreground">{name}</p>
             <span className="text-[10px] text-muted-foreground">{id}</span>
           </div>
         </div>
       </td>
 
       <td className="px-4 py-4">
-        <div className="flex items-center gap-2 text-sm font-medium text-slate-600">
+        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <MapPin size={14} />
           {city}
         </div>
       </td>
 
       <td className="px-4 py-4 text-center">
-        <span className="px-3 py-1 text-xs font-bold rounded-lg bg-slate-100">
+        <span className="px-3 py-1 text-xs font-bold rounded-lg bg-muted text-foreground">
           {units}
         </span>
       </td>
 
-      <td className="hidden md:table-cell px-4 py-4 text-sm font-medium">
+      <td className="hidden md:table-cell px-4 py-4 text-sm font-medium text-foreground">
         {admin}
       </td>
 
@@ -247,8 +247,8 @@ const NodeRow = ({ name, id, logo ,city, type, units, admin, status }: any) => {
         <span
           className={`px-3 py-1 rounded-full text-[10px] font-bold ${
             status === 'Active'
-              ? 'bg-emerald-100 text-emerald-600'
-              : 'bg-orange-100 text-orange-600'
+              ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+              : 'bg-orange-500/10 text-orange-500 border border-orange-500/20'
           }`}
         >
           {type}
@@ -258,7 +258,7 @@ const NodeRow = ({ name, id, logo ,city, type, units, admin, status }: any) => {
       <td className="px-4 py-4 text-right">
         <button
           onClick={() => navigate(`/super-admin/globalSocietyDirectory/${id}`)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-muted/50 text-xs font-bold rounded-xl hover:bg-blue-600 hover:text-white transition"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-muted hover:bg-primary hover:text-primary-foreground text-xs font-bold rounded-xl transition"
         >
           <span className="hidden sm:inline">View Details</span>
           <ArrowUpRight size={14} />

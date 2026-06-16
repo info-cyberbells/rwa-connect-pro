@@ -29,11 +29,13 @@ const societyAdminNav = [
   { icon: MessageSquare, label: "Complaints", href: "/complaintsDetail" },
   { icon: AlertOctagon, label: "Fine", href: "/addPenaltyFine" },
   { icon: Wrench, label: "Maintenance", href: "/maintenance" },
-  { icon: UserCheck, label: "Daily Staff", href: "/daily-staff" },
+  {icon: UserCheck, label: "Daily Staff", href: "/daily-staff" },
   { icon: FileText, label: "Documents", href: "/society-admin/documents" },
+  { icon: Ticket, label: "Support", href: "/society-admin/support" },
   { icon: UserX, label: "Deactivations", href: "/deactivationrequests" },
   { icon: Settings, label: "Settings", href: "/adminSettings" },
-];
+  ];
+
 
 const navigationConfig: Record<string, any[]> = {
   "super-admin": [

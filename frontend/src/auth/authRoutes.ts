@@ -25,6 +25,15 @@ export const AUTHROUTES = {
     USER_GET_MY_PROFILE: "/profile",
     USER_UPDATE_MY_PROFILE: "/profile",
     USER_CHANGE_PASSWORD: "/profile/password",
+    USER_UPDATE_PREFERENCES: "/profile/preferences",
+
+    // SUPPORT ROUTES
+    SUPPORT_CREATE_TICKET: "/support",
+    SUPPORT_GET_MY_TICKETS: "/support/my-tickets",
+    SUPPORT_GET_ALL_TICKETS: "/support/all",
+    SUPPORT_GET_TICKET_DETAILS: "/support", // Base for /:id
+    SUPPORT_ADD_MESSAGE: "/support", // Base for /:id/messages
+    SUPPORT_UPDATE_STATUS: "/support", // Base for /:id/status
  
     USER_GET_ALL_NOTICES: '/notices',
     USER_GET_ALL_ACTIVE_NOTICES: "/notices",

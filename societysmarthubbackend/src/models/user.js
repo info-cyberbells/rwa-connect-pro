@@ -116,6 +116,16 @@ const UserSchema = new Schema(
     designation: { type: String, trim: true },
 
     language: { type: String, default: "en", trim: true }, // e.g. "en", "hi", "mr"
+    
+    preferences: {
+      notifications: {
+        email: { type: Boolean, default: true },
+        sms: { type: Boolean, default: false },
+        push: { type: Boolean, default: true },
+      },
+      theme: { type: String, enum: ["light", "dark", "system"], default: "light" },
+    },
+
     isActive: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
 

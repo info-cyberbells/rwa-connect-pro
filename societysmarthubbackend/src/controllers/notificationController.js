@@ -24,10 +24,6 @@ export const createNotification = async (data) => {
       finalIsRead = true;
     }
 
-    if (category === 'visitor') {
-      console.log(`[DEBUG] Creating visitor notification: title="${title}", recipient=${recipient}, sender=${sender}, isRead_input=${isRead}, finalIsRead=${finalIsRead}`);
-    }
-
     // Handle Broadcast (All users in society or Global if SuperAdmin)
     if (targetAudience && targetAudience !== "specific") {
       const query = {};
@@ -54,7 +50,6 @@ export const createNotification = async (data) => {
       }
 
       const users = await User.find(query).select("_id role");
-      console.log(`[DEBUG] Broadcast Notification: title="${title}", audience=${targetAudience}, found=${users.length} recipients. Query:`, JSON.stringify(query));
       
       let userIds = users.map(u => u._id);
 
@@ -121,14 +116,42 @@ export const getMyNotifications = async (req, res, next) => {
 
     const userObjectId = new mongoose.Types.ObjectId(req.user.id);
     
-    // Special handling for 'Sent' notifications
+    // Special handling for 'Sent' notifications - Group by title/message to avoid duplicates in UI
     if (category === 'Sent') {
-      const total = await Notification.countDocuments({ sender: userObjectId });
+      const notifications = await Notification.aggregate([
+        { $match: { sender: userObjectId } },
+        { $sort: { createdAt: -1 } },
+        {
+          $group: {
+            _id: {
+              title: "$title",
+              message: "$message",
+              createdAt: { $dateToString: { format: "%Y-%m-%d %H:%M", date: "$createdAt" } }
+            },
+            doc: { $first: "$$ROOT" }
+          }
+        },
+        { $replaceRoot: { newRoot: "$doc" } },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit }
+      ]);
 
-      const notifications = await Notification.find({ sender: userObjectId })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+      const totalGrouped = await Notification.aggregate([
+        { $match: { sender: userObjectId } },
+        {
+          $group: {
+            _id: {
+              title: "$title",
+              message: "$message",
+              createdAt: { $dateToString: { format: "%Y-%m-%d %H:%M", date: "$createdAt" } }
+            }
+          }
+        },
+        { $count: "count" }
+      ]);
+
+      const total = totalGrouped.length > 0 ? totalGrouped[0].count : 0;
 
       return res.json({
         status: "success",
@@ -149,7 +172,6 @@ export const getMyNotifications = async (req, res, next) => {
     if (category && category !== 'All') {
       if (category === 'Unread') {
         query.isRead = false;
-        // [FIX] Never show my own sent messages in my Unread tab
         query.sender = { $ne: userObjectId };
       } else if (category === 'Read' || category === 'Resolved') {
         query.isRead = true;
@@ -172,18 +194,13 @@ export const getMyNotifications = async (req, res, next) => {
     }
     if (category === 'Read') query.isRead = true;
 
-    // [NEW] If looking for Unread, and I sent it to myself but marked it as read, 
     // it should definitely NOT show up. The query { isRead: false } already ensures this.
-
-    console.log(`[DEBUG] getMyNotifications: user=${req.user.id}, query=${JSON.stringify(query)}, category=${category}`);
 
     const total = await Notification.countDocuments(query);
     const notifications = await Notification.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
-
-    console.log(`[DEBUG] getMyNotifications: Found ${notifications.length} records out of total ${total}`);
 
     res.json({
       status: "success",

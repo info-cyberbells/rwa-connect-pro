@@ -20,15 +20,15 @@ import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOTP from "./pages/VerifyOTP";
 import ResetPassword from "./pages/ResetPassword";
 
- 
+
 // Dashboard Pages
 import SuperAdminDashboard from "./pages/dashboard/SuperAdminDashboard";
 import SocietyAdminDashboard from "./pages/dashboard/SocietyAdminDashboard";
 import MemberDashboard from "./pages/dashboard/MemberDashboard";
- 
+
 import NotFound from "./pages/NotFound";
 // import Admin from "./pages/SocietySetup/Admin/Admin"
- 
+
 import SocietyIdentitySetup from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietyRegistrationPages/SocietyIdentitySetup"
 import StructureStep from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietyRegistrationPages/StructureStep"
 import AddressStep from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietyRegistrationPages/AddressStep"
@@ -44,7 +44,7 @@ import DocumentCenter from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/Docu
 import SecurityAndPreferences from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SecurityAndPreferences"
 import SuperAdminSettings from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SuperAdminSettings"
 import SystemSettings from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SystemSettings";
- 
+
 import { Sidebar } from "lucide-react";
 import Dashboard from "./pages/SocietyAdmin/Dashboard";
 import ResidentDirectory from "./pages/SocietyAdmin/ResidentDirectory";
@@ -58,7 +58,7 @@ import AddPenaltyFine from "./pages/SocietyAdmin/AddPenaltyFine";
 import DeactivationRequests from "./pages/SocietyAdmin/DeactivationRequests.tsx"
 import DailyStaff from "./pages/SocietyAdmin/DailyStaff";
 import AdminDocumentManagement from "./pages/SocietyAdmin/DocumentManagement";
- 
+
 // import{DashboardLayout} from "./components/layout/DashboardLayout"
 import ResidentialDashboard from "./pages/ResidentialUser/ResidentialDashboard.tsx"
 import ResidentialPayments from "./pages/ResidentialUser/ResidentialPayments.tsx"
@@ -69,12 +69,13 @@ import ResidentDocumentCenter from "./pages/ResidentialUser/DocumentCenter";
 import ProfileHub from "./pages/ResidentialUser/ProfileHub.tsx";
 import SocietySetupContainer from "./pages/SocietySetup/SuperAdmin/SuparAdminPages/SocietySetupContainer.tsx";
 import MySociety from "./pages/SocietyAdmin/MySociety.tsx";
- 
- 
+import SocietyAdminSupport from "./pages/SocietyAdmin/Support.tsx"; // [NEW] Support page for Society Admin
+
+
 import { ThemeProvider } from "./components/theme-provider";
- 
+
 const queryClient = new QueryClient();
- 
+
 const App = () => (
   <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange storageKey="vite-ui-theme">
     <QueryClientProvider client={queryClient}>
@@ -99,43 +100,41 @@ const App = () => (
             <Route path="/verify-otp" element={<VerifyOTP />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 
- 
+
             {/* Super Admin Routes */}
             <Route path="/super-admin" element={<SuperAdminDashboard />} />
-            <Route path="/Dashboard/*" element={<Dashboard />} />
+            {/* <Route path="/Dashboard/*" element={<Dashboard />} /> */}
             <Route path="/super-admin/globalSocietyDirectory" element={<GlobalSocietyDirectory />} />
             <Route path="/super-admin/globalSocietyDirectory/:id" element={<SocietyDetails />} />
             <Route path="/super-admin/register-society" element={<SocietySetupContainer />} />
             <Route path="/super-admin/globalPayments" element={<GlobalPayments />} />
             <Route path="/super-admin/support-Tickets" element={<SupportTickets />} />
-            {/* <Route path="/super-admin/document-center" element={<DocumentCenter />} /> */}
+            {/* <Route path="/super-admin/document-cente  r" element={<DocumentCenter />} /> */}
             <Route path="/super-admin/Settings" element={<SuperAdminSettings />} />
-             <Route path="/super-admin/securityAndPreferences" element={<SecurityAndPreferences />} />
+            <Route path="/super-admin/securityAndPreferences" element={<SecurityAndPreferences />} />
             <Route path="/systemSettings/*" element={<SystemSettings />} />
- 
- 
- 
- 
- 
-            {/* Member Routes */}
-            <Route path="/member" element={<MemberDashboard />} />
-            <Route path="/member/*" element={<MemberDashboard />} />
- 
-            {/* 404 */}
-            <Route path="*" element={<NotFound />} />
- 
             {/*  Super Admin Routes */}
             {/* <Route path="/admin/*" element={<Admin />} /> */}
             <Route path="/societyIdentitySetup/*" element={<SocietyIdentitySetup />} />
             <Route path="/structureStep/*" element={< StructureStep />} />
             <Route path="/addressStep/*" element={< AddressStep />} />
             <Route path="/finalizeSetup/*" element={< FinalizeSetup />} />
-            <Route path="/adminDetailsStep/*" element={< AdminDetailsStep />} /> 
- 
+            <Route path="/adminDetailsStep/*" element={< AdminDetailsStep />} />
             <Route path="/sidebar/*" element={<Sidebar />} />
             <Route path="/adminDashboard/*" element={<AdminDashboard />} />
+ <Route path="/notificationsHub" element={<NotificationHub />} />
 
-            <Route path="/notificationsHub" element={<NotificationHub />} />
+
+
+
+            {/* Member Routes */}
+            <Route path="/member" element={<MemberDashboard />} />
+            <Route path="/member/*" element={<MemberDashboard />} />
+
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+
+
 
 
 
@@ -148,33 +147,34 @@ const App = () => (
             <Route path="/finances/*" element={<Finances />} />
             <Route path="/adminSettings/*" element={<AdminSettings />} />
             <Route path="/notificationHub" element={<NotificationHub />} />
-            <Route path="/maintenance/*" element={<Maintenance/>} />
-           <Route path="/addPenaltyFine/*" element={<AddPenaltyFine/>} />
-           <Route path="/my-society/*" element={<MySociety/>} />
-           <Route path="/deactivationrequests" element={<DeactivationRequests />} />
-           <Route path="/daily-staff" element={<DailyStaff />} />
-           <Route path="/society-admin/documents" element={<AdminDocumentManagement />} />
+            <Route path="/maintenance/*" element={<Maintenance />} />
+            <Route path="/addPenaltyFine/*" element={<AddPenaltyFine />} />
+            <Route path="/my-society/*" element={<MySociety />} />
+            <Route path="/deactivationrequests" element={<DeactivationRequests />} />
+            <Route path="/daily-staff" element={<DailyStaff />} />
+            <Route path="/society-admin/documents" element={<AdminDocumentManagement />} />
+            <Route path="/society-admin/support" element={<SocietyAdminSupport />} />
 
 
             {/* All these paths will now render within the DashboardLayout alongside the Sidebar */}
             <Route path="/residentialDashboard" element={<ResidentialDashboard />} />
             <Route path="/member/payments" element={<ResidentialPayments />} />
-            <Route path="/member/notices" element={<ResidentialsocietyNotices />} />  
+            <Route path="/member/notices" element={<ResidentialsocietyNotices />} />
             <Route path="/member/staff-directory" element={<StaffDirectory />} />
             <Route path="/member/documents" element={<ResidentDocumentCenter />} />
-            <Route path="/member/support" element={<ResidentialSupport/>} />  
-            <Route path="/member/profile" element={<ProfileHub/>} />
-         
- 
- 
- 
- 
- 
+            <Route path="/member/support" element={<ResidentialSupport />} />
+            <Route path="/member/profile" element={<ProfileHub />} />
+
+
+
+
+
+
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   </ThemeProvider>
 );
- 
+
 export default App;

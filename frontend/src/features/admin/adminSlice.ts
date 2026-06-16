@@ -52,10 +52,61 @@ import {
   uploadDocumentService,
   getAdminDocumentsService,
   updateDocumentService,
-  deleteDocumentService
+  deleteDocumentService,
+  createSupportTicketService,
+  getMySupportTicketsService,
+  getSupportTicketDetailsService,
+  addSupportTicketMessageService
   } from "../../auth/authServices";
 
   // ... existing code
+
+  // ─── Support Thunks ─────────────────────────────────────────────────────────────
+
+  export const fetchMySupportTickets = createAsyncThunk(
+  "admin/fetchMySupportTickets",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await getMySupportTicketsService();
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch tickets");
+    }
+  }
+  );
+
+  export const fetchSupportTicketDetails = createAsyncThunk(
+  "admin/fetchSupportTicketDetails",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      return await getSupportTicketDetailsService(id);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch details");
+    }
+  }
+  );
+
+  export const createSupportTicket = createAsyncThunk(
+  "admin/createSupportTicket",
+  async (payload: any, { rejectWithValue }) => {
+    try {
+      return await createSupportTicketService(payload);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to raise ticket");
+    }
+  }
+  );
+
+  export const addSupportMessage = createAsyncThunk(
+  "admin/addSupportMessage",
+  async ({ id, payload }: { id: string; payload: any }, { rejectWithValue }) => {
+    try {
+      return await addSupportTicketMessageService(id, payload);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || "Failed to send message");
+    }
+  }
+  );
+
 
   // [MODULE-C]: VERIFY STAFF THUNK
   export const verifyStaff = createAsyncThunk(

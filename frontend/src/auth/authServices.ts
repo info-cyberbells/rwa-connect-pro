@@ -616,3 +616,40 @@ export const deleteDocumentService = async (id: string): Promise<any> => {
   const response = await axiosInstance.delete(`${AUTHROUTES.ADMIN_DELETE_DOCUMENT}/${id}`);
   return response.data;
 };
+
+// SUPPORT SERVICES
+export const createSupportTicketService = async (payload: any): Promise<any> => {
+  const response = await axiosInstance.post(AUTHROUTES.SUPPORT_CREATE_TICKET, payload);
+  return response.data;
+};
+
+export const getMySupportTicketsService = async (): Promise<any> => {
+  const response = await axiosInstance.get(AUTHROUTES.SUPPORT_GET_MY_TICKETS);
+  return response.data;
+};
+
+export const getAllSupportTicketsService = async (params = {}): Promise<any> => {
+  const response = await axiosInstance.get(AUTHROUTES.SUPPORT_GET_ALL_TICKETS, { params });
+  return response.data;
+};
+
+export const getSupportTicketDetailsService = async (id: string): Promise<any> => {
+  const response = await axiosInstance.get(`${AUTHROUTES.SUPPORT_GET_TICKET_DETAILS}/${id}`);
+  return response.data;
+};
+
+export const addSupportTicketMessageService = async (id: string, payload: any): Promise<any> => {
+  const response = await axiosInstance.post(`${AUTHROUTES.SUPPORT_ADD_MESSAGE}/${id}/messages`, payload);
+  return response.data;
+};
+
+export const updateSupportTicketStatusService = async (id: string, payload: any): Promise<any> => {
+  const response = await axiosInstance.patch(`${AUTHROUTES.SUPPORT_UPDATE_STATUS}/${id}/status`, payload);
+  return response.data;
+};
+
+// PREFERENCES SERVICES
+export const updateMyPreferencesService = async (payload: any): Promise<any> => {
+  const response = await axiosInstance.patch(AUTHROUTES.USER_UPDATE_PREFERENCES, payload);
+  return response.data;
+};

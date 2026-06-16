@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Visitor from "../models/Visitor.js";
 import User from "../models/user.js";
+import Notification from "../models/Notification.js";
 import { createNotification } from "./notificationController.js"; 
 import { logActivity } from "../utils/logActivity.js"; 
 

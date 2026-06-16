@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Shield, LayoutGrid, MapPin, Settings, Info, ArrowRight, CloudUpload } from 'lucide-react';
-import { motion } from 'framer-motion'; 
 import { useNavigate } from 'react-router-dom';
 
 const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) => {
@@ -27,13 +27,6 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
     phone: false
   });
 
-  const steps = [
-    { id: 'identity', label: 'Identity', icon: Shield, status: 'active' },
-    { id: 'structure', label: 'Structure', icon: LayoutGrid, status: 'upcoming' },
-    { id: 'address', label: 'Address', icon: MapPin, status: 'upcoming' },
-    { id: 'settings', label: 'Settings', icon: Settings, status: 'upcoming' },
-  ];
-
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -59,24 +52,23 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
     if (hasError) return;
 
     updateFormData(formData);
-    // console.log("STEP 1 DATA:", formData);
     nextStep();
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-6xl bg-card/80 backdrop-blur-md rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white overflow-hidden"
+        className="w-full max-w-6xl bg-card rounded-[2.5rem] shadow-2xl border border-border overflow-hidden"
       >
 
-        <main className="p-12 grid grid-cols-1 lg:grid-cols-2 gap-20">
+        <main className="p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
           
           {/* LEFT SIDE FORM */}
           <section className="space-y-8">
             <header>
-              <h2 className="text-4xl font-black text-foreground tracking-tight mb-2">Society Identity</h2>
+              <h2 className="text-3xl lg:text-4xl font-black text-foreground tracking-tight mb-2">Society Identity</h2>
               <p className="text-muted-foreground font-medium">Please provide the registered details of your society.</p>
             </header>
 
@@ -95,8 +87,8 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                   }
                   placeholder="e.g. Green Acres Residency"
                   className={`w-full p-4 rounded-2xl border ${
-                    errors.societyName ? 'border-red-400' : 'border-border'
-                  } bg-muted/50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none`}
+                    errors.societyName ? 'border-destructive' : 'border-border'
+                  } bg-muted/50 text-foreground focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all`}
                 />
               </div>
 
@@ -113,8 +105,8 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                   }
                   placeholder="admin@society.com"
                   className={`w-full p-4 rounded-2xl border ${
-                    errors.email ? 'border-red-400' : 'border-border'
-                  } bg-muted/50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none`}
+                    errors.email ? 'border-destructive' : 'border-border'
+                  } bg-muted/50 text-foreground focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all`}
                 />
               </div>
 
@@ -131,8 +123,8 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                   }
                   placeholder="+91 00000 00000"
                   className={`w-full p-4 rounded-2xl border ${
-                    errors.phone ? 'border-red-400' : 'border-border'
-                  } bg-muted/50 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none`}
+                    errors.phone ? 'border-destructive' : 'border-border'
+                  } bg-muted/50 text-foreground focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all`}
                 />
               </div>
 
@@ -154,10 +146,10 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                   className="hidden"
                 />
 
-                <div className="w-full aspect-square max-w-[340px] mx-auto border-2 border-dashed border-blue-100 rounded-[3rem] flex flex-col items-center justify-center p-10 bg-blue-50/20 hover:bg-card hover:border-blue-400 hover:shadow-2xl transition-all duration-500">
+                <div className="w-full aspect-square max-w-[340px] mx-auto border-2 border-dashed border-primary/20 rounded-[3rem] flex flex-col items-center justify-center p-10 bg-primary/5 hover:bg-muted hover:border-primary hover:shadow-2xl transition-all duration-500">
                   
                   <div className="relative mb-6">
-                    <div className="w-24 h-24 bg-card rounded-3xl flex items-center justify-center border border-slate-50 shadow-lg">
+                    <div className="w-24 h-24 bg-card rounded-3xl flex items-center justify-center border border-border shadow-lg">
 
                       {formData.logoPreview ? (
                         <img
@@ -166,8 +158,8 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
                           className="w-20 h-20 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center">
-                          <span className="text-green-600 font-serif italic text-xl font-bold">
+                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                          <span className="text-primary font-serif italic text-xl font-bold">
                             {formData.societyName
                               ? formData.societyName.substring(0, 2).toUpperCase()
                               : "GA"}
@@ -177,7 +169,7 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
 
                     </div>
 
-                    <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white p-2 rounded-xl shadow-lg">
+                    <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground p-2 rounded-xl shadow-lg">
                       <CloudUpload size={16} />
                     </div>
                   </div>
@@ -194,16 +186,16 @@ const SocietyIdentitySetup = ({ nextStep, updateFormData, defaultValues }: any) 
         </main>
 
         {/* FOOTER */}
-        <footer className="px-10 py-8 border-t border-dashed border-blue-100 bg-muted/50 flex items-center justify-between">
+        <footer className="px-10 py-8 border-t border-border bg-muted/50 flex items-center justify-between">
           <button
           onClick={()=>navigate(-1)}
-          className="text-muted-foreground font-black text-xs uppercase tracking-widest">
+          className="text-muted-foreground hover:text-foreground font-black text-xs uppercase tracking-widest transition-colors">
             Cancel Process
           </button>
 
           <button
             onClick={handleContinue}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-[1.5rem] font-bold flex items-center gap-3 shadow-lg transition-all"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 rounded-[1.5rem] font-bold flex items-center gap-3 shadow-lg transition-all"
           >
             Save & Continue
             <ArrowRight size={20} />

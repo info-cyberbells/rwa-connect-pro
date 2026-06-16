@@ -24,7 +24,7 @@ router.get("/unread-count", getUnreadCount);
 router.patch("/read-all", markAllAsRead);
 router.patch("/:id/read", markAsRead);
 
-// Society Admin & Super Admin - Manual Broadcast
-router.post("/broadcast", permit("society_admin", "superadmin"), broadcastManual);
+// Society Admin, Super Admin, Guard, Member - Manual Broadcast
+router.post("/broadcast", permit("society_admin", "superadmin", "guard", "user", "admin", "super-admin", "member"), broadcastManual);
 
 export default router;

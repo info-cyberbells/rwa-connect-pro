@@ -17,7 +17,8 @@ import deliveryRoutes from "./routes/deliveryRoutes.js";
 import staffRoutes from "./routes/staffRoutes.js";
 import ratingsRouter from "./routes/ratings.js";
 import documentsRouter from "./routes/documents.js";
-import notificationRouter from "./routes/notifications.js"; // [NEW] Import notifications router
+import notificationRouter from "./routes/notifications.js"; //  Import notifications router
+import supportRouter from "./routes/supportRoutes.js"; // Import support tickets router
 
 const app = express();
 
@@ -60,7 +61,8 @@ app.use("/api/delivery", deliveryRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/ratings", ratingsRouter);
 app.use("/api/documents", documentsRouter);
-app.use("/api/notifications", notificationRouter); // [NEW] Mount notifications router
+app.use("/api/notifications", notificationRouter); //   notifications router
+app.use("/api/support", supportRouter); //   support tickets router
 
 // Error handler (must be last)
 app.use(errorHandler);
